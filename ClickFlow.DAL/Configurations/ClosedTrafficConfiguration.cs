@@ -19,6 +19,7 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(t => t.DeviceType).IsRequired().HasMaxLength(100);
             builder.Property(t => t.Browser).IsRequired().HasMaxLength(100);
             builder.Property(t => t.ReferrerURL).IsRequired().HasMaxLength(255);
+            builder.Property(t => t.OrderId).IsRequired(false);
 
             builder.HasOne(u => u.Publisher).WithMany(t => t.ClosedTraffics).HasForeignKey(t => t.PublisherId);
 			builder.HasOne(u => u.Campaign).WithMany(t => t.ClosedTraffics).HasForeignKey(t => t.CampaignId);

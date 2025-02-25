@@ -7,7 +7,8 @@
         public bool? IsValid { get; set; }
         public int? Revenue { get; set; }
         public string DeviceType { get; set; }
-		public string Browser { get; set; }
+        public string OrderId { get; set; }
+        public string Browser { get; set; }
 		public string ReferrerURL { get; set; }
 		public DateTime Timestamp { get; set; }
 		public int? CampaignId { get; set; }
