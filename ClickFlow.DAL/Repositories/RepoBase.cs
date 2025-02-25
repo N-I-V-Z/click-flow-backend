@@ -1,9 +1,10 @@
-﻿using ClickFlow.DAL.Queries;
+﻿using ClickFlow.DAL.EF;
+using ClickFlow.DAL.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClickFlow.DAL.Repositories
 {
-	public class RepoBase<T> : IRepoBase<T> where T : class
+    public class RepoBase<T> : IRepoBase<T> where T : class
 	{
 		private readonly ClickFlowContext _context;
 		protected readonly DbSet<T> _dbSet;

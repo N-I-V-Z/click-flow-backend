@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClickFlow.BLL\ClickFlow.BLL.csproj" />
-    <ProjectReference Include="..\ClickFlow.DAL\ClickFlow.DAL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

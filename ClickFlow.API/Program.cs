@@ -1,6 +1,5 @@
 
 using ClickFlow.API.ConfigExtensions;
-using ClickFlow.DAL;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -9,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using ClickFlow.DAL.Entities;
+using ClickFlow.DAL.EF;
 
 namespace ClickFlow.API
 {
@@ -22,6 +22,10 @@ namespace ClickFlow.API
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddDbContext<ClickFlowContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(option =>
             {
