@@ -4,7 +4,8 @@
     {
         public int Id { get; set; }
         public string IpAddress { get; set; }
-        public int? ConversionCount {  get; set; }
+        public bool? IsValid { get; set; }
+        public int? Revenue { get; set; }
         public string DeviceType { get; set; }
         public string Browser { get; set; }
         public string ReferrerURL { get; set; }
