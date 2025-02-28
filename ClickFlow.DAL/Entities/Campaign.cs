@@ -21,8 +21,8 @@ namespace ClickFlow.DAL.Entities
 		public int? AdvertiserId { get; set; }
         public Advertiser? Advertiser { get; set; }
         public ICollection<Traffic>? Traffics { get; set; }
-		public ICollection<ClosedTraffics>? ClosedTraffics { get; set; }
+		public ICollection<ClosedTraffic>? ClosedTraffics { get; set; }
 		public ICollection<Feedback>? Feedbacks { get; set; }
-        public ICollection<Reports>? Reports { get; set; }
+        public ICollection<Report>? Reports { get; set; }
     }
 }

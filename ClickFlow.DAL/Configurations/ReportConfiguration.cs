@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ClickFlow.DAL.Configurations
 {
-	public class ReportConfiguration : IEntityTypeConfiguration<Reports>
+	public class ReportConfiguration : IEntityTypeConfiguration<Report>
 	{
-		public void Configure(EntityTypeBuilder<Reports> builder)
+		public void Configure(EntityTypeBuilder<Report> builder)
 		{
 			builder.ToTable("Reports");
 			builder.HasKey(r => r.Id);

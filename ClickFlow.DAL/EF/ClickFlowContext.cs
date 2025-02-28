@@ -22,11 +22,11 @@ namespace ClickFlow.DAL.EF
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Traffic> Traffics { get; set; }
-        public DbSet<ClosedTraffics> ClosedTraffics { get; set; }
+        public DbSet<ClosedTraffic> ClosedTraffics { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
-        public DbSet<Reports> Reports { get; set; }
+        public DbSet<Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -10,7 +10,6 @@
     <Folder Include="Helpers\Config\" />
     <Folder Include="Helpers\Validations\" />
     <Folder Include="Services\Implements\" />
-    <Folder Include="Services\Interfaces\" />
   </ItemGroup>
 
   <ItemGroup>

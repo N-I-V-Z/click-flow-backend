@@ -2,7 +2,7 @@
 
 namespace ClickFlow.DAL.Entities
 {
-	public class Reports
+	public class Report
 	{
 		public int Id { get; set; }
 		public string Reason { get; set; }
