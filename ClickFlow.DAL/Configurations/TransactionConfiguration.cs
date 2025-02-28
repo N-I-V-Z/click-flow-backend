@@ -15,7 +15,7 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(t => t.Amount).IsRequired();
             builder.Property(t => t.PaymentDate).IsRequired();
             builder.Property(t => t.Status).IsRequired(false);
-            builder.Property(t => t.Remaining).IsRequired(false);
+            builder.Property(t => t.Balance).IsRequired(false);
             builder.Property(t => t.TransactionType).IsRequired();
 
             builder.HasOne(w => w.Wallet).WithMany(t => t.Transactions).HasForeignKey(t => t.WalletId);

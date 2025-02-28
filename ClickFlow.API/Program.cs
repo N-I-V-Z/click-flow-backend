@@ -40,8 +40,6 @@ namespace ClickFlow.API
 			var connectionString = builder.Configuration.GetConnectionString("ClickFlowDB");
 			builder.Services.AddDbContext<ClickFlowContext>(options => options.UseSqlServer(connectionString));
 
-			builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
-
 			builder.Services.AddRepoBase();
 
 			builder.Services.AddUnitOfWork();

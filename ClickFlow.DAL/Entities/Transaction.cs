@@ -8,7 +8,7 @@ namespace ClickFlow.DAL.Entities
         public int Amount { get; set; }
         public DateTime PaymentDate { get; set; }
         public bool? Status { get; set; }
-        public int? Remaining { get; set; }
+        public int? Balance { get; set; }
         public TransactionType TransactionType { get; set; }
 		public int? WalletId { get; set; }
 		public Wallet? Wallet { get; set; }
