@@ -17,7 +17,8 @@ namespace ClickFlow.DAL.Entities
         public int? Commission { get; set; }
         public int? Percents { get; set; }
         public string Image { get; set; }
-        public int? AdvertiserId { get; set; }
+		public bool IsDeleted { get; set; }
+		public int? AdvertiserId { get; set; }
         public Advertiser? Advertiser { get; set; }
         public ICollection<Traffic>? Traffics { get; set; }
 		public ICollection<ClosedTraffics>? ClosedTraffics { get; set; }
