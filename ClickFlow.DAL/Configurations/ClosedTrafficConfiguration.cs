@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ClickFlow.DAL.Configurations
 {
-	public class ClosedTrafficConfiguration : IEntityTypeConfiguration<ClosedTraffics>
+	public class ClosedTrafficConfiguration : IEntityTypeConfiguration<ClosedTraffic>
 	{
-		public void Configure(EntityTypeBuilder<ClosedTraffics> builder)
+		public void Configure(EntityTypeBuilder<ClosedTraffic> builder)
 		{
 			builder.ToTable("ClosedTraffics").HasIndex(t => t.IpAddress);
 			builder.HasKey(t => t.Id);

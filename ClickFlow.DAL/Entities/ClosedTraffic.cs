@@ -1,6 +1,6 @@
 ﻿namespace ClickFlow.DAL.Entities
 {
-	public class ClosedTraffics
+	public class ClosedTraffic
 	{
 		public int Id { get; set; }
 		public string IpAddress { get; set; }
