@@ -13,7 +13,7 @@ namespace ClickFlow.DAL.Entities
         public DateOnly EndDate { get; set; }
         public TypePay TypePay { get; set; }
         public Industry TypeCampaign { get; set; }
-        public bool Status { get; set; }
+        public CampaignStatus Status { get; set; }
         public int? Commission { get; set; }
         public int? Percents { get; set; }
         public string Image { get; set; }

@@ -20,7 +20,6 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(c => c.EndDate).IsRequired();
             builder.Property(c => c.TypePay).IsRequired();
             builder.Property(c => c.TypeCampaign).IsRequired();
-            builder.Property(c => c.Status);
             builder.Property(c => c.Commission).IsRequired(false);
             builder.Property(c => c.Percents).IsRequired(false);
             builder.Property(c => c.Image).IsRequired().HasMaxLength(255);

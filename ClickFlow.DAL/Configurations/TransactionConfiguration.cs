@@ -12,7 +12,6 @@ namespace ClickFlow.DAL.Configurations
             builder.HasKey(t => t.Id);
 
             builder.Property(t => t.Id).UseIdentityColumn();
-            builder.Property(t => t.WalletId);
             builder.Property(t => t.Amount).IsRequired();
             builder.Property(t => t.PaymentDate).IsRequired();
             builder.Property(t => t.Status).IsRequired(false);
