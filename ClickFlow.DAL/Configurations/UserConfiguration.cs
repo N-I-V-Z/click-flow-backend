@@ -21,7 +21,7 @@ namespace ClickFlow.DAL.Configurations
 
             builder.HasOne(p => p.Publisher).WithOne(u => u.User).HasForeignKey<User>(u => u.PublisherId);
             builder.HasOne(p => p.Advertiser).WithOne(u => u.User).HasForeignKey<User>(u => u.AdvertiserId);
-            builder.HasOne(w => w.Wallet).WithOne(u => u.Publisher).HasForeignKey<User>(u => u.WalletId);
+            builder.HasOne(w => w.Wallet).WithOne(u => u.User).HasForeignKey<User>(u => u.WalletId);
         }
     }
 }
