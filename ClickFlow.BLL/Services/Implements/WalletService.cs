@@ -3,6 +3,7 @@ using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.DTOs.WalletDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
+using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 using System.Net;
 
@@ -19,12 +20,12 @@ namespace ClickFlow.BLL.Services.Implements
 			_mapper = mapper;
 		}
 
-		public async Task<WalletViewDTO> CreateWallet(WalletCreateDTO dto)
+		public async Task<WalletViewDTO> CreateWalletAsync(WalletCreateDTO dto)
 		{
 			try
 			{
 				var repo = _unitOfWork.GetRepo<Wallet>();
-				var createdWallet = new Wallet { Balance = dto.Balance };
+				var createdWallet = _mapper.Map<Wallet>(dto);
 
 				await repo.CreateAsync(createdWallet);
 
@@ -43,7 +44,36 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<WalletViewDTO> UpdateWallet(int id, WalletUpdateDTO dto)
+		public async Task<WalletViewDTO> GetWalletByUserIdAsync(int id)
+		{
+			try
+			{
+				var userRepo = _unitOfWork.GetRepo<User>();
+				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+
+				var user = await userRepo.GetSingleAsync(new QueryBuilder<User>()
+					.WithPredicate(x => x.Id == id)
+					.WithTracking(false)
+					.WithInclude(x => x.Wallet)
+					.Build()
+					);
+
+				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
+					.WithPredicate(x => x.Id == user.WalletId)
+					.WithTracking(false)
+					.Build()
+					);
+
+				return _mapper.Map<WalletViewDTO>(wallet);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+
+		public async Task<WalletViewDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto)
 		{
 			try
 			{

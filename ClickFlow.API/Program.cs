@@ -2,13 +2,16 @@
 using ClickFlow.API.ConfigExtensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.EF;
+using System.Text.Json.Serialization;
+using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.BLL.Services.Implements;
+using ClickFlow.BLL.Helpers.Config;
+using Microsoft.Extensions.Options;
 
 namespace ClickFlow.API
 {
@@ -19,13 +22,20 @@ namespace ClickFlow.API
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
-
-			builder.Services.AddControllers();
+			builder.Services.AddControllers()
+				.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+			});
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddDbContext<ClickFlowContext>(option =>
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
 			});
+
+			builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
+			builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<VnPayConfiguration>>().Value);
+
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
 
