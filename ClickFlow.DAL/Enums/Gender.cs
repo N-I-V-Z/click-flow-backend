@@ -1,9 +1,14 @@
-﻿namespace ClickFlow.DAL.Enums
+﻿using System.Runtime.Serialization;
+
+namespace ClickFlow.DAL.Enums
 {
 	public enum Gender
     {
-        Male,
-        Female,
-        Other
-    }
+		[EnumMember(Value = "Nam")]
+		Male,
+		[EnumMember(Value = "Nữ")]
+		Female,
+		[EnumMember(Value = "Khác")]
+		Other
+	}
 }

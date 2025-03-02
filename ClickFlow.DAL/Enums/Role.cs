@@ -1,9 +1,14 @@
-﻿namespace ClickFlow.DAL.Enums
+﻿using System.Runtime.Serialization;
+
+namespace ClickFlow.DAL.Enums
 {
     public enum Role
     {
-        Admin,
-        Advertiser,
-        Publisher
-    }
+		[EnumMember(Value = "Quản trị viên")]
+		Admin,
+		[EnumMember(Value = "Nhà cung cấp")]
+		Advertiser,
+		[EnumMember(Value = "Nhà tiếp thị")]
+		Publisher
+	}
 }
