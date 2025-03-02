@@ -1,9 +1,14 @@
-﻿namespace ClickFlow.DAL.Enums
+﻿using System.Runtime.Serialization;
+
+namespace ClickFlow.DAL.Enums
 {
     public enum TypePay
     {
-        CPC, 
-        CPA, 
-        CPS
-    }
+		[EnumMember(Value = "CPC")]
+		CPC,
+		[EnumMember(Value = "CPA")]
+		CPA,
+		[EnumMember(Value = "CPS")]
+		CPS
+	}
 }

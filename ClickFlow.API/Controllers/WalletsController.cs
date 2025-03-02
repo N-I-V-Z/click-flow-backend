@@ -19,7 +19,6 @@ namespace ClickFlow.API.Controllers
 
 		//[Authorize]
 		[HttpPost]
-		//[Route("create")]
 		public async Task<IActionResult> CreateWallet([FromBody] WalletCreateDTO dto)
 		{
 			try
@@ -39,7 +38,6 @@ namespace ClickFlow.API.Controllers
 
 		//[Authorize]
 		[HttpPut]
-		//[Route("update")]
 		public async Task<IActionResult> Update([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
 		{
 			try

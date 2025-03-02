@@ -80,7 +80,7 @@ namespace ClickFlow.BLL.Helpers.Fillters
 				{
 					try
 					{
-						var enumValue = Enum.Parse(propertyType, search, ignoreCase: true);
+						var enumValue = System.Enum.Parse(propertyType, search, ignoreCase: true);
 						var searchValue = Expression.Constant(enumValue, propertyType);
 						var equalExpression = Expression.Equal(propertyAccess, searchValue);
 						expression = Expression.OrElse(expression, equalExpression);

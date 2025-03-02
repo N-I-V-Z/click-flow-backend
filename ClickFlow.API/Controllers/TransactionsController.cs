@@ -19,8 +19,8 @@ namespace ClickFlow.API.Controllers
 		}
 
 		//[Authorize]
-		[HttpPost("create-transaction")]
-		public async Task<IActionResult> CreateTransactionWithdraw([FromBody] TransactionCreateDTO dto)
+		[HttpPost]
+		public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
 		{
 			try
 			{
@@ -37,10 +37,10 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[HttpPost("create-payment-url")]
+		//[Authorize]
+		[HttpPost("payment-url")]
 		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
 		{
-
 			try
 			{
 				if (dto == null || dto.Amount <= 0)
