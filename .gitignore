@@ -16,7 +16,6 @@ obj/
 *.user
 *.suo
 *.njsproj
-*.sln
 
 # Environment files
 .env*
