@@ -11,8 +11,7 @@ namespace ClickFlow.DAL.Configurations
             builder.ToTable("Publishers");
             builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.Id).UseIdentityColumn();
-            builder.Property(p => p.PaymentInfo).IsRequired().HasMaxLength(255);
+            builder.Property(p => p.Id).UseIdentityColumn();       
         }
     }
 }

@@ -20,5 +20,7 @@ namespace ClickFlow.DAL.Entities
         public Publisher? Publisher { get; set; }
         public Wallet? Wallet { get; set; }
 
+        public virtual ICollection<PaymentMethod> PaymentMethods { get; set; }
+
     }
 }

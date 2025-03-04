@@ -27,6 +27,8 @@ namespace ClickFlow.DAL.EF
         public DbSet<User> Users { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,6 +42,7 @@ namespace ClickFlow.DAL.EF
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new ReportConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentMethodConfiguration());
         }
     }
 
