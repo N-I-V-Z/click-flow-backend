@@ -3,7 +3,6 @@
     public class Publisher
     {
         public int Id { get; set; }
-        public string PaymentInfo { get; set; }
         public User? User { get; set;}
 		public ICollection<Report>? Reports { get; set; }
 		public ICollection<Feedback>? Feedbacks { get; set; }
