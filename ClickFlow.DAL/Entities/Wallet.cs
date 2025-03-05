@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int Balance { get; set; }
-        public User? User { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
     }
 }

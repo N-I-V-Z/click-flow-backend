@@ -55,31 +55,31 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
-		[HttpGet]
-		[Route("get-owner-wallet")]
-		public async Task<IActionResult> GetWalletByToken()
-		{
-			try
-			{
-				var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-				if (string.IsNullOrEmpty(userId))
-				{
-					return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-				}
+		//[Authorize]
+		//[HttpGet]
+		//[Route("get-owner-wallet")]
+		//public async Task<IActionResult> GetWalletByToken()
+		//{
+		//	try
+		//	{
+		//		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		//		if (string.IsNullOrEmpty(userId))
+		//		{
+		//			return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
+		//		}
 
-				var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
-				if (response == null) return NotFound("Không tìm thấy ví cho người dùng này.");
-				return Ok(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
+		//		var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
+		//		if (response == null) return NotFound("Không tìm thấy ví cho người dùng này.");
+		//		return Ok(response);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Console.ForegroundColor = ConsoleColor.Red;
+		//		Console.WriteLine(ex.Message);
+		//		Console.ResetColor();
+		//		return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+		//	}
+		//}
 
 	}
 }

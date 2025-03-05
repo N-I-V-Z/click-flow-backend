@@ -1,6 +1,11 @@
-﻿using ClickFlow.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.DAL.Configurations
 {
@@ -9,16 +14,25 @@ namespace ClickFlow.DAL.Configurations
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
             builder.ToTable("Transactions");
-            builder.HasKey(t => t.Id);
+            builder.HasKey(tr => tr.Id);
+            builder.Property(tr => tr.Id).UseIdentityColumn();
 
-            builder.Property(t => t.Id).UseIdentityColumn();
-            builder.Property(t => t.Amount).IsRequired();
-            builder.Property(t => t.PaymentDate).IsRequired();
-            builder.Property(t => t.Status).IsRequired(false);
-            builder.Property(t => t.Balance).IsRequired(false);
-            builder.Property(t => t.TransactionType).IsRequired();
+            builder.Property(tr => tr.Amount)
+                   .IsRequired();
+            builder.Property(tr => tr.PaymentDate)
+                   .IsRequired();
+            builder.Property(tr => tr.Status)
+                   .IsRequired(false);
+            builder.Property(tr => tr.Balance)
+                   .IsRequired(false);
+            builder.Property(tr => tr.TransactionType)
+                   .IsRequired();
 
-            builder.HasOne(w => w.Wallet).WithMany(t => t.Transactions).HasForeignKey(t => t.WalletId);
+            builder.HasOne(tr => tr.Wallet)
+                   .WithMany(w => w.Transactions)
+                   .HasForeignKey(tr => tr.WalletId)
+                   .IsRequired(false);
         }
     }
+
 }
