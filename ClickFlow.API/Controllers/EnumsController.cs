@@ -1,5 +1,6 @@
 ﻿using ClickFlow.BLL.Helpers.Enum;
 using ClickFlow.DAL.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -8,7 +9,7 @@ namespace ClickFlow.API.Controllers
 	[ApiController]
 	public class EnumsController : BaseAPIController
 	{
-		//[Authorize]
+		[Authorize]
 		[HttpGet("campaign-status-list")]
 		public IActionResult GetCampaignStatusList()
 		{
@@ -26,7 +27,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet("gender-list")]
 		public IActionResult GetGenderList()
 		{
@@ -44,7 +45,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet("industry-list")]
 		public IActionResult GetIndustryList()
 		{
@@ -62,7 +63,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet("report-status-list")]
 		public IActionResult GetReportStatusList()
 		{
@@ -80,7 +81,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet("role-list")]
 		public IActionResult GetRoleList()
 		{
@@ -98,7 +99,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet("type-pay-list")]
 		public IActionResult GetTypePayList()
 		{
@@ -116,7 +117,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet("transaction-type-list")]
 		public IActionResult GetTransactionTypeList()
 		{
