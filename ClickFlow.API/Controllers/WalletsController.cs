@@ -17,7 +17,6 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-		[Authorize]
 		[HttpPost]
 		public async Task<IActionResult> CreateWallet([FromBody] WalletCreateDTO dto)
 		{
@@ -38,7 +37,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPut]
 		public async Task<IActionResult> UpdateWallet([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
 		{
@@ -59,7 +58,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet]
 		[Route("get-owner-wallet")]
 		public async Task<IActionResult> GetWalletByToken()

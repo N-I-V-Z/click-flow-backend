@@ -27,7 +27,6 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
 		[HttpGet("gender-list")]
 		public IActionResult GetGenderList()
 		{
@@ -45,7 +44,6 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
 		[HttpGet("industry-list")]
 		public IActionResult GetIndustryList()
 		{
@@ -81,7 +79,6 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
 		[HttpGet("role-list")]
 		public IActionResult GetRoleList()
 		{

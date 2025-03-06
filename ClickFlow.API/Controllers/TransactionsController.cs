@@ -19,7 +19,7 @@ namespace ClickFlow.API.Controllers
 			_vnPayService = vnPayService;
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
 		{
@@ -40,7 +40,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost("payment-url")]
 		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
 		{
