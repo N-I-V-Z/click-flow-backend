@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TransactionDTOs;
+using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
+using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 namespace ClickFlow.BLL.Services.Implements
@@ -17,7 +20,27 @@ namespace ClickFlow.BLL.Services.Implements
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
+		protected virtual QueryBuilder<Transaction> CreateQueryBuilder(string? search = null)
+		{
+			var queryBuilder = new QueryBuilder<Transaction>()
+								.WithTracking(false);
 
+			if (!string.IsNullOrEmpty(search))
+			{
+				var predicate = FilterHelper.BuildSearchExpression<Transaction>(search);
+				queryBuilder.WithPredicate(predicate);
+			}
+
+			return queryBuilder;
+		}
+
+		public async Task<PaginatedList<TransactionViewDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
+		{
+			var paginatedEntities = await PaginatedList<Transaction>.CreateAsync(query, pageIndex, pageSize);
+			var resultDto = _mapper.Map<List<TransactionViewDTO>>(paginatedEntities);
+
+			return new PaginatedList<TransactionViewDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
+		}
 		public async Task<TransactionViewDTO> CreateTransactionAsync(TransactionCreateDTO dto)
 		{
 			try
@@ -85,9 +108,31 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public Task<IEnumerable<TransactionViewDTO>> GetAllTransactionsByWalletIdAsync(int walletId)
+		public async Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByWalletIdAsync(int walletId, PagingRequestDTO dto)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var queryBuilder = CreateQueryBuilder(dto.Keyword);
+				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == walletId);
+				if (!string.IsNullOrEmpty(dto.Keyword))
+				{
+					var predicate = FilterHelper.BuildSearchExpression<Transaction>(dto.Keyword);
+					queryBuilder.WithPredicate(predicate);
+				}
+				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+				var transactions = transactionRepo.Get(queryOptions.Build());
+
+				var results = _mapper.Map<List<TransactionViewDTO>>(transactions);
+
+				var pageResults = await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
+
+				return pageResults;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
 		}
 
 		public async Task<TransactionViewDTO> UpdateStatusTransactionAsync(int id, TransactionUpdateStatusDTO dto)
@@ -96,15 +141,13 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				await _unitOfWork.BeginTransactionAsync();
 
-				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+				var queryBuilder = CreateQueryBuilder();
+				var queryOptions = queryBuilder.WithPredicate(x => x.Id == id);
 
+				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var walletRepo = _unitOfWork.GetRepo<Wallet>();
 
-				var transaction = await transactionRepo.GetSingleAsync(new QueryBuilder<Transaction>()
-					.WithPredicate(x => x.Id == id)
-					.WithTracking(false)
-					.Build()
-					);
+				var transaction = await transactionRepo.GetSingleAsync(queryOptions.Build());
 
 				if (transaction.Status == dto.Status) throw new Exception("Không thay đổi");
 
