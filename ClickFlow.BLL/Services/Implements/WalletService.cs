@@ -44,34 +44,34 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		//public async Task<WalletViewDTO> GetWalletByUserIdAsync(int id)
-		//{
-		//	try
-		//	{
-		//		var userRepo = _unitOfWork.GetRepo<UserDetail>();
-		//		var walletRepo = _unitOfWork.GetRepo<Wallet>();
+		public async Task<WalletViewDTO> GetWalletByUserIdAsync(int id)
+		{
+			try
+			{
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+				var walletRepo = _unitOfWork.GetRepo<Wallet>();
 
-		//		var user = await userRepo.GetSingleAsync(new QueryBuilder<UserDetail>()
-		//			.WithPredicate(x => x.Id == id)
-		//			.WithTracking(false)
-		//			.WithInclude(x => x.Wallet)
-		//			.Build()
-		//			);
+				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
+					.WithPredicate(x => x.Id == id)
+					.WithTracking(false)
+					.WithInclude(x => x.Wallet)
+					.Build()
+					);
 
-		//		var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
-		//			.WithPredicate(x => x.Id == user.WalletId)
-		//			.WithTracking(false)
-		//			.Build()
-		//			);
+				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
+					.WithPredicate(x => x.Id == user.WalletId)
+					.WithTracking(false)
+					.Build()
+					);
 
-		//		return _mapper.Map<WalletViewDTO>(wallet);
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		Console.WriteLine(ex.ToString());
-		//		throw;
-		//	}
-		//}
+				return _mapper.Map<WalletViewDTO>(wallet);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
 
 		public async Task<WalletViewDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto)
 		{
