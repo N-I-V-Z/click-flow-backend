@@ -12,6 +12,7 @@ using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Helpers.Config;
 using Microsoft.Extensions.Options;
+using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.API
 {
@@ -32,11 +33,17 @@ namespace ClickFlow.API
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
 			});
+            var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+            builder.Services.AddSingleton(emailConfig);
 
-			builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
+            builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
 			builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<VnPayConfiguration>>().Value);
 
-			builder.Services.AddEndpointsApiExplorer();
+
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
+
+            builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
 
 			builder.Services.AddCors(opts =>
@@ -47,16 +54,14 @@ namespace ClickFlow.API
 				});
 			});
 
-			var connectionString = builder.Configuration.GetConnectionString("ClickFlowDB");
-			builder.Services.AddDbContext<ClickFlowContext>(options => options.UseSqlServer(connectionString));
-
 			builder.Services.AddRepoBase();
 
 			builder.Services.AddUnitOfWork();
 
 			builder.Services.AddMapper();
 
-			builder.Services.AddBLLServices();
+          
+            builder.Services.AddBLLServices();
 
 			builder.Services.AddAuthentication(options =>
 			{
@@ -84,7 +89,7 @@ namespace ClickFlow.API
 			builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 
-			var app = builder.Build();
+            var app = builder.Build();
 
 			using (var scope = app.Services.CreateScope())
 			{

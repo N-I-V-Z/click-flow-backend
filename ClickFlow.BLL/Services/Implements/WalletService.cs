@@ -65,18 +65,17 @@ namespace ClickFlow.BLL.Services.Implements
 		{
 			try
 			{
-				var walletQueryBuilder = CreateQueryBuilder();
-				
-				var userRepo = _unitOfWork.GetRepo<User>();
-				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+        var walletRepo = _unitOfWork.GetRepo<Wallet>();							
 
-				var user = await userRepo.GetSingleAsync(new QueryBuilder<User>()
+				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
 					.WithPredicate(x => x.Id == id)
 					.WithTracking(false)
 					.WithInclude(x => x.Wallet)
 					.Build()
 					);
 
+        var walletQueryBuilder = CreateQueryBuilder();
 				var walletQueryOptions = walletQueryBuilder
 					.WithPredicate(x => x.Id == user.WalletId)
 					.Build();

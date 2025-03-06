@@ -19,6 +19,6 @@ namespace ClickFlow.DAL.Entities
         public bool IsDefault { get; set; }
 
         [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        public virtual ApplicationUser User { get; set; }
     }
 }

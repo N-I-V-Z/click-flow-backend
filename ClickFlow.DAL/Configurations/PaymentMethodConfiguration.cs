@@ -14,17 +14,21 @@ namespace ClickFlow.DAL.Configurations
         public void Configure(EntityTypeBuilder<PaymentMethod> builder)
         {
             builder.ToTable("PaymentMethods");
-            builder.HasKey(p => p.Id);
+            builder.HasKey(pm => pm.Id);
+            builder.Property(pm => pm.Id).UseIdentityColumn();
 
-            builder.Property(p => p.Id).UseIdentityColumn();
-            builder.Property(p => p.PaymentInfo).IsRequired().HasMaxLength(255);
-            builder.Property(p => p.BankName).HasMaxLength(100);
-            builder.Property(p => p.IsDefault).IsRequired().HasDefaultValue(false);
+            builder.Property(pm => pm.PaymentInfo)
+                   .IsRequired()
+                   .HasMaxLength(500);
+            builder.Property(pm => pm.BankName)
+                   .HasMaxLength(200);
+            builder.Property(pm => pm.IsDefault)
+                   .IsRequired();
 
-            builder.HasOne(p => p.User)
-                   .WithMany(u => u.PaymentMethods)
-                   .HasForeignKey(p => p.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(pm => pm.User)
+                   .WithMany() // Nếu ApplicationUser không có collection PaymentMethods
+                   .HasForeignKey(pm => pm.UserId)
+                   .IsRequired();
         }
     }
 }
