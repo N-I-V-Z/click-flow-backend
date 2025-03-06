@@ -39,7 +39,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> GetReports([FromQuery] PagingRequestDTO dto)
 		{
@@ -60,7 +60,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO dto)
 		{
@@ -81,7 +81,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin, Advertiser")]
 		[HttpDelete]
 		public async Task<IActionResult> DeleteReport([FromQuery] int id)
 		{
@@ -102,7 +102,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpPut("status")]
 		public async Task<IActionResult> UpdateStatusReport([FromQuery] int id, [FromBody] ReportStatus status)
 		{
@@ -123,7 +123,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpPut("response")]
 		public async Task<IActionResult> UpdateResponseReport([FromQuery] int id, [FromBody] string response)
 		{
