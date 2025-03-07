@@ -18,7 +18,7 @@ namespace ClickFlow.API.Controllers
 			_reportService = reportService;
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin, Advertiser")]
 		[HttpGet("id")]
 		public async Task<IActionResult> GetReportById([FromQuery] int id)
 		{
@@ -39,7 +39,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpGet]
 		public async Task<IActionResult> GetReports([FromQuery] PagingRequestDTO dto)
 		{
