@@ -27,7 +27,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _walletService.UpdateWalletAsync(id, dto);
-				if (response == null) return SaveError(response);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -41,8 +41,8 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet]
-		[Route("get-owner-wallet")]
-		public async Task<IActionResult> GetWalletByToken()
+		[Route("own")]
+		public async Task<IActionResult> GetOwnWallet()
 		{
 			try
 			{
@@ -54,7 +54,7 @@ namespace ClickFlow.API.Controllers
 				}
 
 				var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
-				if (response == null) return NotFound("Không tìm thấy ví cho người dùng này.");
+				if (response == null) return GetError("Không có dữ liệu.");
 				return Ok(response);
 			}
 			catch (Exception ex)

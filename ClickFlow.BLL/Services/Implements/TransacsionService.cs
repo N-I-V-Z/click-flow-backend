@@ -108,12 +108,18 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByWalletIdAsync(int walletId, PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
 		{
 			try
 			{
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
+					.WithPredicate(x => x.Id == userId)
+					.WithTracking(false)
+					.Build());
+
 				var queryBuilder = CreateQueryBuilder(dto.Keyword);
-				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == walletId);
+				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == user.WalletId);
 				if (!string.IsNullOrEmpty(dto.Keyword))
 				{
 					var predicate = FilterHelper.BuildSearchExpression<Transaction>(dto.Keyword);
@@ -157,7 +163,7 @@ namespace ClickFlow.BLL.Services.Implements
 					.Build()
 					);
 
-				transaction.Status = dto.Status;				
+				transaction.Status = dto.Status;
 
 				if (dto.Status == true)
 				{
@@ -185,6 +191,34 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				Console.WriteLine(ex.ToString());
 				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
+
+		public async Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsAsync(PagingRequestDTO dto)
+		{
+			try
+			{
+				var queryBuilder = CreateQueryBuilder(dto.Keyword);
+				var queryOptions = queryBuilder;
+
+				if (!string.IsNullOrEmpty(dto.Keyword))
+				{
+					var predicate = FilterHelper.BuildSearchExpression<Transaction>(dto.Keyword);
+					queryBuilder.WithPredicate(predicate);
+				}
+				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+				var transactions = transactionRepo.Get(queryOptions.Build());
+
+				var results = _mapper.Map<List<TransactionViewDTO>>(transactions);
+
+				var pageResults = await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
+
+				return pageResults;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
 				throw;
 			}
 		}
