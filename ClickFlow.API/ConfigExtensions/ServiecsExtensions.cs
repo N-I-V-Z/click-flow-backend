@@ -125,6 +125,16 @@ namespace ClickFlow.API.ConfigExtensions
 					context.SaveChanges();
 
 				}
+
+				if (!context.UserRoles.Any())
+				{
+					context.UserRoles.AddRange(
+						new IdentityUserRole<int> { UserId = 1, RoleId = 1 },
+						new IdentityUserRole<int> { UserId = 2, RoleId = 3 },
+						new IdentityUserRole<int> { UserId = 3, RoleId = 2 }
+					);
+					context.SaveChanges();
+				}
 			}
 
 		}
