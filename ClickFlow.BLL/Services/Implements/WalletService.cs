@@ -16,8 +16,8 @@ namespace ClickFlow.BLL.Services.Implements
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public WalletService(IUnitOfWork unitOfWork, IMapper mapper) 
-		{ 
+		public WalletService(IUnitOfWork unitOfWork, IMapper mapper)
+		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
@@ -66,7 +66,7 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
-        var walletRepo = _unitOfWork.GetRepo<Wallet>();							
+				var walletRepo = _unitOfWork.GetRepo<Wallet>();
 
 				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
 					.WithPredicate(x => x.Id == id)
@@ -75,7 +75,7 @@ namespace ClickFlow.BLL.Services.Implements
 					.Build()
 					);
 
-        var walletQueryBuilder = CreateQueryBuilder();
+				var walletQueryBuilder = CreateQueryBuilder();
 				var walletQueryOptions = walletQueryBuilder
 					.WithPredicate(x => x.Id == user.WalletId)
 					.Build();
@@ -96,7 +96,8 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var repo = _unitOfWork.GetRepo<Wallet>();
 
-				var updatedWallet = new Wallet { 
+				var updatedWallet = new Wallet
+				{
 					Id = id,
 					Balance = dto.Balance
 				};

@@ -22,12 +22,10 @@ namespace ClickFlow.API.Controllers
 		[HttpGet("id")]
 		public async Task<IActionResult> GetReportById([FromQuery] int id)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
 				var response = await _reportService.GetByIdAsync(id);
-				if (response == null) return NotFound();
+				if (response == null) return GetError("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -41,14 +39,12 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
-		public async Task<IActionResult> GetReports([FromQuery] PagingRequestDTO dto)
+		public async Task<IActionResult> GetAllReports([FromQuery] PagingRequestDTO dto)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
 				var response = await _reportService.GetAllAsync(dto);
-				if (!response.Any()) return NotFound();
+				if (!response.Any()) return GetError("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -69,7 +65,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.CreateReportAsync(dto);
-				if (response == null) return SaveError(response);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -90,7 +86,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.DeleteAsync(id);
-				if (!response) return SaveError(response);
+				if (!response) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -111,7 +107,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.UpdateStatusReportAsync(id, status);
-				if (response == null) return SaveError(response);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -132,7 +128,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var result = await _reportService.UpdateResponseReportAsync(id, response);
-				if (result == null) return SaveError(result);
+				if (result == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
