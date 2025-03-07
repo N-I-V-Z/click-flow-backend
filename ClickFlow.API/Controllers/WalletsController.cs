@@ -39,7 +39,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet]
 		[Route("get-owner-wallet")]
 		public async Task<IActionResult> GetWalletByToken()
