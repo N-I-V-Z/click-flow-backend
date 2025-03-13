@@ -1,6 +1,7 @@
 ﻿using ClickFlow.BLL.DTOs.TransactionDTOs;
 using ClickFlow.BLL.DTOs.VnPayDTOs;
 using ClickFlow.BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -18,10 +19,12 @@ namespace ClickFlow.API.Controllers
 			_vnPayService = vnPayService;
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpPost]
 		public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
 		{
+			if (!ModelState.IsValid) return ModelInvalid();
+
 			try
 			{
 				var response = await _transactionService.CreateTransactionAsync(dto);
@@ -37,7 +40,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpPost("payment-url")]
 		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
 		{

@@ -1,4 +1,6 @@
-﻿using ClickFlow.BLL.DTOs.TransactionDTOs;
+﻿using ClickFlow.BLL.DTOs.PagingDTOs;
+using ClickFlow.BLL.DTOs.TransactionDTOs;
+using ClickFlow.DAL.Paging;
 
 namespace ClickFlow.BLL.Services.Interfaces
 {
@@ -6,6 +8,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 	{
 		Task<TransactionViewDTO> CreateTransactionAsync(TransactionCreateDTO dto);
 		Task<TransactionViewDTO> UpdateStatusTransactionAsync(int id, TransactionUpdateStatusDTO dto);
-		Task<IEnumerable<TransactionViewDTO>> GetAllTransactionsByWalletIdAsync(int walletId);
+		Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByWalletIdAsync(int walletId, PagingRequestDTO dto);
 	}
 }

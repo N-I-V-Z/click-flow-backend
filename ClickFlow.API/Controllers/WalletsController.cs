@@ -17,10 +17,12 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpPost]
 		public async Task<IActionResult> CreateWallet([FromBody] WalletCreateDTO dto)
 		{
+			if (!ModelState.IsValid) return ModelInvalid();
+
 			try
 			{
 				var response = await _walletService.CreateWalletAsync(dto);
@@ -36,10 +38,12 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize]
 		[HttpPut]
-		public async Task<IActionResult> Update([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
+		public async Task<IActionResult> UpdateWallet([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
 		{
+			if (!ModelState.IsValid) return ModelInvalid();
+
 			try
 			{
 				var response = await _walletService.UpdateWalletAsync(id, dto);

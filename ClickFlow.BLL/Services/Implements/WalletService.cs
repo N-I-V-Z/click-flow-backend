@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.DTOs.WalletDTOs;
+using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
+using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 using System.Net;
@@ -20,11 +22,26 @@ namespace ClickFlow.BLL.Services.Implements
 			_mapper = mapper;
 		}
 
+		protected virtual QueryBuilder<Wallet> CreateQueryBuilder(string? search = null)
+		{
+			var queryBuilder = new QueryBuilder<Wallet>()
+								.WithTracking(false);
+
+			if (!string.IsNullOrEmpty(search))
+			{
+				var predicate = FilterHelper.BuildSearchExpression<Wallet>(search);
+				queryBuilder.WithPredicate(predicate);
+			}
+
+			return queryBuilder;
+		}
+
 		public async Task<WalletViewDTO> CreateWalletAsync(WalletCreateDTO dto)
 		{
 			try
 			{
 				var repo = _unitOfWork.GetRepo<Wallet>();
+
 				var createdWallet = _mapper.Map<Wallet>(dto);
 
 				await repo.CreateAsync(createdWallet);
@@ -49,7 +66,7 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
-				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+        var walletRepo = _unitOfWork.GetRepo<Wallet>();							
 
 				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
 					.WithPredicate(x => x.Id == id)
@@ -58,11 +75,11 @@ namespace ClickFlow.BLL.Services.Implements
 					.Build()
 					);
 
-				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
+        var walletQueryBuilder = CreateQueryBuilder();
+				var walletQueryOptions = walletQueryBuilder
 					.WithPredicate(x => x.Id == user.WalletId)
-					.WithTracking(false)
-					.Build()
-					);
+					.Build();
+				var wallet = await walletRepo.GetSingleAsync(walletQueryOptions);
 
 				return _mapper.Map<WalletViewDTO>(wallet);
 			}
@@ -78,6 +95,7 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				var repo = _unitOfWork.GetRepo<Wallet>();
+
 				var updatedWallet = new Wallet { 
 					Id = id,
 					Balance = dto.Balance
