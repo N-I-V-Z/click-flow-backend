@@ -25,7 +25,7 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(u => u.IsDeleted)
                    .IsRequired();
 
-            // Quan hệ one-to-one tùy chọn: ApplicationUser - Advertiser, Publisher, Wallet
+          
             builder.HasOne(u => u.Advertiser)
                    .WithOne(a => a.ApplicationUser)
                    .HasForeignKey<ApplicationUser>(u => u.AdvertiserId)
