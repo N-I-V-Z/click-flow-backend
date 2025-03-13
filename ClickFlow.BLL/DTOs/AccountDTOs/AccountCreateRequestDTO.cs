@@ -3,6 +3,7 @@ using ClickFlow.DAL.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,9 +36,13 @@ namespace ClickFlow.BLL.DTOs.AccountDTOs
         public Role Role { get; set; }
 
         // Thông tin riêng cho Advertiser
-        public string CompanyName { get; set; }     
+        [AllowNull]
+        public string CompanyName { get; set; }
+        [AllowNull]
         public string IntroductionWebsite { get; set; }
+        [AllowNull]
         public int StaffSize { get; set; }
+        [AllowNull]
         public Industry Industry { get; set; }
     }
 }

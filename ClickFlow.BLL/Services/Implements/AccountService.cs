@@ -48,6 +48,7 @@ namespace ClickFlow.BLL.Services.Implements
                 new Claim("Email", user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("Id", user.Id.ToString()),
+                new Claim("Role", user.Role.ToString()),
                 new Claim("Name", user.UserName)
             };
 
@@ -318,8 +319,10 @@ namespace ClickFlow.BLL.Services.Implements
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
+                Console.WriteLine($"Role từ request: {accRequest.Role}");
                 var user = new ApplicationUser
                 {
+                    Role = accRequest.Role,
                     Email = accRequest.Email,
                     UserName = accRequest.UserName,
                     PhoneNumber = accRequest.PhoneNumber,
@@ -333,7 +336,11 @@ namespace ClickFlow.BLL.Services.Implements
                     throw new Exception("Một số lỗi xảy ra trong quá trình đăng kí tài khoản. Vui lòn thử lại sau ít phút.");
                 }
 
-                //await _identityService.AddToRoleAsync(user, Role.Member.ToString());
+                if (!Enum.IsDefined(typeof(Role), accRequest.Role))
+                {
+                    throw new ArgumentException("Role không hợp lệ.");
+                }
+                
                 await _identityService.AddToRoleAsync(user, accRequest.Role.ToString());
                 switch (accRequest.Role)
                 {

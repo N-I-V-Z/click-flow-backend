@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.DAL.Entities;
+using System.Globalization;
 using System.Reflection;
 
 namespace ClickFlow.BLL.Helpers.Mapper
@@ -24,6 +27,16 @@ namespace ClickFlow.BLL.Helpers.Mapper
 					CreateMap(entityType, dtoType).ReverseMap();
 				}
 			}
+            CreateMap<CampaignCreateDTO, Campaign>()
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src =>
+                    DateOnly.FromDateTime(DateTime.ParseExact(src.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
+                    DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
+            CreateMap<CampaignUpdateDTO, Campaign>()
+               .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src =>
+                   DateOnly.FromDateTime(DateTime.ParseExact(src.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))))
+               .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
+                   DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
         }
     }
 }
