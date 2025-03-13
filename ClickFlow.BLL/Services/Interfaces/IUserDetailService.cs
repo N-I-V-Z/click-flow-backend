@@ -1,0 +1,20 @@
+﻿using ClickFlow.BLL.DTOs.Response;
+using ClickFlow.BLL.DTOs.UserDetailDTOs;
+using ClickFlow.DAL.Paging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ClickFlow.BLL.Services.Interfaces
+{
+    public interface IUserDetailService
+    {
+        Task<BaseResponse> CreateUpdateUserDetail(UserDetailRequestDTO dto, string userId);
+        Task<BaseResponse> DeleteUserDetail(string userId);
+        Task<PaginatedList<UserDetailViewDTO>> GetAllUserDetails(int pageIndex, int pageSize);
+        Task<PaginatedList<UserDetailViewDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name);
+        Task<UserDetailViewDTO> GetUserDetailByUserId(string userId);
+    }
+}
