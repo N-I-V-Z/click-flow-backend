@@ -38,6 +38,7 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(c => c.Status)
                    .IsRequired();
             builder.Property(c => c.Image)
+                   .IsRequired()
                    .HasMaxLength(500);
             builder.Property(c => c.IsDeleted)
                    .IsRequired();

@@ -7,7 +7,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 {
 	public interface IReportService
 	{
-		Task<ReportViewDTO> CreateReportAsync(ReportCreateDTO dto);
+		Task<ReportViewDTO> CreateReportAsync(int advertiserId, ReportCreateDTO dto);
 		Task<PaginatedList<ReportViewDTO>> GetAllAsync(PagingRequestDTO dto);
 		Task<ReportViewDTO> GetByIdAsync(int id);
 		Task<bool> DeleteAsync(int id);

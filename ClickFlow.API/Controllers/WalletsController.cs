@@ -54,7 +54,7 @@ namespace ClickFlow.API.Controllers
 				}
 
 				var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
-				if (response == null) return GetError("Không có dữ liệu.");
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return Ok(response);
 			}
 			catch (Exception ex)

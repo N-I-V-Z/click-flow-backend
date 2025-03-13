@@ -11,7 +11,7 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class TrafficService : ITrafficService
+    public class TrafficService : ITrafficService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
@@ -224,5 +224,32 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
-	}
+
+        public async Task<PaginatedList<TrafficViewDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto)
+        {
+            try
+            {
+                var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+                var queryBuilder = CreateQueryBuilder();
+                var queryOptions = queryBuilder.WithPredicate(x => x.CampaignId == id);
+                if (!string.IsNullOrEmpty(dto.Keyword))
+                {
+                    var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
+                    queryBuilder.WithPredicate(predicate);
+                }
+
+                var loadedRecords = trafficRepo.Get(queryBuilder.Build());
+
+                var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
+                var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
+                return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+        }
+    }
 }

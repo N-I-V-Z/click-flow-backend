@@ -56,7 +56,7 @@ namespace ClickFlow.API.Controllers
 				}
 
 				var response = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
-				if (response == null) return GetError("Không có dữ liệu.");
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return Ok(response);
 			}
 			catch (Exception ex)
@@ -145,7 +145,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _transactionService.GetAllTransactionsAsync(dto);
-				if (response == null) return GetError("Không có dữ liệu.");
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
