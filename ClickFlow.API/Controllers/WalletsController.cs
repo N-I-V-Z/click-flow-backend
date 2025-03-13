@@ -1,5 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs.WalletDTOs;
 using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -17,28 +18,7 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-		[Authorize]
-		[HttpPost]
-		public async Task<IActionResult> CreateWallet([FromBody] WalletCreateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
-			try
-			{
-				var response = await _walletService.CreateWalletAsync(dto);
-				if (response == null) return SaveError(response);
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPut]
 		public async Task<IActionResult> UpdateWallet([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
 		{
@@ -47,7 +27,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _walletService.UpdateWalletAsync(id, dto);
-				if (response == null) return SaveError(response);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -59,21 +39,22 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet]
-		[Route("get-owner-wallet")]
-		public async Task<IActionResult> GetWalletByToken()
+		[Route("own")]
+		public async Task<IActionResult> GetOwnWallet()
 		{
 			try
 			{
-				var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+				var userId = User.FindFirst("Id")?.Value;
+
 				if (string.IsNullOrEmpty(userId))
 				{
 					return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
 				}
 
 				var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
-				if (response == null) return NotFound("Không tìm thấy ví cho người dùng này.");
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return Ok(response);
 			}
 			catch (Exception ex)

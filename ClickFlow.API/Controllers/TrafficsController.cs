@@ -22,12 +22,10 @@ namespace ClickFlow.API.Controllers
 		[HttpGet("id")]
 		public async Task<IActionResult> GetTrafficById([FromQuery] int id)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
 				var response = await _trafficService.GetByIdAsync(id);
-				if (response == null) return NotFound();
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -43,12 +41,10 @@ namespace ClickFlow.API.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetTraffics([FromQuery] PagingRequestDTO dto)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
 				var response = await _trafficService.GetAllAsync(dto);
-				if (!response.Any()) return NotFound();
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -60,25 +56,86 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[HttpPost]
-		//public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
-		//{
-		//	if (!ModelState.IsValid) return ModelInvalid();
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publisher")]
+		public async Task<IActionResult> GetTrafficsByPublisher([FromQuery] PagingRequestDTO dto)
+		{
+			try
+			{
+				var userId = User.FindFirst("Id")?.Value;
 
-		//	try
-		//	{
+				var response = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
 
-		//		var response = await _trafficService.CreateAsync(dto);
-		//		if (response == null) return SaveError(response);
-		//		return SaveSuccess(response);
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		Console.ForegroundColor = ConsoleColor.Red;
-		//		Console.WriteLine(ex.Message);
-		//		Console.ResetColor();
-		//		return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-		//	}
-		//}
-	}
+		[Authorize(Roles = "Advertiser")]
+		[HttpGet("advertiser")]
+		public async Task<IActionResult> GetTrafficsByAdvertiser([FromQuery] PagingRequestDTO dto)
+		{
+			try
+			{
+				var userId = User.FindFirst("Id")?.Value;
+
+				var response = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+        [Authorize]
+        [HttpGet("campaign")]
+        public async Task<IActionResult> GetTrafficsByCampaign([FromQuery] int campaignId, [FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var response = await _trafficService.GetAllByCampaignIdAsync(campaignId, dto);
+                if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
+        //{
+        //	if (!ModelState.IsValid) return ModelInvalid();
+
+        //	try
+        //	{
+
+        //		var response = await _trafficService.CreateAsync(dto);
+        //		if (response == null) return SaveError(response);
+        //		return SaveSuccess(response);
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //		Console.ForegroundColor = ConsoleColor.Red;
+        //		Console.WriteLine(ex.Message);
+        //		Console.ResetColor();
+        //		return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+        //	}
+        //}
+    }
 }

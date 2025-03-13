@@ -17,18 +17,22 @@ namespace ClickFlow.DAL.Configurations
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id).UseIdentityColumn();
 
-            builder.Property(t => t.IpAddress)
+            builder.Property(ct => ct.IpAddress)
                    .IsRequired()
                    .HasMaxLength(100);
-            builder.Property(t => t.DeviceType)
+            builder.Property(ct => ct.DeviceType)
+                   .IsRequired()
                    .HasMaxLength(50);
-            builder.Property(t => t.OrderId)
+            builder.Property(ct => ct.OrderId)
+                    .IsRequired(false)
                    .HasMaxLength(100);
-            builder.Property(t => t.Browser)
+            builder.Property(ct => ct.Browser)
+                   .IsRequired(false)
                    .HasMaxLength(100);
-            builder.Property(t => t.ReferrerURL)
+            builder.Property(ct => ct.ReferrerURL)
+                   .IsRequired(false)
                    .HasMaxLength(500);
-            builder.Property(t => t.Timestamp)
+            builder.Property(ct => ct.Timestamp)
                    .IsRequired();
 
             builder.HasOne(t => t.Campaign)

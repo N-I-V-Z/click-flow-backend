@@ -18,16 +18,14 @@ namespace ClickFlow.API.Controllers
 			_reportService = reportService;
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin, Advertiser")]
 		[HttpGet("id")]
 		public async Task<IActionResult> GetReportById([FromQuery] int id)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
 				var response = await _reportService.GetByIdAsync(id);
-				if (response == null) return NotFound();
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -39,16 +37,14 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpGet]
-		public async Task<IActionResult> GetReports([FromQuery] PagingRequestDTO dto)
+		public async Task<IActionResult> GetAllReports([FromQuery] PagingRequestDTO dto)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
 				var response = await _reportService.GetAllAsync(dto);
-				if (!response.Any()) return NotFound();
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -60,7 +56,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO dto)
 		{
@@ -68,8 +64,15 @@ namespace ClickFlow.API.Controllers
 
 			try
 			{
-				var response = await _reportService.CreateReportAsync(dto);
-				if (response == null) return SaveError(response);
+                var advertiserId = User.FindFirst("Id")?.Value;
+
+                if (string.IsNullOrEmpty(advertiserId))
+                {
+                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
+                }
+
+                var response = await _reportService.CreateReportAsync(int.Parse(advertiserId), dto);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -81,7 +84,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin, Advertiser")]
 		[HttpDelete]
 		public async Task<IActionResult> DeleteReport([FromQuery] int id)
 		{
@@ -90,7 +93,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.DeleteAsync(id);
-				if (!response) return SaveError(response);
+				if (!response) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -102,7 +105,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpPut("status")]
 		public async Task<IActionResult> UpdateStatusReport([FromQuery] int id, [FromBody] ReportStatus status)
 		{
@@ -111,7 +114,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.UpdateStatusReportAsync(id, status);
-				if (response == null) return SaveError(response);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -123,7 +126,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpPut("response")]
 		public async Task<IActionResult> UpdateResponseReport([FromQuery] int id, [FromBody] string response)
 		{
@@ -132,7 +135,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var result = await _reportService.UpdateResponseReportAsync(id, response);
-				if (result == null) return SaveError(result);
+				if (result == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)

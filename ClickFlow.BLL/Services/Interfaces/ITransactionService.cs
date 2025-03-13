@@ -8,6 +8,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 	{
 		Task<TransactionViewDTO> CreateTransactionAsync(TransactionCreateDTO dto);
 		Task<TransactionViewDTO> UpdateStatusTransactionAsync(int id, TransactionUpdateStatusDTO dto);
-		Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByWalletIdAsync(int walletId, PagingRequestDTO dto);
+		Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto);
+		Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsAsync(PagingRequestDTO dto);
 	}
 }

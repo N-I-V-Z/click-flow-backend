@@ -1,5 +1,7 @@
-﻿using ClickFlow.BLL.DTOs.TransactionDTOs;
+﻿using ClickFlow.BLL.DTOs.PagingDTOs;
+using ClickFlow.BLL.DTOs.TransactionDTOs;
 using ClickFlow.BLL.DTOs.VnPayDTOs;
+using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,7 @@ namespace ClickFlow.API.Controllers
 			_vnPayService = vnPayService;
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
 		{
@@ -28,7 +30,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _transactionService.CreateTransactionAsync(dto);
-				if (response == null) return SaveError(response);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -40,7 +42,53 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Publisher, Advertiser")]
+		[HttpGet("own")]
+		public async Task<IActionResult> GetOwnTransactions([FromQuery] PagingRequestDTO dto)
+		{
+			try
+			{
+				var userId = User.FindFirst("Id")?.Value;
+
+				if (string.IsNullOrEmpty(userId))
+				{
+					return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
+				}
+
+				var response = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
+				if (response == null) return GetNotFound("Không có dữ liệu.");
+				return Ok(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpPut("status")]
+		public async Task<IActionResult> UpdateStatusTransaction([FromQuery] int id, [FromBody] TransactionUpdateStatusDTO dto)
+		{
+			try
+			{
+				var response = await _transactionService.UpdateStatusTransactionAsync(id, dto);
+				if (response == null) return SaveError();
+				return SaveSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+			}
+		}
+
+
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost("payment-url")]
 		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
 		{
@@ -48,7 +96,8 @@ namespace ClickFlow.API.Controllers
 			{
 				if (dto == null || dto.Amount <= 0)
 				{
-					return GetError("Dữ liệu không hợp lệ.");
+					ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
+					return ModelInvalid();
 				}
 
 				var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, dto);
@@ -86,6 +135,25 @@ namespace ClickFlow.API.Controllers
 				Console.WriteLine(ex.Message);
 				Console.ResetColor();
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpGet]
+		public async Task<IActionResult> GetAllTransactions([FromQuery] PagingRequestDTO dto)
+		{
+			try
+			{
+				var response = await _transactionService.GetAllTransactionsAsync(dto);
+				if (response == null) return GetNotFound("Không có dữ liệu.");
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
 			}
 		}
 	}

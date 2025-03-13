@@ -16,7 +16,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var list = EnumHelper.GetEnumList<CampaignStatus>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{
@@ -27,14 +27,13 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
 		[HttpGet("gender-list")]
 		public IActionResult GetGenderList()
 		{
 			try
 			{
 				var list = EnumHelper.GetEnumList<Gender>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{
@@ -45,14 +44,13 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
 		[HttpGet("industry-list")]
 		public IActionResult GetIndustryList()
 		{
 			try
 			{
 				var list = EnumHelper.GetEnumList<Industry>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{
@@ -69,8 +67,8 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var list = EnumHelper.GetEnumList<Industry>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				var list = EnumHelper.GetEnumList<ReportStatus>();
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{
@@ -81,14 +79,13 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
 		[HttpGet("role-list")]
 		public IActionResult GetRoleList()
 		{
 			try
 			{
 				var list = EnumHelper.GetEnumList<Role>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{
@@ -106,7 +103,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var list = EnumHelper.GetEnumList<TypePay>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{
@@ -124,7 +121,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var list = EnumHelper.GetEnumList<TransactionType>();
-				return list.Any() ? GetSuccess(list) : GetError("Danh sách trống.");
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
 			}
 			catch (Exception ex)
 			{

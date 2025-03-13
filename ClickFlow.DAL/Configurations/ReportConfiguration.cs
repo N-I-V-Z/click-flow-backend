@@ -25,6 +25,7 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(r => r.CreateAt)
                    .IsRequired();
             builder.Property(r => r.Response)
+                   .IsRequired(false)
                    .HasMaxLength(1000);
             builder.Property(r => r.EvidenceURL)
                    .HasMaxLength(500);
