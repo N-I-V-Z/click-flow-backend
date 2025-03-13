@@ -22,11 +22,11 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(ud => ud.Gender)
                    .IsRequired();
             builder.Property(ud => ud.AvatarURL)
-                   .HasMaxLength(500);
+                   .HasMaxLength(500)
+                   .IsRequired(false);
             builder.Property(ud => ud.Address)
-                   .HasMaxLength(500);
-            builder.Property(ud => ud.IdentityCard)
-                   .HasMaxLength(100);
+                   .HasMaxLength(500)
+                   .IsRequired(false);        
 
             builder.HasOne(ud => ud.User)
                    .WithOne() // Nếu ApplicationUser không có navigation property cho UserDetail

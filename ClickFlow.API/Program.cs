@@ -46,7 +46,7 @@ namespace ClickFlow.API
             builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
 
-			builder.Services.AddCors(opts =>
+            builder.Services.AddCors(opts =>
 			{
 				opts.AddPolicy("corspolicy", build =>
 				{

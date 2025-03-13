@@ -135,7 +135,6 @@ namespace ClickFlow.API.ConfigExtensions
                         new ApplicationUser { FullName = "advertiser", Role = Role.Advertiser, AdvertiserId = 1, UserName = "advertiser", NormalizedUserName = "ADVERTISER", Email = "advertiser@email.com", NormalizedEmail = "ADVERTISER@EMAIL.COM", PasswordHash = "AQAAAAIAAYagAAAAEAN3E2E/F3buDNQ0SZqFsAKaBHiyju1qtHw9xHXA/GRgPrTykm9xzk2/cZbxBtcyJQ==", SecurityStamp = "T2TN5HE4A5KPDBID35DKS2K5EL2PGOO4", ConcurrencyStamp = "b7864ba2-e029-4005-84aa-96000f2044de", PhoneNumber = "0977777777", LockoutEnabled = true, WalletId = 2 }
                     );
                     context.SaveChanges();
-
                 }
 
                 if (!context.UserRoles.Any())
@@ -167,7 +166,7 @@ namespace ClickFlow.API.ConfigExtensions
                             TypePay = TypePay.CPC,
                             Image = "abc"
                         }
-                        );
+                    );
                     context.SaveChanges();
                 }
 
@@ -184,11 +183,120 @@ namespace ClickFlow.API.ConfigExtensions
                             Reason = "ABC",
                             Status = ReportStatus.Pending
                         }
-                        );
+                    );
                     context.SaveChanges();
                 }
-            }
 
+                if (!context.UserDetail.Any())
+                {
+                    context.UserDetail.AddRange(
+                        new UserDetail
+                        {
+                            ApplicationUserId = 1, // Admin
+                            DateOfBirth = new DateTime(1990, 1, 1),
+                            Gender = Gender.Male,
+                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Address = "123 Admin Street"
+                        },
+                        new UserDetail
+                        {
+                            ApplicationUserId = 2, // Publisher
+                            DateOfBirth = new DateTime(1995, 5, 5),
+                            Gender = Gender.Female,
+                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Address = "456 Publisher Street"
+                        },
+                        new UserDetail
+                        {
+                            ApplicationUserId = 3, // Advertiser
+                            DateOfBirth = new DateTime(1985, 10, 10),
+                            Gender = Gender.Male,
+                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Address = "789 Advertiser Street"
+                        }
+                    );
+                    context.SaveChanges();
+                }
+
+                        
+
+                if (!context.Feedbacks.Any())
+                {
+                    context.Feedbacks.AddRange(
+                        new Feedback
+                        {
+                            CampaignId = 1, // Campaign ABC
+                            Description = "Great campaign!",
+                            StarRate = 5,
+                            Timestamp = DateTime.UtcNow
+                        },
+                        new Feedback
+                        {
+                            CampaignId = 1, // Campaign ABC
+                            Description = "Could be better.",
+                            StarRate = 3,
+                            Timestamp = DateTime.UtcNow.AddDays(-1)
+                        }
+                    );
+                    context.SaveChanges();
+                }
+
+                if (!context.Campaigns.Any())
+                {
+                    context.Campaigns.AddRange(
+                        new Campaign
+                        {
+                            AdvertiserId = 1,
+                            Budget = 1000000,
+                            Commission = 10000,
+                            Description = "Chiến dịch quảng cáo sản phẩm ABC",
+                            IsDeleted = false,
+                            EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(12)),
+                            Name = "Chiến dịch ABC",
+                            OriginURL = "https://youtube.com",
+                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Status = CampaignStatus.Activing,
+                            TypeCampaign = Industry.Education,
+                            TypePay = TypePay.CPC,
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                        },
+                        new Campaign
+                        {
+                            AdvertiserId = 1,
+                            Budget = 2000000,
+                            Commission = 20000,
+                            Description = "Chiến dịch quảng cáo sản phẩm XYZ",
+                            IsDeleted = false,
+                            EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(6)),
+                            Name = "Chiến dịch XYZ",
+                            OriginURL = "https://google.com",
+                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Status = CampaignStatus.Activing,
+                            TypeCampaign = Industry.Tourism,
+                            TypePay = TypePay.CPA,
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                        },
+                        new Campaign
+                        {
+                            AdvertiserId = 1,
+                            Budget = 1500000,
+                            Commission = 15000,
+                            Description = "Chiến dịch quảng cáo sản phẩm DEF",
+                            IsDeleted = false,
+                            EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(9)),
+                            Name = "Chiến dịch DEF",
+                            OriginURL = "https://facebook.com",
+                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Status = CampaignStatus.Pending,
+                            TypeCampaign = Industry.FoodAndBeverage,
+                            TypePay = TypePay.CPC,
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                        }
+                    );
+                    context.SaveChanges();
+                }
+
+            }
         }
     }
 }
