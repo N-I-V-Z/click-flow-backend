@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.BLL.DTOs.UserDTOs;
 using ClickFlow.DAL.Entities;
 using System.Globalization;
 using System.Reflection;
@@ -37,6 +38,7 @@ namespace ClickFlow.BLL.Helpers.Mapper
                    DateOnly.FromDateTime(DateTime.ParseExact(src.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))))
                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
                    DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
+            CreateMap<ApplicationUser, UserViewDTO>();
         }
     }
 }
