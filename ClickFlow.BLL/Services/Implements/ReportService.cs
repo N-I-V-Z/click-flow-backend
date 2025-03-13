@@ -43,15 +43,17 @@ namespace ClickFlow.BLL.Services.Implements
 			return new PaginatedList<ReportViewDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
 		}
 
-		public async Task<ReportViewDTO> CreateReportAsync(ReportCreateDTO dto)
+		public async Task<ReportViewDTO> CreateReportAsync(int advertiserId, ReportCreateDTO dto)
 		{
 			try
 			{
 				var reportRepo = _unitOfWork.GetRepo<Report>();
 				var newReport = _mapper.Map<Report>(dto);
 
+				newReport.AdvertiserId = advertiserId;
 				newReport.Status = ReportStatus.Pending;
 				newReport.CreateAt = DateTime.UtcNow;
+
 				await reportRepo.CreateAsync(newReport);
 
 				var saver = await _unitOfWork.SaveAsync();

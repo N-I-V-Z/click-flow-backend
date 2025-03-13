@@ -25,7 +25,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.GetByIdAsync(id);
-				if (response == null) return GetError("Không có dữ liệu.");
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -44,7 +44,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.GetAllAsync(dto);
-				if (!response.Any()) return GetError("Không có dữ liệu.");
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -64,7 +64,14 @@ namespace ClickFlow.API.Controllers
 
 			try
 			{
-				var response = await _reportService.CreateReportAsync(dto);
+                var advertiserId = User.FindFirst("Id")?.Value;
+
+                if (string.IsNullOrEmpty(advertiserId))
+                {
+                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
+                }
+
+                var response = await _reportService.CreateReportAsync(int.Parse(advertiserId), dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}

@@ -25,7 +25,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _trafficService.GetByIdAsync(id);
-				if (response == null) return GetError("Không có dữ liệu.");
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -44,7 +44,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _trafficService.GetAllAsync(dto);
-				if (!response.Any()) return GetError("Không có dữ liệu.");
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -65,7 +65,7 @@ namespace ClickFlow.API.Controllers
 				var userId = User.FindFirst("Id")?.Value;
 
 				var response = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
-				if (!response.Any()) return GetError("Không có dữ liệu.");
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -86,7 +86,7 @@ namespace ClickFlow.API.Controllers
 				var userId = User.FindFirst("Id")?.Value;
 
 				var response = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
-				if (!response.Any()) return GetError("Không có dữ liệu.");
+				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -98,25 +98,44 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[HttpPost]
-		//public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
-		//{
-		//	if (!ModelState.IsValid) return ModelInvalid();
+        [Authorize]
+        [HttpGet("campaign")]
+        public async Task<IActionResult> GetTrafficsByCampaign([FromQuery] int campaignId, [FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var response = await _trafficService.GetAllByCampaignIdAsync(campaignId, dto);
+                if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		//	try
-		//	{
+        //[HttpPost]
+        //public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
+        //{
+        //	if (!ModelState.IsValid) return ModelInvalid();
 
-		//		var response = await _trafficService.CreateAsync(dto);
-		//		if (response == null) return SaveError(response);
-		//		return SaveSuccess(response);
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		Console.ForegroundColor = ConsoleColor.Red;
-		//		Console.WriteLine(ex.Message);
-		//		Console.ResetColor();
-		//		return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-		//	}
-		//}
-	}
+        //	try
+        //	{
+
+        //		var response = await _trafficService.CreateAsync(dto);
+        //		if (response == null) return SaveError(response);
+        //		return SaveSuccess(response);
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //		Console.ForegroundColor = ConsoleColor.Red;
+        //		Console.WriteLine(ex.Message);
+        //		Console.ResetColor();
+        //		return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+        //	}
+        //}
+    }
 }
