@@ -19,12 +19,12 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin, Advertiser")]
-		[HttpGet("id")]
-		public async Task<IActionResult> GetReportById([FromQuery] int id)
+		[HttpGet("{reportId}")]
+		public async Task<IActionResult> GetReportById(int reportId)
 		{
 			try
 			{
-				var response = await _reportService.GetByIdAsync(id);
+				var response = await _reportService.GetByIdAsync(reportId);
 				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
@@ -85,14 +85,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin, Advertiser")]
-		[HttpDelete]
-		public async Task<IActionResult> DeleteReport([FromQuery] int id)
+		[HttpDelete("{reportId}")]
+		public async Task<IActionResult> DeleteReport([FromQuery] int reportId)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _reportService.DeleteAsync(id);
+				var response = await _reportService.DeleteAsync(reportId);
 				if (!response) return SaveError();
 				return SaveSuccess(response);
 			}
@@ -106,14 +106,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
-		[HttpPut("status")]
-		public async Task<IActionResult> UpdateStatusReport([FromQuery] int id, [FromBody] ReportStatus status)
+		[HttpPut("status/{reportId}")]
+		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatus status)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _reportService.UpdateStatusReportAsync(id, status);
+				var response = await _reportService.UpdateStatusReportAsync(reportId, status);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
@@ -127,14 +127,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
-		[HttpPut("response")]
-		public async Task<IActionResult> UpdateResponseReport([FromQuery] int id, [FromBody] string response)
+		[HttpPut("response/{reportId}")]
+		public async Task<IActionResult> UpdateResponseReport(int reportId, [FromBody] string response)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var result = await _reportService.UpdateResponseReportAsync(id, response);
+				var result = await _reportService.UpdateResponseReportAsync(reportId, response);
 				if (result == null) return SaveError();
 				return SaveSuccess(response);
 			}
