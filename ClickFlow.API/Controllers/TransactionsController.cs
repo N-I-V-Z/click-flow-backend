@@ -69,12 +69,12 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
-		[HttpPut("status")]
-		public async Task<IActionResult> UpdateStatusTransaction([FromQuery] int id, [FromBody] TransactionUpdateStatusDTO dto)
+		[HttpPut("status/{transactionId}")]
+		public async Task<IActionResult> UpdateStatusTransaction(int transactionId, [FromBody] TransactionUpdateStatusDTO dto)
 		{
 			try
 			{
-				var response = await _transactionService.UpdateStatusTransactionAsync(id, dto);
+				var response = await _transactionService.UpdateStatusTransactionAsync(transactionId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}

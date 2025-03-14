@@ -19,14 +19,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpPut]
-		public async Task<IActionResult> UpdateWallet([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
+		[HttpPut("{walletId}")]
+		public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _walletService.UpdateWalletAsync(id, dto);
+				var response = await _walletService.UpdateWalletAsync(walletId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
