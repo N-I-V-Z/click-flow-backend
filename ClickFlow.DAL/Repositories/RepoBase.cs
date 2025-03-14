@@ -1,6 +1,7 @@
 ﻿using ClickFlow.DAL.EF;
 using ClickFlow.DAL.Queries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ClickFlow.DAL.Repositories
 {
@@ -60,7 +61,15 @@ namespace ClickFlow.DAL.Repositories
 				}
 			}
 
-			if (options.Predicate != null)
+            if (options.ThenIncludeProperties?.Any() ?? false)
+            {
+                foreach (var thenIncludeProperty in options.ThenIncludeProperties)
+                {
+                    query = ((IIncludableQueryable<T, object>)query).ThenInclude(thenIncludeProperty);
+                }
+            }
+
+            if (options.Predicate != null)
 			{
 				query = query.Where(options.Predicate);
 			}

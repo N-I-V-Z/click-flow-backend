@@ -155,7 +155,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaigns = repo.Get(new QueryBuilder<Campaign>()
                 .WithPredicate(x => !x.IsDeleted)
-                .WithInclude(x => x.Advertiser)
+                .WithInclude(x => x.Advertiser)             
                 .Build());
 
             var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
@@ -176,7 +176,7 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus status,int pageIndex, int pageSize)
+        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus status, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaigns = repo.Get(new QueryBuilder<Campaign>()
@@ -188,6 +188,7 @@ namespace ClickFlow.BLL.Services.Implements
             var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
+
 
         public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize)
         {

@@ -39,6 +39,9 @@ namespace ClickFlow.BLL.Helpers.Mapper
                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
                    DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
             CreateMap<ApplicationUser, UserViewDTO>();
+
+            CreateMap<Campaign, CampaignResponseDTO>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName));
         }
     }
 }
