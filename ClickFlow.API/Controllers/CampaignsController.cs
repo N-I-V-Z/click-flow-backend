@@ -35,9 +35,9 @@ namespace ClickFlow.API.Controllers
 
         [HttpGet]
         [Route("get-campaigns-by-advertiser/{advertiserId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsByAdvertiserId(int advertiserId, int pageIndex, int pageSize)
+        public async Task<IActionResult> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus status, int pageIndex, int pageSize)
         {
-            var response = await _campaignService.GetCampaignsByAdvertiserId(advertiserId, pageIndex, pageSize);
+            var response = await _campaignService.GetCampaignsByAdvertiserId(advertiserId, status, pageIndex, pageSize);
             return GetSuccess(response);
         }
 
