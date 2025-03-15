@@ -20,5 +20,7 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize);
         Task<PaginatedList<AdvertiserResponseDTO>> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize);
         Task<CampaignResponseDTO> GetCampaignById(int id);
+        Task<string> ValidateCampaignForTraffic(int campaignId);
+
     }
 }
