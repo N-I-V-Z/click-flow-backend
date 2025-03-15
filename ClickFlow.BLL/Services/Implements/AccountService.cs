@@ -349,8 +349,8 @@ namespace ClickFlow.BLL.Services.Implements
                         {
                             CompanyName = accRequest.CompanyName,
                             IntroductionWebsite = accRequest.IntroductionWebsite,
-                            StaffSize = accRequest.StaffSize,
-                            Industry = accRequest.Industry,
+                            StaffSize = accRequest.StaffSize ?? 0,
+                            Industry = accRequest.Industry ?? Industry.Other,
                             ApplicationUser = user
                         };
                         var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();

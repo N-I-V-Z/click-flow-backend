@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.UserDTOs;
 using ClickFlow.DAL.Entities;
@@ -39,6 +40,31 @@ namespace ClickFlow.BLL.Helpers.Mapper
                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
                    DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
             CreateMap<ApplicationUser, UserViewDTO>();
+            
+            CreateMap<Advertiser, AdvertiserResponseDTO>();
+            CreateMap<ApplicationUser, AdvertiserResponseDTO>()
+            .ForMember(dest => dest.Id,
+               opt => opt.MapFrom(src => src.Advertiser.Id))
+             .ForMember(dest => dest.CompanyName,
+               opt => opt.MapFrom(src => src.Advertiser.CompanyName))
+             .ForMember(dest => dest.IntroductionWebsite,
+               opt => opt.MapFrom(src => src.Advertiser.IntroductionWebsite))
+             .ForMember(dest => dest.StaffSize,
+               opt => opt.MapFrom(src => src.Advertiser.StaffSize))
+             .ForMember(dest => dest.Industry,
+               opt => opt.MapFrom(src => src.Advertiser.Industry))
+             .ForMember(dest => dest.FullName,
+               opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Email,
+               opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.Role,
+               opt => opt.MapFrom(src => src.Role))
+            .ForMember(dest => dest.Campaigns,
+               opt => opt.MapFrom(src => src.Advertiser.Campaigns));
+
+            CreateMap<Campaign, CampaignResponseDTO>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName));
+           
         }
     }
 }
