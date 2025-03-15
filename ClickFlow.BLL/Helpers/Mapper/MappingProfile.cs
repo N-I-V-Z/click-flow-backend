@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.BLL.DTOs.PublisherDTOs;
 using ClickFlow.BLL.DTOs.UserDTOs;
 using ClickFlow.DAL.Entities;
 using System.Globalization;
@@ -61,6 +62,13 @@ namespace ClickFlow.BLL.Helpers.Mapper
                opt => opt.MapFrom(src => src.Role))
             .ForMember(dest => dest.Campaigns,
                opt => opt.MapFrom(src => src.Advertiser.Campaigns));
+
+            CreateMap<ApplicationUser, PublisherResponseDTO>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Publisher.Id))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+   
+
 
             CreateMap<Campaign, CampaignResponseDTO>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName));
