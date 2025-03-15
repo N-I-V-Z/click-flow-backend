@@ -7,10 +7,10 @@ namespace ClickFlow.BLL.Services.Interfaces
 	public interface ITrafficService
 	{
 		Task<PaginatedList<TrafficViewDTO>> GetAllAsync(PagingRequestDTO dto);
-		//Task<PaginatedList<TrafficViewDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto);
-		//Task<PaginatedList<TrafficViewDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto);
-		//Task<PaginatedList<TrafficViewDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto);
+		Task<PaginatedList<TrafficViewDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto);
+		Task<PaginatedList<TrafficViewDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto);
+		Task<PaginatedList<TrafficViewDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto);
 		Task<TrafficViewDTO> GetByIdAsync(int id);
-		//Task<TrafficViewDTO> CreateAsync(TrafficCreateDTO dto);
+		Task<TrafficViewDTO> CreateAsync(TrafficCreateDTO dto);
 	}
 }

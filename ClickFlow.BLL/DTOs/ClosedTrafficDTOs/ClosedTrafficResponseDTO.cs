@@ -1,9 +1,7 @@
-﻿using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
-
-namespace ClickFlow.BLL.DTOs.TrafficDTOs
+﻿namespace ClickFlow.BLL.DTOs.ClosedTrafficDTOs
 {
-    public class TrafficViewDTO
-	{
+    public class ClosedTrafficResponseDTO
+    {
         public int Id { get; set; }
         public string IpAddress { get; set; }
         public bool? IsValid { get; set; }
@@ -14,6 +12,5 @@ namespace ClickFlow.BLL.DTOs.TrafficDTOs
         public string ReferrerURL { get; set; }
         public DateTime Timestamp { get; set; }
         public int? CampaignParticipationId { get; set; }
-        public CampaignParticipationNoTrafficResponseDTO? CampaignParticipation { get; set; }
     }
 }

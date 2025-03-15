@@ -83,50 +83,50 @@ namespace ClickFlow.API.ConfigExtensions
 
             if (env.IsDevelopment())
             {
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
+                await context.Database.EnsureDeletedAsync();
+                await context.Database.EnsureCreatedAsync();
             }
 
             if (!context.Roles.Any())
             {
-                context.Roles.AddRange(
+                await context.Roles.AddRangeAsync(
                     new IdentityRole<int> { Name = "Admin", NormalizedName = "ADMIN" },
                     new IdentityRole<int> { Name = "Advertiser", NormalizedName = "ADVERTISER" },
                     new IdentityRole<int> { Name = "Publisher", NormalizedName = "PUBLISHER" }
                 );
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
 
             if (env.IsDevelopment())
             {
                 if (!context.Publishers.Any())
                 {
-                    context.Publishers.AddRange(
+                    await context.Publishers.AddRangeAsync(
                         new Publisher()
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.Advertisers.Any())
                 {
-                    context.Advertisers.AddRange(
+                    await context.Advertisers.AddRangeAsync(
                         new Advertiser { CompanyName = "ABC", IntroductionWebsite = "ABC", StaffSize = 0, Industry = Industry.FoodAndBeverage }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.Wallets.Any())
                 {
-                    context.Wallets.AddRange(
+                    await context.Wallets.AddRangeAsync(
                         new Wallet { Balance = 0 },
                         new Wallet { Balance = 0 }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.Users.Any())
                 {
-                    context.Users.AddRange(
+                    await context.Users.AddRangeAsync(
                         // Pass: Admin@123
                         new ApplicationUser { FullName = "admin", Role = Role.Admin, UserName = "admin", NormalizedUserName = "ADMIN", Email = "admin@email.com", NormalizedEmail = "ADMIN@EMAIL.COM", PasswordHash = "AQAAAAIAAYagAAAAEDH0xTQNvAznmb/NtaE+zrtLrV4Xz1hGMInXCZE2MoDFR88A06IT6meJb7wHSEj6vQ==", SecurityStamp = "BWYPPRX7FGAHVOE7REDRNSWC72LU67ZP", ConcurrencyStamp = "4bd4dcb0-b231-4169-93c3-81f70479637a", PhoneNumber = "0999999999", LockoutEnabled = true },
                         // Pass: Publisher@123
@@ -134,22 +134,22 @@ namespace ClickFlow.API.ConfigExtensions
                         // Pass: Advertiser@123
                         new ApplicationUser { FullName = "advertiser", Role = Role.Advertiser, AdvertiserId = 1, UserName = "advertiser", NormalizedUserName = "ADVERTISER", Email = "advertiser@email.com", NormalizedEmail = "ADVERTISER@EMAIL.COM", PasswordHash = "AQAAAAIAAYagAAAAEAN3E2E/F3buDNQ0SZqFsAKaBHiyju1qtHw9xHXA/GRgPrTykm9xzk2/cZbxBtcyJQ==", SecurityStamp = "T2TN5HE4A5KPDBID35DKS2K5EL2PGOO4", ConcurrencyStamp = "b7864ba2-e029-4005-84aa-96000f2044de", PhoneNumber = "0977777777", LockoutEnabled = true, WalletId = 2 }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.UserRoles.Any())
                 {
-                    context.UserRoles.AddRange(
+                    await context.UserRoles.AddRangeAsync(
                         new IdentityUserRole<int> { UserId = 1, RoleId = 1 },
                         new IdentityUserRole<int> { UserId = 2, RoleId = 3 },
                         new IdentityUserRole<int> { UserId = 3, RoleId = 2 }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.Campaigns.Any())
                 {
-                    context.Campaigns.AddRange(
+                    await context.Campaigns.AddRangeAsync(
                         new Campaign
                         {
                             AdvertiserId = 1,
@@ -167,12 +167,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Image = "abc"
                         }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.Reports.Any())
                 {
-                    context.Reports.AddRange(
+                    await context.Reports.AddRangeAsync(
                         new Report
                         {
                             AdvertiserId = 1,
@@ -184,12 +184,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = ReportStatus.Pending
                         }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.UserDetail.Any())
                 {
-                    context.UserDetail.AddRange(
+                    await context.UserDetail.AddRangeAsync(
                         new UserDetail
                         {
                             ApplicationUserId = 1, // Admin
@@ -215,14 +215,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Address = "789 Advertiser Street"
                         }
                     );
-                    context.SaveChanges();
-                }
-
-                        
+                    await context.SaveChangesAsync();
+                }           
 
                 if (!context.Feedbacks.Any())
                 {
-                    context.Feedbacks.AddRange(
+                    await context.Feedbacks.AddRangeAsync(
                         new Feedback
                         {
                             CampaignId = 1, // Campaign ABC
@@ -238,12 +236,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Timestamp = DateTime.UtcNow.AddDays(-1)
                         }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 if (!context.Campaigns.Any())
                 {
-                    context.Campaigns.AddRange(
+                    await context.Campaigns.AddRangeAsync(
                         new Campaign
                         {
                             AdvertiserId = 1,
@@ -293,7 +291,40 @@ namespace ClickFlow.API.ConfigExtensions
                             Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
                         }
                     );
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
+                }
+
+                if (!context.CampaignParticipations.Any())
+                {
+                    await context.CampaignParticipations.AddRangeAsync(
+                        new CampaignParticipation
+                        {
+                            CampaignId = 1,
+                            CreateAt = DateTime.UtcNow,
+                            PublisherId = 1,
+                            Status = CampaignParticipationStatus.Pending,
+                            
+                        }
+                    );
+                    await context.SaveChangesAsync();
+                }
+
+                if (!context.Traffics.Any())
+                {
+                    await context.Traffics.AddRangeAsync(
+                        new Traffic
+                        {
+                            Browser = "Chrome",
+                            CampaignParticipationId = 1,
+                            DeviceType = "Mobile",
+                            IpAddress = "1.1.1.1",
+                            IsValid = true,
+                            ReferrerURL = "http://abc.com",
+                            Revenue = 1000,
+                            Timestamp = DateTime.UtcNow
+                        }
+                    );
+                    await context.SaveChangesAsync();
                 }
 
             }
