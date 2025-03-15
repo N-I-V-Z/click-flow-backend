@@ -195,7 +195,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Name = "XYZ",
                             OriginURL = "https://twitter.com",
                             StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                            Status = CampaignStatus.Completed,
+                            Status = CampaignStatus.Pending,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPS,
                             Image = "xyz",
