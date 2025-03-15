@@ -36,13 +36,16 @@ namespace ClickFlow.BLL.DTOs.AccountDTOs
         public Role Role { get; set; }
 
         // Thông tin riêng cho Advertiser
-        [AllowNull]
-        public string CompanyName { get; set; }
-        [AllowNull]
-        public string IntroductionWebsite { get; set; }
-        [AllowNull]
-        public int StaffSize { get; set; }
-        [AllowNull]
-        public Industry Industry { get; set; }
+        [RequiredIfRole(Role.Advertiser, "CompanyName")]
+        public string? CompanyName { get; set; }
+
+        [RequiredIfRole(Role.Advertiser, "IntroductionWebsite")]
+        public string? IntroductionWebsite { get; set; }
+
+        [RequiredIfRole(Role.Advertiser, "StaffSize")]
+        public int? StaffSize { get; set; }
+
+        [RequiredIfRole(Role.Advertiser, "Industry")]
+        public Industry? Industry { get; set; }
     }
 }
