@@ -27,14 +27,6 @@ namespace ClickFlow.DAL.Configurations
                    .WithOne(f => f.Feedbacker)
                    .HasForeignKey(f => f.FeedbackerId)
                    .IsRequired(false);
-            builder.HasMany(p => p.Traffics)
-                   .WithOne(t => t.Publisher)
-                   .HasForeignKey(t => t.PublisherId)
-                   .IsRequired(false);
-            builder.HasMany(p => p.ClosedTraffics)
-                   .WithOne(ct => ct.Publisher)
-                   .HasForeignKey(ct => ct.PublisherId)
-                   .IsRequired(false);
         }
     }
 

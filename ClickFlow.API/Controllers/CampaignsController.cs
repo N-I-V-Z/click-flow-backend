@@ -42,27 +42,27 @@ namespace ClickFlow.API.Controllers
         }
 
 
-        [HttpGet]
-        [Route("get-campaigns-joined-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize)
-        {
-            var response = await _campaignService.GetCampaignsJoinedByPublisher(publisherId, pageIndex, pageSize);
-            return GetSuccess(response);
-        }
-        [HttpGet]
-        [Route("get-advertisers-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize)
-        {
-            try
-            {
-                var response = await _campaignService.GetAdvertisersByPublisher(publisherId, pageIndex, pageSize);
-                return GetSuccess(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Đã xảy ra lỗi khi lấy danh sách Advertiser.");
-            }
-        }
+        //[HttpGet]
+        //[Route("get-campaigns-joined-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
+        //public async Task<IActionResult> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize)
+        //{
+        //    var response = await _campaignService.GetCampaignsJoinedByPublisher(publisherId, pageIndex, pageSize);
+        //    return GetSuccess(response);
+        //}
+        //[HttpGet]
+        //[Route("get-advertisers-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
+        //public async Task<IActionResult> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize)
+        //{
+        //    try
+        //    {
+        //        var response = await _campaignService.GetAdvertisersByPublisher(publisherId, pageIndex, pageSize);
+        //        return GetSuccess(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "Đã xảy ra lỗi khi lấy danh sách Advertiser.");
+        //    }
+        //}
 
         [HttpGet]
         [Route("get-campaign-by-id/{id}")]

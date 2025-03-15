@@ -20,9 +20,8 @@ namespace ClickFlow.DAL.Entities
 		public bool IsDeleted { get; set; }
 		public int? AdvertiserId { get; set; }
         public Advertiser? Advertiser { get; set; }
-        public ICollection<Traffic>? Traffics { get; set; }
-		public ICollection<ClosedTraffic>? ClosedTraffics { get; set; }
 		public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<Report>? Reports { get; set; }
+        public ICollection<CampaignParticipation>? CampaignParticipations { get; set; }
     }
 }

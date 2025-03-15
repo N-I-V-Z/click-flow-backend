@@ -43,21 +43,11 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(c => c.IsDeleted)
                    .IsRequired();
 
-            // Quan hệ với Advertiser (nếu có)
             builder.HasOne(c => c.Advertiser)
                    .WithMany(a => a.Campaigns)
                    .HasForeignKey(c => c.AdvertiserId)
                    .IsRequired(false);
 
-            // Quan hệ one-to-many với Traffic, ClosedTraffic, Feedback, Report
-            builder.HasMany(c => c.Traffics)
-                   .WithOne(t => t.Campaign)
-                   .HasForeignKey(t => t.CampaignId)
-                   .IsRequired(false);
-            builder.HasMany(c => c.ClosedTraffics)
-                   .WithOne(ct => ct.Campaign)
-                   .HasForeignKey(ct => ct.CampaignId)
-                   .IsRequired(false);
             builder.HasMany(c => c.Feedbacks)
                    .WithOne(f => f.Campaign)
                    .HasForeignKey(f => f.CampaignId)

@@ -11,9 +11,7 @@
         public string Browser { get; set; }
 		public string ReferrerURL { get; set; }
 		public DateTime Timestamp { get; set; }
-		public int? CampaignId { get; set; }
-		public int? PublisherId { get; set; }
-		public Publisher? Publisher { get; set; }
-		public Campaign? Campaign { get; set; }
-	}
+        public int? CampaignParticipationId { get; set; }
+        public CampaignParticipation? CampaignParticipation { get; set; }
+    }
 }

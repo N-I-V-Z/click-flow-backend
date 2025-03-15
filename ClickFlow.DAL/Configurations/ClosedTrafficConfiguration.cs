@@ -35,14 +35,10 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(ct => ct.Timestamp)
                    .IsRequired();
 
-            builder.HasOne(ct => ct.Campaign)
-                   .WithMany(c => c.ClosedTraffics)
-                   .HasForeignKey(ct => ct.CampaignId)
-                   .IsRequired(false);
-            builder.HasOne(ct => ct.Publisher)
-                   .WithMany(p => p.ClosedTraffics)
-                   .HasForeignKey(ct => ct.PublisherId)
-                   .IsRequired(false);
+            builder.HasOne(ct => ct.CampaignParticipation)
+                .WithMany(cp => cp.ClosedTraffics)
+                .HasForeignKey(ct => ct.CampaignParticipationId)
+                .IsRequired(false);
         }
     }
 }

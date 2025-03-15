@@ -131,5 +131,23 @@ namespace ClickFlow.API.Controllers
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
 			}
 		}
-	}
+
+        [Authorize]
+        [HttpGet("campaign-participation-status-list")]
+        public IActionResult GetCampaignParticipationStatusList()
+        {
+            try
+            {
+                var list = EnumHelper.GetEnumList<CampaignParticipationStatus>();
+                return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+    }
 }
