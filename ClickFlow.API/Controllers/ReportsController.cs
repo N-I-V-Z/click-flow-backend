@@ -56,7 +56,26 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Advertiser")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("status")]
+        public async Task<IActionResult> GetReportsByStatus([FromQuery] ReportsGetByStatusDTO dto)
+        {
+            try
+            {
+                var response = await _reportService.GetByStatusAsync(dto);
+                if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+
+        [Authorize(Roles = "Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO dto)
 		{
@@ -85,27 +104,6 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin, Advertiser")]
-		[HttpDelete("{reportId}")]
-		public async Task<IActionResult> DeleteReport([FromQuery] int reportId)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
-			try
-			{
-				var response = await _reportService.DeleteAsync(reportId);
-				if (!response) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize(Roles = "Admin")]
 		[HttpPut("status/{reportId}")]
 		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatus status)
 		{

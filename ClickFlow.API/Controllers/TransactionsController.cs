@@ -21,7 +21,78 @@ namespace ClickFlow.API.Controllers
 			_vnPayService = vnPayService;
 		}
 
-		[Authorize(Roles = "Publisher, Advertiser")]
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnTransactions([FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var userId = User.FindFirst("Id")?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
+                }
+
+                var response = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
+                if (response == null) return GetNotFound("Không có dữ liệu.");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
+
+        [HttpGet("response-payment")]
+        public async Task<IActionResult> PaymentResponse()
+        {
+            try
+            {
+                var vnpayRes = _vnPayService.PaymentExcute(Request.Query);
+
+                var transactionRes = await _transactionService.UpdateStatusTransactionAsync(
+                    int.Parse(vnpayRes.OrderId),
+                    new TransactionUpdateStatusDTO { Status = vnpayRes.IsSuccess });
+
+                if (!vnpayRes.IsSuccess)
+                {
+                    return SaveError(transactionRes);
+                }
+                return SaveSuccess(transactionRes);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllTransactions([FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var response = await _transactionService.GetAllTransactionsAsync(dto);
+                if (response == null) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
+
+        [Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
 		{
@@ -42,33 +113,31 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpGet("own")]
-		public async Task<IActionResult> GetOwnTransactions([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var userId = User.FindFirst("Id")?.Value;
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpPost("payment-url")]
+        public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
+        {
+            try
+            {
+                if (dto == null || dto.Amount <= 0)
+                {
+                    ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
+                    return ModelInvalid();
+                }
 
-				if (string.IsNullOrEmpty(userId))
-				{
-					return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-				}
+                var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, dto);
+                return GetSuccess(paymentUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-				var response = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
-				if (response == null) return GetNotFound("Không có dữ liệu.");
-				return Ok(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
-
-		[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
 		[HttpPut("status/{transactionId}")]
 		public async Task<IActionResult> UpdateStatusTransaction(int transactionId, [FromBody] TransactionUpdateStatusDTO dto)
 		{
@@ -77,76 +146,6 @@ namespace ClickFlow.API.Controllers
 				var response = await _transactionService.UpdateStatusTransactionAsync(transactionId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
-
-
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpPost("payment-url")]
-		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
-		{
-			try
-			{
-				if (dto == null || dto.Amount <= 0)
-				{
-					ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
-					return ModelInvalid();
-				}
-
-				var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, dto);
-				return GetSuccess(paymentUrl);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[HttpGet("response-payment")]
-		public async Task<IActionResult> PaymentResponse()
-		{
-			try
-			{
-				var vnpayRes = _vnPayService.PaymentExcute(Request.Query);
-
-				var transactionRes = await _transactionService.UpdateStatusTransactionAsync(
-					int.Parse(vnpayRes.OrderId), 
-					new TransactionUpdateStatusDTO { Status = vnpayRes.IsSuccess });
-
-				if (!vnpayRes.IsSuccess)
-				{
-					return SaveError(transactionRes);
-				}
-				return SaveSuccess(transactionRes);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpGet]
-		public async Task<IActionResult> GetAllTransactions([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var response = await _transactionService.GetAllTransactionsAsync(dto);
-				if (response == null) return GetNotFound("Không có dữ liệu.");
-				return GetSuccess(response);
 			}
 			catch (Exception ex)
 			{
