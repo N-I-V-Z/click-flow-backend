@@ -164,13 +164,47 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "abc"
+                            Image = "abc",
+                            Percents = 10
+                        },
+                        new Campaign
+                        {
+                            AdvertiserId = 1,
+                            Budget = 2000000,
+                            Commission = 15000,
+                            Description = "DEF",
+                            IsDeleted = false,
+                            EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(6)),
+                            Name = "DEF",
+                            OriginURL = "https://facebook.com",
+                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Status = CampaignStatus.Activing,
+                            TypeCampaign = Industry.FoodAndBeverage,
+                            TypePay = TypePay.CPA,
+                            Image = "def",
+                            Percents = 15
+                        },
+                        new Campaign
+                        {
+                            AdvertiserId = 1,
+                            Budget = 500000,
+                            Commission = 5000,
+                            Description = "XYZ",
+                            IsDeleted = false,
+                            EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(3)),
+                            Name = "XYZ",
+                            OriginURL = "https://twitter.com",
+                            StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Status = CampaignStatus.Completed,
+                            TypeCampaign = Industry.Education,
+                            TypePay = TypePay.CPS,
+                            Image = "xyz",
+                            Percents = 20
                         }
                     );
                     await context.SaveChangesAsync();
                 }
-
-                if (!context.Reports.Any())
+                    if (!context.Reports.Any())
                 {
                     await context.Reports.AddRangeAsync(
                         new Report
