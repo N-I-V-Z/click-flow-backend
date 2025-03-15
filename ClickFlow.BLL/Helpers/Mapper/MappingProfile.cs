@@ -72,7 +72,11 @@ namespace ClickFlow.BLL.Helpers.Mapper
 
             CreateMap<Campaign, CampaignResponseDTO>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName));
-           
+
+            CreateMap<Campaign, CampaignResponseForPublisherDTO>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName))
+            .ForMember(dest => dest.PublisherStatus, opt => opt.Ignore());
+
         }
     }
 }
