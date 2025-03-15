@@ -164,6 +164,19 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
+        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsExceptFromPending(int pageIndex, int pageSize)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
+            var campaigns = repo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(x => !x.IsDeleted && x.Status != CampaignStatus.Pending)
+                .WithInclude(x => x.Advertiser)
+                .Build());
+
+            var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
+            var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
+            return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
+        }
+
         public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatus(CampaignStatus? status, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();

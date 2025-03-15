@@ -1,6 +1,7 @@
 ﻿using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
+using ClickFlow.DAL.Paging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -24,6 +25,14 @@ namespace ClickFlow.API.Controllers
             var response = await _campaignService.GetAllCampaigns(pageIndex, pageSize);
             return GetSuccess(response);
         }
+        [HttpGet]
+        [Route("get-campaigns-except-from-pending/{pageIndex}/{pageSize}")]
+        public async Task<IActionResult> GetCampaignsExceptFromPending(int pageIndex, int pageSize)
+        {
+            var response = await _campaignService.GetCampaignsExceptFromPending(pageIndex, pageSize);
+            return GetSuccess(response);
+        }
+ 
 
         [HttpGet]
         [Route("get-campaigns-by-status/{status}/{pageIndex}/{pageSize}")]
