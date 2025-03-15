@@ -190,63 +190,63 @@ namespace ClickFlow.BLL.Services.Implements
         }
 
 
-        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize)
-        {
-            var repo = _unitOfWork.GetRepo<Traffic>();
-            var traffics = await Task.Run(() => repo.Get(new QueryBuilder<Traffic>()
-                .WithPredicate(x => x.PublisherId == publisherId)
-                .WithInclude(x => x.Campaign)
-                .Build()));
+        //public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize)
+        //{
+        //    var repo = _unitOfWork.GetRepo<Traffic>();
+        //    var traffics = await Task.Run(() => repo.Get(new QueryBuilder<Traffic>()
+        //        .WithPredicate(x => x.PublisherId == publisherId)
+        //        .WithInclude(x => x.Campaign)
+        //        .Build()));
 
-            if (traffics == null || !traffics.Any())
-            {
-                return new PaginatedList<CampaignResponseDTO>(new List<CampaignResponseDTO>(), 0, pageIndex, pageSize);
-            }
+        //    if (traffics == null || !traffics.Any())
+        //    {
+        //        return new PaginatedList<CampaignResponseDTO>(new List<CampaignResponseDTO>(), 0, pageIndex, pageSize);
+        //    }
 
-            var campaigns = traffics
-                .Select(x => x.Campaign)
-                .Where(x => !x.IsDeleted)
-                .ToList();    
-            var pagedCampaigns = await Task.Run(() => new PaginatedList<Campaign>(
-                campaigns.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
-                campaigns.Count,
-                pageIndex,
-                pageSize
-            ));
+        //    var campaigns = traffics
+        //        .Select(x => x.Campaign)
+        //        .Where(x => !x.IsDeleted)
+        //        .ToList();    
+        //    var pagedCampaigns = await Task.Run(() => new PaginatedList<Campaign>(
+        //        campaigns.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
+        //        campaigns.Count,
+        //        pageIndex,
+        //        pageSize
+        //    ));
 
-            var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
+        //    var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
 
-            return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
-        }
+        //    return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
+        //}
 
 
-        public async Task<PaginatedList<AdvertiserResponseDTO>> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize)
-        {
-            var trafficRepo = _unitOfWork.GetRepo<Traffic>();
-            var traffics = await Task.Run(() => trafficRepo.Get(new QueryBuilder<Traffic>()
-                .WithPredicate(x => x.PublisherId == publisherId)
-                .WithInclude(x => x.Campaign.Advertiser)
-                .Build()));
+        //public async Task<PaginatedList<AdvertiserResponseDTO>> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize)
+        //{
+        //    var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+        //    var traffics = await Task.Run(() => trafficRepo.Get(new QueryBuilder<Traffic>()
+        //        .WithPredicate(x => x.PublisherId == publisherId)
+        //        .WithInclude(x => x.Campaign.Advertiser)
+        //        .Build()));
 
-            if (traffics == null || !traffics.Any())
-            {
-                return new PaginatedList<AdvertiserResponseDTO>(new List<AdvertiserResponseDTO>(), 0, pageIndex, pageSize);
-            }
+        //    if (traffics == null || !traffics.Any())
+        //    {
+        //        return new PaginatedList<AdvertiserResponseDTO>(new List<AdvertiserResponseDTO>(), 0, pageIndex, pageSize);
+        //    }
 
-            var advertisers = traffics
-                .Where(x => x.Campaign != null && x.Campaign.Advertiser != null)
-                .Select(x => x.Campaign.Advertiser)
-                .Distinct()
-                .ToList();
+        //    var advertisers = traffics
+        //        .Where(x => x.Campaign != null && x.Campaign.Advertiser != null)
+        //        .Select(x => x.Campaign.Advertiser)
+        //        .Distinct()
+        //        .ToList();
 
-            var pagedAdvertisers = await Task.Run(() => new PaginatedList<Advertiser>(
-                advertisers.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
-                advertisers.Count, pageIndex, pageSize
-            ));
+        //    var pagedAdvertisers = await Task.Run(() => new PaginatedList<Advertiser>(
+        //        advertisers.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
+        //        advertisers.Count, pageIndex, pageSize
+        //    ));
 
-            var result = _mapper.Map<List<AdvertiserResponseDTO>>(pagedAdvertisers);
-            return new PaginatedList<AdvertiserResponseDTO>(result, pagedAdvertisers.TotalItems, pageIndex, pageSize);
-        }
+        //    var result = _mapper.Map<List<AdvertiserResponseDTO>>(pagedAdvertisers);
+        //    return new PaginatedList<AdvertiserResponseDTO>(result, pagedAdvertisers.TotalItems, pageIndex, pageSize);
+        //}
 
         public async Task<CampaignResponseDTO> GetCampaignById(int id)
         {
