@@ -27,7 +27,7 @@ namespace ClickFlow.API
 				.AddJsonOptions(options =>
 			{
 				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-			});
+            });
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddDbContext<ClickFlowContext>(option =>
 			{
