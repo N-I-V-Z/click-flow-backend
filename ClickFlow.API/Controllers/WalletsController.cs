@@ -18,15 +18,41 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpPut]
-		public async Task<IActionResult> UpdateWallet([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnWallet()
+        {
+            try
+            {
+                var userId = User.FindFirst("Id")?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
+                }
+
+                var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
+                if (response == null) return GetNotFound("Không có dữ liệu.");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
+
+        [Authorize(Roles = "Publisher, Advertiser")]
+		[HttpPut("{walletId}")]
+		public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _walletService.UpdateWalletAsync(id, dto);
+				var response = await _walletService.UpdateWalletAsync(walletId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
@@ -38,33 +64,5 @@ namespace ClickFlow.API.Controllers
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
 			}
 		}
-
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpGet]
-		[Route("own")]
-		public async Task<IActionResult> GetOwnWallet()
-		{
-			try
-			{
-				var userId = User.FindFirst("Id")?.Value;
-
-				if (string.IsNullOrEmpty(userId))
-				{
-					return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-				}
-
-				var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
-				if (response == null) return GetNotFound("Không có dữ liệu.");
-				return Ok(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
-
 	}
 }

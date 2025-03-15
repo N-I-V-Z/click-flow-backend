@@ -2,6 +2,7 @@
 using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,12 +20,12 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize]
-		[HttpGet("id")]
-		public async Task<IActionResult> GetTrafficById([FromQuery] int id)
-		{
-			try
-			{
-				var response = await _trafficService.GetByIdAsync(id);
+		[HttpGet("{trafficId}")]
+		public async Task<IActionResult> GetTrafficById(int trafficId)
+        {
+            try
+            {
+				var response = await _trafficService.GetByIdAsync(trafficId);
 				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
@@ -99,8 +100,8 @@ namespace ClickFlow.API.Controllers
 		}
 
         [Authorize]
-        [HttpGet("campaign")]
-        public async Task<IActionResult> GetTrafficsByCampaign([FromQuery] int campaignId, [FromQuery] PagingRequestDTO dto)
+        [HttpGet("campaign/{campaignId}")]
+        public async Task<IActionResult> GetTrafficsByCampaign(int campaignId, [FromQuery] PagingRequestDTO dto)
         {
             try
             {
