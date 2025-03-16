@@ -19,19 +19,5 @@ namespace ClickFlow.BLL.Services.Implements
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
-        public async Task<PaginatedList<PublisherResponseDTO>> GetAllPublishersAsync(int pageIndex, int pageSize)
-        {
-            var repo = _unitOfWork.GetRepo<ApplicationUser>();
-
-            var users = repo.Get(new QueryBuilder<ApplicationUser>()
-                .WithPredicate(x => x.Role == Role.Publisher && !x.IsDeleted)
-                .WithInclude(x => x.Publisher)
-                .Build());
-
-            var pagedUsers = await PaginatedList<ApplicationUser>.CreateAsync(users, pageIndex, pageSize);
-            var result = _mapper.Map<List<PublisherResponseDTO>>(pagedUsers);
-            return new PaginatedList<PublisherResponseDTO>(result, pagedUsers.TotalItems, pageIndex, pageSize);
-        }
     }
 }

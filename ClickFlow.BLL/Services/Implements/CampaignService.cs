@@ -28,10 +28,16 @@ namespace ClickFlow.BLL.Services.Implements
         {
             try
             {
+                if (!int.TryParse(userId, out int advertiserId))
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "UserId không hợp lệ." };
+                }
                 await _unitOfWork.BeginTransactionAsync();
                 var repo = _unitOfWork.GetRepo<Campaign>();
 
                 var campaign = _mapper.Map<Campaign>(dto);
+
+                campaign.AdvertiserId = advertiserId;
 
                 campaign.Status = CampaignStatus.Pending;
 

@@ -14,22 +14,5 @@ namespace ClickFlow.API.Controllers
             _publisherService = publisherService;
         }
 
-        [HttpGet]
-        [Route("get-all-publishers/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAllPublishers([FromRoute] int pageIndex, [FromRoute] int pageSize)
-        {
-            try
-            {
-                var response = await _publisherService.GetAllPublishersAsync(pageIndex, pageSize);
-                return GetSuccess(response);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút.");
-            }
-        }
     }
 }

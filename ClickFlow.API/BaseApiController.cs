@@ -93,7 +93,7 @@ namespace ClickFlow.API
 		{
 			get
 			{
-				var id = User.FindFirst("Id")?.Value;
+				var id =  User.FindFirst("Id")?.Value;
 				return id;
 			}
 		}
