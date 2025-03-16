@@ -87,6 +87,7 @@ namespace ClickFlow.API.ConfigExtensions
                 await context.Database.EnsureCreatedAsync();
             }
 
+            #region Seeding Roles
             if (!context.Roles.Any())
             {
                 await context.Roles.AddRangeAsync(
@@ -96,9 +97,11 @@ namespace ClickFlow.API.ConfigExtensions
                 );
                 await context.SaveChangesAsync();
             }
+            #endregion
 
             if (env.IsDevelopment())
             {
+                #region Seeding Users
                 if (!context.Users.Any())
                 {
                     await context.Users.AddRangeAsync(
@@ -111,7 +114,9 @@ namespace ClickFlow.API.ConfigExtensions
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding UserRoles
                 if (!context.UserRoles.Any())
                 {
                     await context.UserRoles.AddRangeAsync(
@@ -121,7 +126,9 @@ namespace ClickFlow.API.ConfigExtensions
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding Publishers
                 if (!context.Publishers.Any())
                 {
                     await context.Publishers.AddRangeAsync(
@@ -132,31 +139,37 @@ namespace ClickFlow.API.ConfigExtensions
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding Advertisers
                 if (!context.Advertisers.Any())
                 {
                     await context.Advertisers.AddRangeAsync(
-                        new Advertiser 
-                        { 
-                            CompanyName = "ABC", 
-                            IntroductionWebsite = "ABC", 
-                            StaffSize = 0, 
-                            Industry = Industry.FoodAndBeverage, 
-                            UserId = 3 
+                        new Advertiser
+                        {
+                            CompanyName = "ABC",
+                            IntroductionWebsite = "ABC",
+                            StaffSize = 0,
+                            Industry = Industry.FoodAndBeverage,
+                            UserId = 3
                         }
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding Wallets
                 if (!context.Wallets.Any())
                 {
                     await context.Wallets.AddRangeAsync(
-                        new Wallet { Balance = 0 },
-                        new Wallet { Balance = 0 }
+                        new Wallet { Balance = 0, UserId = 2 },
+                        new Wallet { Balance = 0, UserId = 3 }
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding Campaigns
                 if (!context.Campaigns.Any())
                 {
                     await context.Campaigns.AddRangeAsync(
@@ -210,82 +223,7 @@ namespace ClickFlow.API.ConfigExtensions
                             TypePay = TypePay.CPS,
                             Image = "xyz",
                             Percents = 20
-                        }
-                    );
-                    await context.SaveChangesAsync();
-                }
-                    if (!context.Reports.Any())
-                {
-                    await context.Reports.AddRangeAsync(
-                        new Report
-                        {
-                            AdvertiserId = 1,
-                            CampaignId = 1,
-                            CreateAt = DateTime.UtcNow,
-                            EvidenceURL = "https://abc.com",
-                            PublisherId = 1,
-                            Reason = "ABC",
-                            Status = ReportStatus.Pending
-                        }
-                    );
-                    await context.SaveChangesAsync();
-                }
-
-                if (!context.UserDetail.Any())
-                {
-                    await context.UserDetail.AddRangeAsync(
-                        new UserDetail
-                        {
-                            ApplicationUserId = 1, // Admin
-                            DateOfBirth = new DateTime(1990, 1, 1),
-                            Gender = Gender.Male,
-                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
-                            Address = "123 Admin Street"
                         },
-                        new UserDetail
-                        {
-                            ApplicationUserId = 2, // Publisher
-                            DateOfBirth = new DateTime(1995, 5, 5),
-                            Gender = Gender.Female,
-                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
-                            Address = "456 Publisher Street"
-                        },
-                        new UserDetail
-                        {
-                            ApplicationUserId = 3, // Advertiser
-                            DateOfBirth = new DateTime(1985, 10, 10),
-                            Gender = Gender.Male,
-                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
-                            Address = "789 Advertiser Street"
-                        }
-                    );
-                    await context.SaveChangesAsync();
-                }           
-
-                if (!context.Feedbacks.Any())
-                {
-                    await context.Feedbacks.AddRangeAsync(
-                        new Feedback
-                        {
-                            CampaignId = 1, // Campaign ABC
-                            Description = "Great campaign!",
-                            StarRate = 5,
-                            Timestamp = DateTime.UtcNow
-                        },
-                        new Feedback
-                        {
-                            CampaignId = 1, // Campaign ABC
-                            Description = "Could be better.",
-                            StarRate = 3,
-                            Timestamp = DateTime.UtcNow.AddDays(-1)
-                        }
-                    );
-                    await context.SaveChangesAsync();
-                }
-
-                if (!context.Campaigns.Any())
-                {
-                    await context.Campaigns.AddRangeAsync(
                         new Campaign
                         {
                             AdvertiserId = 1,
@@ -337,7 +275,84 @@ namespace ClickFlow.API.ConfigExtensions
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding Reports
+                if (!context.Reports.Any())
+                {
+                    await context.Reports.AddRangeAsync(
+                        new Report
+                        {
+                            AdvertiserId = 1,
+                            CampaignId = 1,
+                            CreateAt = DateTime.UtcNow,
+                            EvidenceURL = "https://abc.com",
+                            PublisherId = 1,
+                            Reason = "ABC",
+                            Status = ReportStatus.Pending
+                        }
+                    );
+                    await context.SaveChangesAsync();
+                }
+                #endregion
+
+                #region Seeding UserDetail
+                if (!context.UserDetail.Any())
+                {
+                    await context.UserDetail.AddRangeAsync(
+                        new UserDetail
+                        {
+                            ApplicationUserId = 1, // Admin
+                            DateOfBirth = new DateTime(1990, 1, 1),
+                            Gender = Gender.Male,
+                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Address = "123 Admin Street"
+                        },
+                        new UserDetail
+                        {
+                            ApplicationUserId = 2, // Publisher
+                            DateOfBirth = new DateTime(1995, 5, 5),
+                            Gender = Gender.Female,
+                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Address = "456 Publisher Street"
+                        },
+                        new UserDetail
+                        {
+                            ApplicationUserId = 3, // Advertiser
+                            DateOfBirth = new DateTime(1985, 10, 10),
+                            Gender = Gender.Male,
+                            AvatarURL = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Address = "789 Advertiser Street"
+                        }
+                    );
+                    await context.SaveChangesAsync();
+                }
+                #endregion
+
+                #region Seeding Feedbacks
+                if (!context.Feedbacks.Any())
+                {
+                    await context.Feedbacks.AddRangeAsync(
+                        new Feedback
+                        {
+                            CampaignId = 1, // Campaign ABC
+                            Description = "Great campaign!",
+                            StarRate = 5,
+                            Timestamp = DateTime.UtcNow
+                        },
+                        new Feedback
+                        {
+                            CampaignId = 1, // Campaign ABC
+                            Description = "Could be better.",
+                            StarRate = 3,
+                            Timestamp = DateTime.UtcNow.AddDays(-1)
+                        }
+                    );
+                    await context.SaveChangesAsync();
+                }
+                #endregion
+
+                #region Seeding CampaignParticipations
                 if (!context.CampaignParticipations.Any())
                 {
                     await context.CampaignParticipations.AddRangeAsync(
@@ -347,12 +362,14 @@ namespace ClickFlow.API.ConfigExtensions
                             CreateAt = DateTime.UtcNow,
                             PublisherId = 1,
                             Status = CampaignParticipationStatus.Pending,
-                            
+
                         }
                     );
                     await context.SaveChangesAsync();
                 }
+                #endregion
 
+                #region Seeding Traffics
                 if (!context.Traffics.Any())
                 {
                     await context.Traffics.AddRangeAsync(
@@ -370,7 +387,7 @@ namespace ClickFlow.API.ConfigExtensions
                     );
                     await context.SaveChangesAsync();
                 }
-
+                #endregion
             }
         }
     }

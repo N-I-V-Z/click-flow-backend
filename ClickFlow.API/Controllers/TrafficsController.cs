@@ -1,10 +1,13 @@
-﻿using ClickFlow.BLL.DTOs.PagingDTOs;
+﻿using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
+using ClickFlow.BLL.DTOs.TransactionDTOs;
 using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -43,11 +46,12 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> GetTraffics([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var response = await _trafficService.GetAllAsync(dto);
-				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+        {
+            try
+            {
+				var data = await _trafficService.GetAllAsync(dto);
+                var response = new PagingDTO<TrafficResponseDTO>(data);
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -67,8 +71,10 @@ namespace ClickFlow.API.Controllers
 			{
 				var userId = User.FindFirst("Id")?.Value;
 
-				var response = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
-				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+				var data = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
+                var response = new PagingDTO<TrafficResponseDTO>(data);
+
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -88,8 +94,10 @@ namespace ClickFlow.API.Controllers
 			{
 				var userId = User.FindFirst("Id")?.Value;
 
-				var response = await _trafficService.GetAllByAdvertiserIdAsync(int.Parse(userId), dto);
-				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+				var data = await _trafficService.GetAllByAdvertiserIdAsync(int.Parse(userId), dto);
+                var response = new PagingDTO<TrafficResponseDTO>(data);
+
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)

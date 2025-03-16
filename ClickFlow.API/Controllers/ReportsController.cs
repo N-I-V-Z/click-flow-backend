@@ -1,9 +1,12 @@
-﻿using ClickFlow.BLL.DTOs.PagingDTOs;
+﻿using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.ReportDTOs;
+using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -25,6 +28,7 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _reportService.GetByIdAsync(reportId);
+
 				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
@@ -40,11 +44,13 @@ namespace ClickFlow.API.Controllers
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
 		public async Task<IActionResult> GetAllReports([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var response = await _reportService.GetAllAsync(dto);
-				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+        {
+            try
+            {
+				var data = await _reportService.GetAllAsync(dto);
+                var response = new PagingDTO<ReportResponseDTO>(data);
+
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -62,8 +68,10 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-                var response = await _reportService.GetByStatusAsync(dto);
-                if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+                var data = await _reportService.GetByStatusAsync(dto);
+                var response = new PagingDTO<ReportResponseDTO>(data);
+
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
                 return GetSuccess(response);
             }
             catch (Exception ex)
@@ -134,7 +142,7 @@ namespace ClickFlow.API.Controllers
 			{
 				var result = await _reportService.UpdateResponseReportAsync(reportId, response);
 				if (result == null) return SaveError();
-				return SaveSuccess(response);
+				return SaveSuccess(result);
 			}
 			catch (Exception ex)
 			{
