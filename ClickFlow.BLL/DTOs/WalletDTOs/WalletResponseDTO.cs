@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.DTOs.WalletDTOs
 {
-	public class WalletViewDTO
+	public class WalletResponseDTO
 	{
 		public int Id { get; set; }
 		public int Balance { get; set; }

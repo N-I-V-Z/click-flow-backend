@@ -2,7 +2,7 @@
 
 namespace ClickFlow.BLL.DTOs.TrafficDTOs
 {
-    public class TrafficViewDTO
+    public class TrafficResponseDTO
 	{
         public int Id { get; set; }
         public string IpAddress { get; set; }
@@ -14,6 +14,6 @@ namespace ClickFlow.BLL.DTOs.TrafficDTOs
         public string ReferrerURL { get; set; }
         public DateTime Timestamp { get; set; }
         public int? CampaignParticipationId { get; set; }
-        public CampaignParticipationNoTrafficResponseDTO? CampaignParticipation { get; set; }
+        public CampaignParticipationResponseDTO? CampaignParticipation { get; set; }
     }
 }

@@ -36,61 +36,46 @@ namespace ClickFlow.BLL.Services.Implements
 			return queryBuilder;
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
 		{
 			var paginatedEntities = await PaginatedList<Transaction>.CreateAsync(query, pageIndex, pageSize);
-			var resultDto = _mapper.Map<List<TrafficViewDTO>>(paginatedEntities);
+			var resultDto = _mapper.Map<List<TrafficResponseDTO>>(paginatedEntities);
 
-			return new PaginatedList<TrafficViewDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
+			return new PaginatedList<TrafficResponseDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
 		}
 
-		public async Task<TrafficViewDTO> CreateAsync(TrafficCreateDTO dto)
+		public async Task<TrafficResponseDTO> CreateAsync(TrafficCreateDTO dto)
 		{
-			try
-			{
+			//try
+			//{
 
-				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
-				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+			//	var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+			//	var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
-				// traffic được tạo
-				var newTraffic = _mapper.Map<Traffic>(dto);
+			//	var queryBuilder = CreateQueryBuilder();
+			//	var queryOptions = queryBuilder.WithPredicate(x => x.Id == dto.CampaignId && x.IsValid == true);
+			//	// traffic được tạo
+			//	var newTraffic = _mapper.Map<Traffic>(dto);
 
-				// campaign của traffic được tạo
-				var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
-					.WithPredicate(x => x.Id == dto.CampaignId)
-					.WithTracking(false)
-					.Build()
-					);
-
-				// các traffic của campaign đó, để tính tổng tiền
-				var trafficCampaign = await trafficRepo.GetAllAsync(new QueryBuilder<Traffic>()
-					.WithPredicate(x => x.Id == dto.CampaignId && x.IsValid == true)
-					.WithTracking(false)
-					.Build()
-					);
-				var totalCommission = trafficCampaign.Sum(x => x.Revenue);
-
-				// ngày hiện tại
-				var currentDay = new DateOnly();
-
-				await trafficRepo.CreateAsync(newTraffic);
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
+			//	await trafficRepo.CreateAsync(newTraffic);
+			//	var saver = await _unitOfWork.SaveAsync();
+			//	if (!saver)
+			//	{
+			//		return null;
+			//	}
 
 
-				return _mapper.Map<TrafficViewDTO>(newTraffic);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			//	return _mapper.Map<TrafficViewDTO>(newTraffic);
+			//}
+			//catch (Exception ex)
+			//{
+			//	Console.WriteLine(ex.ToString());
+			//	throw;
+			//}
+			throw new Exception();
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllAsync(PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllAsync(PagingRequestDTO dto)
 		{
 			try
 			{
@@ -108,8 +93,8 @@ namespace ClickFlow.BLL.Services.Implements
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
 				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
+				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -118,7 +103,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<TrafficViewDTO> GetByIdAsync(int id)
+		public async Task<TrafficResponseDTO> GetByIdAsync(int id)
 		{
 			try
 			{
@@ -133,7 +118,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 				var response = await trafficRepo.GetSingleAsync(queryOptions.Build());
 				if (response == null) return null;
-				return _mapper.Map<TrafficViewDTO>(response);
+				return _mapper.Map<TrafficResponseDTO>(response);
 			}
 			catch (Exception ex)
 			{
@@ -142,7 +127,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto)
 		{
 			try
 			{
@@ -165,8 +150,8 @@ namespace ClickFlow.BLL.Services.Implements
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
 				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
+				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -175,7 +160,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto)
 		{
 			try
 			{
@@ -197,8 +182,8 @@ namespace ClickFlow.BLL.Services.Implements
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
 				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
+				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -207,7 +192,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto)
 		{
 			try
 			{
@@ -228,8 +213,8 @@ namespace ClickFlow.BLL.Services.Implements
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
 				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
+				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{

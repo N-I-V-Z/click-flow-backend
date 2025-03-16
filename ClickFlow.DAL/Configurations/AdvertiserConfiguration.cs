@@ -27,6 +27,10 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(a => a.Industry)
                    .IsRequired();
 
+            builder.HasOne(u => u.ApplicationUser)
+                   .WithOne(a => a.Advertiser)
+                   .HasForeignKey<Advertiser>(a => a.UserId);
+
             builder.HasMany(a => a.Campaigns)
                    .WithOne(c => c.Advertiser)
                    .HasForeignKey(c => c.AdvertiserId)

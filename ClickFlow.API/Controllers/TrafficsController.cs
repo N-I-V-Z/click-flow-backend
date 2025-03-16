@@ -13,10 +13,12 @@ namespace ClickFlow.API.Controllers
 	public class TrafficsController : BaseAPIController
 	{
 		private readonly ITrafficService _trafficService;
+		private readonly ICampaignService _campaignService;
 
-		public TrafficsController(ITrafficService trafficService)
+		public TrafficsController(ITrafficService trafficService, ICampaignService campaignService)
 		{
 			_trafficService = trafficService;
+			_campaignService = campaignService;
 		}
 
 		[Authorize]
@@ -118,25 +120,29 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[HttpPost]
-		public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+		//[HttpPost]
+		//public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
+		//{
+		//	if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
+		//	try
+		//	{
+		//		string checkCampaign = await _campaignService.ValidateCampaignForTraffic(dto.CampaignId ?? 0);
+		//		if (checkCampaign != null) return Error(checkCampaign);
 
-				var response = await _trafficService.CreateAsync(dto);
-				if (response == null) return SaveError(response);
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+
+
+		//		var response = await _trafficService.CreateAsync(dto);
+		//		if (response == null) return SaveError(response);
+		//		return SaveSuccess(response);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		Console.ForegroundColor = ConsoleColor.Red;
+		//		Console.WriteLine(ex.Message);
+		//		Console.ResetColor();
+		//		return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+		//	}
+		//}
 	}
 }

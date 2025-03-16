@@ -34,14 +34,14 @@ namespace ClickFlow.BLL.Services.Implements
 			return queryBuilder;
 		}
 
-		public async Task<PaginatedList<TransactionViewDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
 		{
 			var paginatedEntities = await PaginatedList<Transaction>.CreateAsync(query, pageIndex, pageSize);
-			var resultDto = _mapper.Map<List<TransactionViewDTO>>(paginatedEntities);
+			var resultDto = _mapper.Map<List<TransactionResponseDTO>>(paginatedEntities);
 
-			return new PaginatedList<TransactionViewDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
+			return new PaginatedList<TransactionResponseDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
 		}
-		public async Task<TransactionViewDTO> CreateTransactionAsync(TransactionCreateDTO dto)
+		public async Task<TransactionResponseDTO> CreateTransactionAsync(TransactionCreateDTO dto)
 		{
 			try
 			{
@@ -98,7 +98,7 @@ namespace ClickFlow.BLL.Services.Implements
 					return null;
 				}
 
-				return _mapper.Map<TransactionViewDTO>(newTransaction);
+				return _mapper.Map<TransactionResponseDTO>(newTransaction);
 			}
 			catch (Exception ex)
 			{
@@ -108,18 +108,18 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
 		{
 			try
 			{
-				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
-				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
-					.WithPredicate(x => x.Id == userId)
+				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
+					.WithPredicate(x => x.UserId == userId)
 					.WithTracking(false)
 					.Build());
 
 				var queryBuilder = CreateQueryBuilder(dto.Keyword);
-				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == user.WalletId);
+				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == wallet.Id);
 				if (!string.IsNullOrEmpty(dto.Keyword))
 				{
 					var predicate = FilterHelper.BuildSearchExpression<Transaction>(dto.Keyword);
@@ -128,7 +128,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var transactions = transactionRepo.Get(queryOptions.Build());
 
-				var results = _mapper.Map<List<TransactionViewDTO>>(transactions);
+				var results = _mapper.Map<List<TransactionResponseDTO>>(transactions);
 
 				var pageResults = await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 
@@ -141,7 +141,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<TransactionViewDTO> UpdateStatusTransactionAsync(int id, TransactionUpdateStatusDTO dto)
+		public async Task<TransactionResponseDTO> UpdateStatusTransactionAsync(int id, TransactionUpdateStatusDTO dto)
 		{
 			try
 			{
@@ -184,7 +184,7 @@ namespace ClickFlow.BLL.Services.Implements
 					await _unitOfWork.SaveChangesAsync();
 				}
 				await _unitOfWork.CommitTransactionAsync();
-				return _mapper.Map<TransactionViewDTO>(transaction);
+				return _mapper.Map<TransactionResponseDTO>(transaction);
 
 			}
 			catch (Exception ex)
@@ -195,7 +195,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TransactionViewDTO>> GetAllTransactionsAsync(PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsAsync(PagingRequestDTO dto)
 		{
 			try
 			{
@@ -210,7 +210,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var transactions = transactionRepo.Get(queryOptions.Build());
 
-				var results = _mapper.Map<List<TransactionViewDTO>>(transactions);
+				var results = _mapper.Map<List<TransactionResponseDTO>>(transactions);
 
 				var pageResults = await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 

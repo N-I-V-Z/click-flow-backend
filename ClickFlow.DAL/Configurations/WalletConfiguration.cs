@@ -22,7 +22,7 @@ namespace ClickFlow.DAL.Configurations
 
             builder.HasOne(w => w.ApplicationUser)
                    .WithOne(u => u.Wallet)
-                   .HasForeignKey<ApplicationUser>(u => u.WalletId)
+                   .HasForeignKey<Wallet>(u => u.UserId)
                    .IsRequired(false);
 
             builder.HasMany(w => w.Transactions)

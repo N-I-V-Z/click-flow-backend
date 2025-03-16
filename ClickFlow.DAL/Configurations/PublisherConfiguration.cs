@@ -18,6 +18,9 @@ namespace ClickFlow.DAL.Configurations
             builder.Property(p => p.Id).UseIdentityColumn();
 
             // Quan hệ one-to-one với ApplicationUser được cấu hình ở ApplicationUserConfiguration
+            builder.HasOne(u => u.ApplicationUser)
+                   .WithOne(p => p.Publisher)
+                   .HasForeignKey<Publisher>(p => p.UserId);
 
             builder.HasMany(p => p.Reports)
                    .WithOne(r => r.Publisher)
