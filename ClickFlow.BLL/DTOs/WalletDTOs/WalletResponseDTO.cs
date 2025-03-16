@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ClickFlow.BLL.DTOs.WalletDTOs
+﻿namespace ClickFlow.BLL.DTOs.WalletDTOs
 {
-	public class WalletResponseDTO
+    public class WalletResponseDTO
 	{
-		public int Id { get; set; }
-		public int Balance { get; set; }
-	}
+        public int Id { get; set; }
+        public int Balance { get; set; }
+        public int UserId { get; set; }
+    }
 }

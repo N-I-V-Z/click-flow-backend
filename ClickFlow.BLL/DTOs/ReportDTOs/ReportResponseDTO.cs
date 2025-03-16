@@ -6,7 +6,7 @@ using ClickFlow.DAL.Enums;
 
 namespace ClickFlow.BLL.DTOs.ReportDTOs
 {
-	public class ReportViewDTO
+	public class ReportResponseDTO
 	{
 		public int Id { get; set; }
 		public string Reason { get; set; }
@@ -15,7 +15,7 @@ namespace ClickFlow.BLL.DTOs.ReportDTOs
 		public string Response { get; set; }
 		public string EvidenceURL { get; set; }
 		public int? PublisherId { get; set; }
-        public PublisherResponseDTO? Publisher { get; set; }
+        public PublisherViewDTO? Publisher { get; set; }
         public int? AdvertiserId { get; set; }
         public AdvertiserViewDTO? Advertiser { get; set; }
         public int? CampaignId { get; set; }

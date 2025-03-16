@@ -1,10 +1,13 @@
-﻿using ClickFlow.BLL.DTOs.PagingDTOs;
+﻿using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TransactionDTOs;
+using ClickFlow.BLL.DTOs.UserDetailDTOs;
 using ClickFlow.BLL.DTOs.VnPayDTOs;
 using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -34,8 +37,9 @@ namespace ClickFlow.API.Controllers
                     return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
                 }
 
-                var response = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
-                if (response == null) return GetNotFound("Không có dữ liệu.");
+                var data = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
+                var response = new PagingDTO<TransactionResponseDTO>(data);
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
                 return Ok(response);
             }
             catch (Exception ex)
@@ -79,8 +83,9 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-                var response = await _transactionService.GetAllTransactionsAsync(dto);
-                if (response == null) return GetNotFound("Không có dữ liệu.");
+                var data = await _transactionService.GetAllTransactionsAsync(dto);
+                var response = new PagingDTO<TransactionResponseDTO>(data);
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
                 return GetSuccess(response);
             }
             catch (Exception ex)
