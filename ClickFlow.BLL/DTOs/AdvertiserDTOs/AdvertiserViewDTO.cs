@@ -16,6 +16,7 @@ namespace ClickFlow.BLL.DTOs.AdvertiserDTOs
         public string IntroductionWebsite { get; set; }
         public int StaffSize { get; set; }
         public Industry Industry { get; set; }
-        public ApplicationUserResponseDTO? ApplicationUser { get; set; }
+        public int UserId { get; set; }
+        public UserViewDTO? ApplicationUser { get; set; }
     }
 }

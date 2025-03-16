@@ -19,4 +19,8 @@
     <ProjectReference Include="..\ClickFlow.DAL\ClickFlow.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\UserDTOs\" />
+  </ItemGroup>
+
 </Project>

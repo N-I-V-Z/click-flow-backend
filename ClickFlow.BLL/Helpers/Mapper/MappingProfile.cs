@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.AdvertiserDTOs;
+using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.PublisherDTOs;
-using ClickFlow.BLL.DTOs.UserDTOs;
 using ClickFlow.DAL.Entities;
 using System.Globalization;
 using System.Reflection;
 
 namespace ClickFlow.BLL.Helpers.Mapper
 {
-	public class MappingProfile : Profile
+    public class MappingProfile : Profile
 	{
         public MappingProfile()
         {
@@ -41,42 +41,7 @@ namespace ClickFlow.BLL.Helpers.Mapper
                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
                    DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
             CreateMap<ApplicationUser, UserViewDTO>();
-            
-            CreateMap<Advertiser, AdvertiserResponseDTO>();
-            CreateMap<ApplicationUser, AdvertiserResponseDTO>()
-            .ForMember(dest => dest.Id,
-               opt => opt.MapFrom(src => src.Advertiser.Id))
-             .ForMember(dest => dest.CompanyName,
-               opt => opt.MapFrom(src => src.Advertiser.CompanyName))
-             .ForMember(dest => dest.IntroductionWebsite,
-               opt => opt.MapFrom(src => src.Advertiser.IntroductionWebsite))
-             .ForMember(dest => dest.StaffSize,
-               opt => opt.MapFrom(src => src.Advertiser.StaffSize))
-             .ForMember(dest => dest.Industry,
-               opt => opt.MapFrom(src => src.Advertiser.Industry))
-             .ForMember(dest => dest.FullName,
-               opt => opt.MapFrom(src => src.FullName))
-            .ForMember(dest => dest.Email,
-               opt => opt.MapFrom(src => src.Email))
-            .ForMember(dest => dest.Role,
-               opt => opt.MapFrom(src => src.Role))
-            .ForMember(dest => dest.Campaigns,
-               opt => opt.MapFrom(src => src.Advertiser.Campaigns));
-
-            CreateMap<ApplicationUser, PublisherResponseDTO>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Publisher.Id))
-            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
-   
-
-
-            CreateMap<Campaign, CampaignResponseDTO>()
-            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName));
-
-            CreateMap<Campaign, CampaignResponseForPublisherDTO>()
-            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Advertiser.CompanyName))
-            .ForMember(dest => dest.PublisherStatus, opt => opt.Ignore());
-
+           
         }
     }
 }

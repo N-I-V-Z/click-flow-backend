@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ClickFlow.BLL.DTOs.UserDTOs;
+using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -26,6 +26,7 @@ namespace ClickFlow.BLL.Services.Implements
 
             var users = repo.Get(new QueryBuilder<ApplicationUser>()
                 .WithPredicate(x => x.Role == role && !x.IsDeleted)
+                .WithInclude(x => x.Advertiser)
                 .Build());
 
             var pagedUsers = await PaginatedList<ApplicationUser>.CreateAsync(users, pageIndex, pageSize);

@@ -1,4 +1,5 @@
-﻿using ClickFlow.DAL.Enums;
+﻿using ClickFlow.BLL.DTOs.AdvertiserDTOs;
+using ClickFlow.DAL.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,6 @@ namespace ClickFlow.BLL.DTOs.CampaignDTOs
         public int? Percents { get; set; }
         public string Image { get; set; }
         public int? AdvertiserId { get; set; }
-        public string? CompanyName { get; set; }
+        //public AdvertiserResponseDTO? Advertiser { get; set; }
     }
 }
