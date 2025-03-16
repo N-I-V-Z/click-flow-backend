@@ -4,7 +4,7 @@ using ClickFlow.DAL.Enums;
 
 namespace ClickFlow.BLL.DTOs.CampaignParticipationDTOs
 {
-    public class CampaignParticipationNoTrafficResponseDTO
+    public class CampaignParticipationResponseDTO
     {
         public int Id { get; set; }
         public CampaignParticipationStatus Status { get; set; }

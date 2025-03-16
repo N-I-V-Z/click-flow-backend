@@ -36,15 +36,16 @@ namespace ClickFlow.BLL.Services.Implements
 			return queryBuilder;
 		}
 
-		public async Task<WalletViewDTO> CreateWalletAsync(WalletCreateDTO dto)
+		public async Task<WalletResponseDTO> CreateWalletAsync(int userId, WalletCreateDTO dto)
 		{
 			try
 			{
 				var repo = _unitOfWork.GetRepo<Wallet>();
 
 				var createdWallet = _mapper.Map<Wallet>(dto);
+				createdWallet.UserId = userId;
 
-				await repo.CreateAsync(createdWallet);
+                await repo.CreateAsync(createdWallet);
 
 				var saver = await _unitOfWork.SaveAsync();
 				if (!saver)
@@ -52,7 +53,7 @@ namespace ClickFlow.BLL.Services.Implements
 					return null;
 				}
 
-				return _mapper.Map<WalletViewDTO>(createdWallet);
+				return _mapper.Map<WalletResponseDTO>(createdWallet);
 			}
 			catch (Exception ex)
 			{
@@ -61,27 +62,19 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<WalletViewDTO> GetWalletByUserIdAsync(int id)
+		public async Task<WalletResponseDTO> GetWalletByUserIdAsync(int id)
 		{
 			try
 			{
-				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
 				var walletRepo = _unitOfWork.GetRepo<Wallet>();
-
-				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
-					.WithPredicate(x => x.Id == id)
-					.WithTracking(false)
-					.WithInclude(x => x.Wallet)
-					.Build()
-					);
 
 				var walletQueryBuilder = CreateQueryBuilder();
 				var walletQueryOptions = walletQueryBuilder
-					.WithPredicate(x => x.Id == user.WalletId)
+					.WithPredicate(x => x.UserId == id)
 					.Build();
 				var wallet = await walletRepo.GetSingleAsync(walletQueryOptions);
 
-				return _mapper.Map<WalletViewDTO>(wallet);
+				return _mapper.Map<WalletResponseDTO>(wallet);
 			}
 			catch (Exception ex)
 			{
@@ -90,7 +83,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<WalletViewDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto)
+		public async Task<WalletResponseDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto)
 		{
 			try
 			{
@@ -110,7 +103,7 @@ namespace ClickFlow.BLL.Services.Implements
 					return null;
 				}
 
-				return _mapper.Map<WalletViewDTO>(updatedWallet);
+				return _mapper.Map<WalletResponseDTO>(updatedWallet);
 			}
 			catch (Exception ex)
 			{

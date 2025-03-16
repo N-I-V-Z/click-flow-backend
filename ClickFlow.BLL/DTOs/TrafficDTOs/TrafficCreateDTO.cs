@@ -19,7 +19,9 @@ namespace ClickFlow.BLL.DTOs.TrafficDTOs
 		public string ReferrerURL { get; set; }
 		[Required(ErrorMessage = "Timestamp không được để trống.")]
 		public DateTime Timestamp { get; set; }
-		public int? CampaignId { get; set; }
-		public int? PublisherId { get; set; }
+        [Required(ErrorMessage = "CampaignId không được để trống.")]
+        public int CampaignId { get; set; }
+        [Required(ErrorMessage = "PublisherId không được để trống.")]
+        public int PublisherId { get; set; }
 	}
 }

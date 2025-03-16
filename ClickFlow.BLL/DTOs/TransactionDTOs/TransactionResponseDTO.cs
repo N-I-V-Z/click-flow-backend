@@ -2,7 +2,7 @@
 
 namespace ClickFlow.BLL.DTOs.TransactionDTOs
 {
-	public class TransactionViewDTO
+	public class TransactionResponseDTO
 	{
 		public int Id { get; set; }
 		public int Amount { get; set; }

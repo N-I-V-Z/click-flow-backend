@@ -24,22 +24,6 @@ namespace ClickFlow.DAL.Configurations
                    .IsRequired();
             builder.Property(u => u.IsDeleted)
                    .IsRequired();
-
-          
-            builder.HasOne(u => u.Advertiser)
-                   .WithOne(a => a.ApplicationUser)
-                   .HasForeignKey<ApplicationUser>(u => u.AdvertiserId)
-                   .IsRequired(false);
-
-            builder.HasOne(u => u.Publisher)
-                   .WithOne(p => p.ApplicationUser)
-                   .HasForeignKey<ApplicationUser>(u => u.PublisherId)
-                   .IsRequired(false);
-
-            builder.HasOne(u => u.Wallet)
-                   .WithOne(w => w.ApplicationUser)
-                   .HasForeignKey<ApplicationUser>(u => u.WalletId)
-                   .IsRequired(false);
         }
     }
 }
