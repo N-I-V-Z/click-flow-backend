@@ -20,5 +20,15 @@ namespace ClickFlow.BLL.Services.Implements
             _mapper = mapper;
         }
 
+        public async Task<Advertiser> GetAdvertiserByUserIdAsync(int userId)
+        {
+            var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();
+        
+            var advertiser = await advertiserRepo.GetSingleAsync(new QueryBuilder<Advertiser>()
+                .WithPredicate(a => a.UserId == userId) 
+                .Build());
+
+            return advertiser;
+        }
     }
 }

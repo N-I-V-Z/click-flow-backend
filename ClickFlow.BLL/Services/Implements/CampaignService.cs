@@ -18,40 +18,58 @@ namespace ClickFlow.BLL.Services.Implements
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IAdvertiserService _advertiserService;
 
-        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _advertiserService = advertiserService;
         }
 
         public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, string userId)
         {
             try
             {
-                if (!int.TryParse(userId, out int advertiserId))
+           
+                if (!int.TryParse(userId, out int parsedUserId))
                 {
                     return new BaseResponse { IsSuccess = false, Message = "UserId không hợp lệ." };
                 }
+
+              
                 await _unitOfWork.BeginTransactionAsync();
-                var repo = _unitOfWork.GetRepo<Campaign>();
+
+               
+                var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();
+
+
+                var advertiser = await _advertiserService.GetAdvertiserByUserIdAsync(parsedUserId);
+
+                if (advertiser == null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy Advertiser." };
+                }
+        
+                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
                 var campaign = _mapper.Map<Campaign>(dto);
-
-                campaign.AdvertiserId = advertiserId;
-
+         
+                campaign.AdvertiserId = advertiser.Id;
+              
                 campaign.Status = CampaignStatus.Pending;
-
-                await repo.CreateAsync(campaign);
+         
+                await campaignRepo.CreateAsync(campaign);           
                 await _unitOfWork.SaveChangesAsync();
-
                 await _unitOfWork.CommitTransactionAsync();
+
+                // Trả về kết quả thành công
                 return new BaseResponse { IsSuccess = true, Message = "Chiến dịch đã được tạo thành công." };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                await _unitOfWork.RollBackAsync();
-                throw;
+                await _unitOfWork.RollBackAsync();         
+                throw new Exception("Đã xảy ra lỗi khi tạo chiến dịch.", ex);
             }
         }
 
