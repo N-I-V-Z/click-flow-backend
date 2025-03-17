@@ -181,7 +181,9 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaigns = repo.Get(new QueryBuilder<Campaign>()
                 .WithPredicate(x => !x.IsDeleted)
-                .WithInclude(x => x.Advertiser)
+                .WithInclude(x => x.Advertiser.ApplicationUser)   
+
+                
                 .Build());
 
             var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);

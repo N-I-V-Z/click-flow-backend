@@ -19,7 +19,7 @@ namespace ClickFlow.API.Controllers
 
         [HttpPost]
         [Route("create-update-user-detail")]
-        public async Task<IActionResult> CreateUpdateUserDetail(UserDetailRequestDTO dto, int userId)
+        public async Task<IActionResult> CreateUpdateUserDetail(UserDetailRequestDTO dto)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace ClickFlow.API.Controllers
                         return ModelInvalid();
                     }
                 }        
-                var response = await _userDetailService.CreateUpdateUserDetail(dto, userId.ToString());
+                var response = await _userDetailService.CreateUpdateUserDetail(dto, UserId);
                 if (!response.IsSuccess) return SaveError(response.Message);
                 return SaveSuccess(response);
             }
@@ -129,11 +129,11 @@ namespace ClickFlow.API.Controllers
  
         [HttpPost]
         [Route("delete-user-detail")]
-        public async Task<IActionResult> DeleteUserDetail(int userId)
+        public async Task<IActionResult> DeleteUserDetail()
         {
             try
             {      
-                var response = await _userDetailService.DeleteUserDetail(userId.ToString());
+                var response = await _userDetailService.DeleteUserDetail(UserId);
                 if (!response.IsSuccess) return SaveError(response.Message);
                 return SaveSuccess(response);
             }

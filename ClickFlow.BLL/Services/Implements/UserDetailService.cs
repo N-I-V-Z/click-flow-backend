@@ -31,7 +31,11 @@ namespace ClickFlow.BLL.Services.Implements
             {
                 var repo = _unitOfWork.GetRepo<UserDetail>();
                 await _unitOfWork.BeginTransactionAsync();
-
+           
+                 if (!int.TryParse(userId, out int parsedUserId))
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "UserId không hợp lệ." };
+                }
                 var any = await repo.AnyAsync(new QueryBuilder<UserDetail>()
                                                 .WithPredicate(x => x.ApplicationUserId == int.Parse(userId))
                                                 .Build());
