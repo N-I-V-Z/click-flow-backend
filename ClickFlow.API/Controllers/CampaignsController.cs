@@ -1,4 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
@@ -137,6 +138,17 @@ namespace ClickFlow.API.Controllers
             if (!response.IsSuccess) return SaveError(response);
             return SaveSuccess(response);
         }
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterForCampaign([FromBody] CampaignParticipationCreateDTO dto)
+        {
+            var response = await _campaignService.RegisterForCampaign(dto);
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
 
 
     }

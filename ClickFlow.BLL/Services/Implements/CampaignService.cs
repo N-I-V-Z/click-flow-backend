@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
@@ -321,6 +322,52 @@ namespace ClickFlow.BLL.Services.Implements
             }
 
             return null;
+        }
+        public async Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto)
+        {
+            try
+            {
+                
+                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                    .WithPredicate(x => x.Id == dto.CampaignId && !x.IsDeleted && x.Status == CampaignStatus.Activing)
+                    .Build());
+
+                if (campaign == null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không tồn tại hoặc không ở trạng thái hoạt động." };
+                }
+
+             
+                var participationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+                var existingParticipation = await participationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
+                    .WithPredicate(x => x.PublisherId == dto.PublisherId && x.CampaignId == dto.CampaignId)
+                    .Build());
+
+                if (existingParticipation != null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Bạn đã đăng ký chiến dịch này trước đó." };
+                }
+
+            
+                var participation = new CampaignParticipation
+                {
+                    CampaignId = dto.CampaignId,
+                    PublisherId = dto.PublisherId,
+                    ShortLink = dto.ShortLink,
+                    Status = CampaignParticipationStatus.Pending,
+                    CreateAt = DateTime.UtcNow
+                };
+
+                await participationRepo.CreateAsync(participation);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new BaseResponse { IsSuccess = true, Message = "Đăng ký chiến dịch thành công. Vui lòng chờ xử lý." };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse { IsSuccess = false, Message = "Đã xảy ra lỗi khi đăng ký chiến dịch." };
+            }
         }
     }
 }
