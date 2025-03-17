@@ -1,4 +1,6 @@
-﻿using ClickFlow.BLL.DTOs;
+﻿using Azure;
+using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -24,7 +26,19 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-                var response = await _userService.GetUsersByRoleAsync(role, pageIndex, pageSize);            
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _userService.GetUsersByRoleAsync(role, pageIndex, pageSize);
+                var response = new PagingDTO<UserViewDTO>(data);
+                if (response == null) return GetError();
                 return GetSuccess(response);
             }
             catch (Exception ex)

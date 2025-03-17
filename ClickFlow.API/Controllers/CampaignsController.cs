@@ -1,4 +1,6 @@
-﻿using ClickFlow.BLL.DTOs.CampaignDTOs;
+﻿using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.AdvertiserDTOs;
+using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
@@ -21,65 +23,213 @@ namespace ClickFlow.API.Controllers
 
         [HttpGet]
         [Route("get-all-campaigns/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAllCampaigns(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetAllCampaigns([FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
-            var response = await _campaignService.GetAllCampaigns(pageIndex, pageSize);
-            return GetSuccess(response);
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetAllCampaigns(pageIndex, pageSize);
+                var response = new PagingDTO<CampaignResponseDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
         }
+
         [HttpGet]
         [Route("get-campaigns-except-from-pending/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsExceptFromPending(int pageIndex, int pageSize)
+        public async Task<IActionResult> GetCampaignsExceptFromPending([FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
-            var response = await _campaignService.GetCampaignsExceptFromPending(pageIndex, pageSize);
-            return GetSuccess(response);
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetCampaignsExceptFromPending(pageIndex, pageSize);
+                var response = new PagingDTO<CampaignResponseDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
         }
- 
+
 
         [HttpGet]
         [Route("get-campaigns-by-status/{status}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsByStatus(CampaignStatus? status, int pageIndex, int pageSize)
+        public async Task<IActionResult> GetCampaignsByStatus([FromRoute] CampaignStatus? status, [FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
-            var response = await _campaignService.GetCampaignsByStatus(status, pageIndex, pageSize);
-            return GetSuccess(response);
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetCampaignsByStatus(status, pageIndex, pageSize);
+                var response = new PagingDTO<CampaignResponseDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
         }
 
         [HttpGet]
         [Route("get-campaigns-by-advertiser/{advertiserId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus status, int pageIndex, int pageSize)
+        public async Task<IActionResult> GetCampaignsByAdvertiserId([FromRoute] int advertiserId, [FromRoute] CampaignStatus status, [FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
-            var response = await _campaignService.GetCampaignsByAdvertiserId(advertiserId, status, pageIndex, pageSize);
-            return GetSuccess(response);
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetCampaignsByAdvertiserId(advertiserId, status, pageIndex, pageSize);
+                var response = new PagingDTO<CampaignResponseDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
         }
 
 
         [HttpGet]
         [Route("get-campaigns-joined-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize)
-        {
-            var response = await _campaignService.GetCampaignsJoinedByPublisher(publisherId, pageIndex, pageSize);
-            return GetSuccess(response);
-        }
-
-        [HttpGet]
-        [Route("get-all-campaign-for-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAllCampaignForPublisher(int publisherId, int pageIndex, int pageSize)
-        {
-            var response = await _campaignService.GetAllCampaignForPublisher(publisherId, pageIndex, pageSize);
-            return GetSuccess(response);
-        }
-
-        [HttpGet]
-        [Route("get-advertisers-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize)
+        public async Task<IActionResult> GetCampaignsJoinedByPublisher([FromRoute] int publisherId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
             try
             {
-                var response = await _campaignService.GetAdvertisersByPublisher(publisherId, pageIndex, pageSize);
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetCampaignsJoinedByPublisher(publisherId, pageIndex, pageSize);
+                var response = new PagingDTO<CampaignResponseDTO>(data);
+                if (response == null) return GetError();
                 return GetSuccess(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Đã xảy ra lỗi khi lấy danh sách Advertiser.");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+
+        [HttpGet]
+        [Route("get-all-campaign-for-publisher/{publisherId}/{pageIndex}/{pageSize}")]
+        public async Task<IActionResult> GetAllCampaignForPublisher([FromRoute] int publisherId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
+        {
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetAllCampaignForPublisher(publisherId, pageIndex, pageSize);
+                var response = new PagingDTO<CampaignResponseForPublisherDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+
+        [HttpGet]
+        [Route("get-advertisers-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
+        public async Task<IActionResult> GetAdvertisersByPublisher([FromRoute] int publisherId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
+        {
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+
+                var data = await _campaignService.GetAdvertisersByPublisher(publisherId, pageIndex, pageSize);
+                var response = new PagingDTO<AdvertiserResponseDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
             }
         }
 
