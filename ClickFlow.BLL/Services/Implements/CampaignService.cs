@@ -253,7 +253,7 @@ namespace ClickFlow.BLL.Services.Implements
                 .WithInclude(x => x.Campaign.Advertiser)
                 .Build())
                 .Select(x => x.Campaign.Advertiser)
-                .Distinct(); // Tránh trùng lặp advertiser
+                .Distinct();
 
             var pagedAdvertisers = await PaginatedList<Advertiser>.CreateAsync(advertisersQuery, pageIndex, pageSize);
             var result = _mapper.Map<List<AdvertiserResponseDTO>>(pagedAdvertisers);
