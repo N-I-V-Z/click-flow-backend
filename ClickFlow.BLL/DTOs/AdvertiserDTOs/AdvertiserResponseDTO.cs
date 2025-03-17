@@ -19,7 +19,6 @@ namespace ClickFlow.BLL.DTOs.AdvertiserDTOs
         public string FullName { get; set; }
         public string Email { get; set; }
         public Role Role { get; set; }
-        public List<CampaignResponseDTO> Campaigns { get; set; }
 
     }
 }

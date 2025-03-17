@@ -1,5 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
@@ -20,6 +21,7 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<PaginatedList<CampaignResponseForPublisherDTO>> GetAllCampaignForPublisher(int publisherId, int pageIndex, int pageSize);
         Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize);
         Task<PaginatedList<AdvertiserResponseDTO>> GetAdvertisersByPublisher(int publisherId, int pageIndex, int pageSize);
+        Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto);
         Task<CampaignResponseDTO> GetCampaignById(int id);
         Task<string> ValidateCampaignForTraffic(int campaignId);
 
