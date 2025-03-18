@@ -25,26 +25,22 @@ namespace ClickFlow.BLL.Services.Implements
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse> CreateUpdateUserDetail(UserDetailRequestDTO dto, string userId)
+        public async Task<BaseResponse> CreateUpdateUserDetail(UserDetailRequestDTO dto, int userId)
         {
             try
             {
                 var repo = _unitOfWork.GetRepo<UserDetail>();
                 await _unitOfWork.BeginTransactionAsync();
            
-                 if (!int.TryParse(userId, out int parsedUserId))
-                {
-                    return new BaseResponse { IsSuccess = false, Message = "UserId không hợp lệ." };
-                }
                 var any = await repo.AnyAsync(new QueryBuilder<UserDetail>()
-                                                .WithPredicate(x => x.ApplicationUserId == int.Parse(userId))
+                                                .WithPredicate(x => x.ApplicationUserId == userId)
                                                 .Build());
                 if (any)
                 {
                     var userDetail = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
-                                                                .WithPredicate(x => x.ApplicationUserId == int.Parse(userId))
+                                                                .WithPredicate(x => x.ApplicationUserId == userId)
                                                                 .Build());
-                    if (userId != userDetail.ApplicationUserId.ToString()) return new BaseResponse { IsSuccess = false, Message = "Người dùng không khớp." };
+                    if (userId != userDetail.ApplicationUserId) return new BaseResponse { IsSuccess = false, Message = "Người dùng không khớp." };
 
                     var updateUserDetail = _mapper.Map(dto, userDetail);
                     await repo.UpdateAsync(updateUserDetail);
@@ -52,7 +48,7 @@ namespace ClickFlow.BLL.Services.Implements
                 else
                 {
                     var userDetail = _mapper.Map<UserDetail>(dto);
-                    userDetail.ApplicationUserId = int.Parse(userId);
+                    userDetail.ApplicationUserId = userId;
                     await repo.CreateAsync(userDetail);
                 }
                 var saver = await _unitOfWork.SaveAsync();
@@ -67,18 +63,18 @@ namespace ClickFlow.BLL.Services.Implements
             }
         }
 
-        public async Task<BaseResponse> DeleteUserDetail(string userId)
+        public async Task<BaseResponse> DeleteUserDetail(int userId)
         {
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var any = await repo.AnyAsync(new QueryBuilder<UserDetail>()
-                                            .WithPredicate(x => x.ApplicationUserId == int.Parse(userId))
+                                            .WithPredicate(x => x.ApplicationUserId == userId)
                                             .Build());
             if (any)
             {
                 var userDetail = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
-                                                            .WithPredicate(x => x.ApplicationUserId == int.Parse(userId))
+                                                            .WithPredicate(x => x.ApplicationUserId ==userId)
                                                             .Build());
-                if (userId != userDetail.ApplicationUserId.ToString()) return new BaseResponse { IsSuccess = false, Message = "Người dùng không khớp." };
+                if (userId != userDetail.ApplicationUserId) return new BaseResponse { IsSuccess = false, Message = "Người dùng không khớp." };
                 await repo.DeleteAsync(userDetail);
                 var saver = await _unitOfWork.SaveAsync();
                 if (!saver) return new BaseResponse { IsSuccess = false, Message = "Xóa dữ liệu thất bại" };
@@ -114,11 +110,11 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<UserDetailViewDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<UserDetailViewDTO> GetUserDetailByUserId(string userId)
+        public async Task<UserDetailViewDTO> GetUserDetailByUserId(int userId)
         {
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var response = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
-                                                    .WithPredicate(x => x.ApplicationUserId == int.Parse(userId))
+                                                    .WithPredicate(x => x.ApplicationUserId ==userId)
                                                     .WithTracking(false)
                                                     .Build());
             if (response == null) return null;

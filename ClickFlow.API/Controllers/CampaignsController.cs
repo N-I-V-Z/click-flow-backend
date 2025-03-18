@@ -113,8 +113,37 @@ namespace ClickFlow.API.Controllers
         }
 
         [HttpGet]
+        [Route("get-publisher-paticipation-by-status-for-advertiser/{pageIndex}/{pageSize}")]
+        public async Task<IActionResult> GetPublisherPaticipationByStatusForAdvertiser([FromQuery] CampaignParticipationStatus? campaignParticipationStatus, [FromRoute] int pageIndex, [FromRoute] int pageSize)
+        {
+            try
+            {
+                if (pageIndex <= 0)
+                {
+                    return GetError("Page Index phải là số nguyên dương.");
+                }
+
+                if (pageSize <= 0)
+                {
+                    return GetError("Page Size phải là số nguyên dương.");
+                }
+                var data = await _campaignService.GetPublisherPaticipationByStatusForAdvertiser(UserId, campaignParticipationStatus, pageIndex, pageSize);
+                var response = new PagingDTO<CampaignParticipationResponseDTO>(data);
+                if (response == null) return GetError();
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+
+        [HttpGet]
         [Route("get-campaigns-by-advertiser/{advertiserId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetCampaignsByAdvertiserId([FromRoute] int advertiserId, [FromRoute] CampaignStatus status, [FromRoute] int pageIndex, [FromRoute] int pageSize)
+        public async Task<IActionResult> GetCampaignsByAdvertiserId([FromRoute] int advertiserId, [FromQuery] CampaignStatus? status, [FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
             try
             {

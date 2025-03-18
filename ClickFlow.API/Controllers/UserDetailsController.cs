@@ -53,7 +53,7 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-                var response = await _userDetailService.GetUserDetailByUserId(userId.ToString());
+                var response = await _userDetailService.GetUserDetailByUserId(userId);
                 if (response == null) return GetError();
                 return GetSuccess(response);
             }

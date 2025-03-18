@@ -90,9 +90,9 @@ namespace ClickFlow.BLL.Services.Implements
             return user;
         }
 
-        public async Task<ApplicationUser> GetByIdAsync(string id)
+        public async Task<ApplicationUser> GetByIdAsync(int id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id.ToString());
             return user;
         }
 
