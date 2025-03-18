@@ -27,16 +27,10 @@ namespace ClickFlow.BLL.Services.Implements
             _advertiserService = advertiserService;
         }
 
-        public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, string userId)
+        public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
         {
             try
             {
-           
-                if (!int.TryParse(userId, out int parsedUserId))
-                {
-                    return new BaseResponse { IsSuccess = false, Message = "UserId không hợp lệ." };
-                }
-
               
                 await _unitOfWork.BeginTransactionAsync();
 
@@ -44,7 +38,7 @@ namespace ClickFlow.BLL.Services.Implements
                 var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();
 
 
-                var advertiser = await _advertiserService.GetAdvertiserByUserIdAsync(parsedUserId);
+                var advertiser = await _advertiserService.GetAdvertiserByUserIdAsync(userId);
 
                 if (advertiser == null)
                 {
@@ -140,7 +134,7 @@ namespace ClickFlow.BLL.Services.Implements
             }
         }
 
-        public async Task<BaseResponse> DeleteCampaign(int id, string userId)
+        public async Task<BaseResponse> DeleteCampaign(int id, int userId)
         {
             try
             {
@@ -217,11 +211,27 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus status, int pageIndex, int pageSize)
+        public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(int advertiserId, CampaignParticipationStatus? campaignParticipationStatus, int pageIndex, int pageSize)
+        {
+            var repo = _unitOfWork.GetRepo<CampaignParticipation>();
+            var campaignParticipations = repo.Get(new QueryBuilder<CampaignParticipation>()
+                .WithPredicate(x => x.Campaign.Advertiser.UserId == advertiserId
+                && (!campaignParticipationStatus.HasValue || x.Status == campaignParticipationStatus))
+                .WithInclude(x => x.Campaign)
+                .Build());
+
+            var pagedCampaigns = await PaginatedList<CampaignParticipation>.CreateAsync(campaignParticipations, pageIndex, pageSize);
+            var response = _mapper.Map<List<CampaignParticipationResponseDTO>>(pagedCampaigns);
+            return new PaginatedList<CampaignParticipationResponseDTO>(response, pagedCampaigns.TotalItems, pageIndex, pageSize);
+        }
+
+        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus? status, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaigns = repo.Get(new QueryBuilder<Campaign>()
-                .WithPredicate(x => !x.IsDeleted && x.AdvertiserId == advertiserId && x.Status == status)
+                 .WithPredicate(x => !x.IsDeleted
+                            && x.AdvertiserId == advertiserId
+                            && (!status.HasValue || x.Status == status))
                 .WithInclude(x => x.Advertiser)
                 .Build());
 
