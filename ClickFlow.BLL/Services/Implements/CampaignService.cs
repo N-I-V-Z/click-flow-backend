@@ -211,6 +211,19 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
+        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatuses(List<CampaignStatus>? statuses, int pageIndex, int pageSize)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
+            var campaigns = repo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(x => !x.IsDeleted && (statuses == null || statuses.Count == 0 || statuses.Contains(x.Status)))
+                .WithInclude(x => x.Advertiser)
+                .Build());
+
+            var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
+            var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
+            return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
+        }
+
         public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(int advertiserId, CampaignParticipationStatus? campaignParticipationStatus, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<CampaignParticipation>();
