@@ -69,9 +69,7 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var userId = User.FindFirst("Id")?.Value;
-
-				var data = await _trafficService.GetAllByPublisherIdAsync(int.Parse(userId), dto);
+				var data = await _trafficService.GetAllByPublisherIdAsync(UserId, dto);
                 var response = new PagingDTO<TrafficResponseDTO>(data);
 
                 if (!data.Any()) return GetNotFound("Không có dữ liệu.");
@@ -92,9 +90,7 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var userId = User.FindFirst("Id")?.Value;
-
-				var data = await _trafficService.GetAllByAdvertiserIdAsync(int.Parse(userId), dto);
+				var data = await _trafficService.GetAllByAdvertiserIdAsync(UserId, dto);
                 var response = new PagingDTO<TrafficResponseDTO>(data);
 
                 if (!data.Any()) return GetNotFound("Không có dữ liệu.");
@@ -128,29 +124,29 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[HttpPost]
-		//public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
-		//{
-		//	if (!ModelState.IsValid) return ModelInvalid();
+		[HttpPost]
+		public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
+		{
+			if (!ModelState.IsValid) return ModelInvalid();
 
-		//	try
-		//	{
-		//		string checkCampaign = await _campaignService.ValidateCampaignForTraffic(dto.CampaignId ?? 0);
-		//		if (checkCampaign != null) return Error(checkCampaign);
+			try
+			{
+				string checkCampaign = await _campaignService.ValidateCampaignForTraffic(dto.CampaignId);
+				if (checkCampaign != null) return Error(checkCampaign);
 
 
 
-		//		var response = await _trafficService.CreateAsync(dto);
-		//		if (response == null) return SaveError(response);
-		//		return SaveSuccess(response);
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		Console.ForegroundColor = ConsoleColor.Red;
-		//		Console.WriteLine(ex.Message);
-		//		Console.ResetColor();
-		//		return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-		//	}
-		//}
+				var response = await _trafficService.CreateAsync(dto);
+				if (response == null) return SaveError(response);
+				return SaveSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
 	}
 }

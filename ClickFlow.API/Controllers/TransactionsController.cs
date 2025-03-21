@@ -30,14 +30,7 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-                var userId = User.FindFirst("Id")?.Value;
-
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-                }
-
-                var data = await _transactionService.GetAllTransactionsByUserIdAsync(int.Parse(userId), dto);
+                var data = await _transactionService.GetAllTransactionsByUserIdAsync(UserId, dto);
                 var response = new PagingDTO<TransactionResponseDTO>(data);
                 if (!data.Any()) return GetNotFound("Không có dữ liệu.");
                 return Ok(response);

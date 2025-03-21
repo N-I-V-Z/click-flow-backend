@@ -91,14 +91,7 @@ namespace ClickFlow.API.Controllers
 
 			try
 			{
-                var advertiserId = User.FindFirst("Id")?.Value;
-
-                if (string.IsNullOrEmpty(advertiserId))
-                {
-                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-                }
-
-                var response = await _reportService.CreateReportAsync(int.Parse(advertiserId), dto);
+                var response = await _reportService.CreateReportAsync(UserId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
