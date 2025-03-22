@@ -347,6 +347,7 @@ namespace ClickFlow.BLL.Services.Implements
                     case Role.Advertiser:
                         var advertiser = new Advertiser
                         {
+                          Id = user.Id,
                             CompanyName = accRequest.CompanyName,
                             IntroductionWebsite = accRequest.IntroductionWebsite,
                             StaffSize = accRequest.StaffSize ?? 0,
@@ -359,6 +360,7 @@ namespace ClickFlow.BLL.Services.Implements
                     case Role.Publisher:
                         var publisher = new Publisher
                         {
+                            Id = user.Id,
                             ApplicationUser = user
                         };
                         var publisherRepo = _unitOfWork.GetRepo<Publisher>();

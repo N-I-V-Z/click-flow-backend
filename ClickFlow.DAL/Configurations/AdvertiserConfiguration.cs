@@ -15,7 +15,10 @@ namespace ClickFlow.DAL.Configurations
         {
             builder.ToTable("Advertisers");
             builder.HasKey(a => a.Id);
-            builder.Property(a => a.Id).UseIdentityColumn();
+            builder.HasKey(a => a.UserId);
+
+            builder.Property(a => a.UserId)
+                   .ValueGeneratedNever();
 
             builder.Property(a => a.CompanyName)
                    .IsRequired()

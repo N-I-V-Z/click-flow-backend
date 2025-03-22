@@ -307,7 +307,38 @@ namespace ClickFlow.BLL.Services.Implements
         
             return new PaginatedList<CampaignResponseForPublisherDTO>(mappedCampaigns, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
+        public async Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
 
+          
+            var currentCampaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
+                .WithPredicate(x => x.Id == campaignId && !x.IsDeleted)
+                .Build());
+
+            if (currentCampaign == null)
+            {
+                throw new Exception("Chiến dịch không tồn tại hoặc đã bị xóa.");
+            }
+
+           
+            var campaignsQuery = repo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(x => !x.IsDeleted && x.TypeCampaign == currentCampaign.TypeCampaign && x.Status == CampaignStatus.Activing && x.AverageStarRate.HasValue && x.Id != campaignId) 
+                .WithInclude(x => x.Advertiser)
+                .WithOrderBy(query => query.OrderByDescending(c => c.AverageStarRate))
+                .Build());
+
+          
+            var topCampaigns = await campaignsQuery
+                .Take(10)
+                .ToListAsync();
+
+           
+            var result = _mapper.Map<List<CampaignResponseDTO>>(topCampaigns);
+
+        
+            return new PaginatedList<CampaignResponseDTO>(result, topCampaigns.Count, pageIndex, pageSize);
+        }
         public async Task<CampaignResponseDTO> GetCampaignById(int id)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();

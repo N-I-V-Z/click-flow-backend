@@ -14,10 +14,9 @@ namespace ClickFlow.DAL.Configurations
         public void Configure(EntityTypeBuilder<Publisher> builder)
         {
             builder.ToTable("Publishers");
-            builder.HasKey(p => p.Id);
-            builder.Property(p => p.Id).UseIdentityColumn();
-
-            // Quan hệ one-to-one với ApplicationUser được cấu hình ở ApplicationUserConfiguration
+            builder.HasKey(p => p.UserId);           
+            builder.Property(p => p.UserId)
+                   .ValueGeneratedNever();
             builder.HasOne(u => u.ApplicationUser)
                    .WithOne(p => p.Publisher)
                    .HasForeignKey<Publisher>(p => p.UserId);
