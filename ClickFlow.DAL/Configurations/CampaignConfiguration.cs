@@ -27,6 +27,8 @@ namespace ClickFlow.DAL.Configurations
                    .HasMaxLength(500);
             builder.Property(c => c.Budget)
                    .IsRequired();
+            builder.Property(c => c.RemainingBudget)
+                  .IsRequired(false);
             builder.Property(c => c.StartDate)
                    .IsRequired();
             builder.Property(c => c.EndDate)

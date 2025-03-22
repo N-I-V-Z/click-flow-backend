@@ -26,6 +26,8 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<CampaignResponseDTO> GetCampaignById(int id);
         Task<string> ValidateCampaignForTraffic(int campaignId);
         Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatuses(List<CampaignStatus>? statuses, int pageIndex, int pageSize);
+        Task UpdateCampaignBudgetAsync(int campaignId, int revenue);
+        Task CheckAndStopExpiredCampaigns();
 
     }
 }
