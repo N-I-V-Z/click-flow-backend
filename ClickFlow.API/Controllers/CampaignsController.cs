@@ -262,36 +262,6 @@ namespace ClickFlow.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-advertisers-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAdvertisersByPublisher([FromRoute] int publisherId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
-        {
-            try
-            {
-                if (pageIndex <= 0)
-                {
-                    return GetError("Page Index phải là số nguyên dương.");
-                }
-
-                if (pageSize <= 0)
-                {
-                    return GetError("Page Size phải là số nguyên dương.");
-                }
-
-                var data = await _campaignService.GetAdvertisersByPublisher(publisherId, pageIndex, pageSize);
-                var response = new PagingDTO<AdvertiserResponseDTO>(data);
-                if (response == null) return GetError();
-                return GetSuccess(response);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-            }
-        }
-
-        [HttpGet]
         [Route("get-campaign-by-id/{id}")]
         public async Task<IActionResult> GetCampaignById(int id)
         {
