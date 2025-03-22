@@ -454,7 +454,7 @@ namespace ClickFlow.BLL.Services.Implements
                 .WithPredicate(c => c.Id == campaignId)
                 .Build());
 
-            if (campaign != null && campaign.RemainingBudget <= 0)
+            if (campaign.RemainingBudget <= 0 || campaign.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 campaign.Status = CampaignStatus.Completed;
                 await campaignRepo.UpdateAsync(campaign);
