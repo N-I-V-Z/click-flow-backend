@@ -319,7 +319,7 @@ namespace ClickFlow.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterForCampaign([FromBody] CampaignParticipationCreateDTO dto)
         {
-            var response = await _campaignService.RegisterForCampaign(dto);
+            var response = await _campaignService.RegisterForCampaign(dto, UserId);
             if (response.IsSuccess)
             {
                 return Ok(response);

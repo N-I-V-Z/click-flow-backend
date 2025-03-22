@@ -353,11 +353,23 @@ namespace ClickFlow.BLL.Services.Implements
 
             return new BaseResponse { IsSuccess = true, Message = "Chiến dịch hợp lệ để chạy traffic." };
         }
-        public async Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto)
+        public async Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto, int userId)
         {
             try
-            {
-                
+            {               
+                var publisherRepo = _unitOfWork.GetRepo<Publisher>();
+                var publisher = await publisherRepo.GetSingleAsync(new QueryBuilder<Publisher>()
+                    .WithPredicate(x => x.UserId == userId) 
+                    .Build());
+
+                if (publisher == null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Người dùng không phải Publisher hoặc chưa được đăng ký." };
+                }
+
+                int publisherId = publisher.Id; 
+
+               
                 var campaignRepo = _unitOfWork.GetRepo<Campaign>();
                 var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
                     .WithPredicate(x => x.Id == dto.CampaignId && !x.IsDeleted && x.Status == CampaignStatus.Activing)
@@ -368,10 +380,10 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không tồn tại hoặc không ở trạng thái hoạt động." };
                 }
 
-             
+               
                 var participationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
                 var existingParticipation = await participationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
-                    .WithPredicate(x => x.PublisherId == dto.PublisherId && x.CampaignId == dto.CampaignId)
+                    .WithPredicate(x => x.PublisherId == publisherId && x.CampaignId == dto.CampaignId)
                     .Build());
 
                 if (existingParticipation != null)
@@ -379,12 +391,12 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Bạn đã đăng ký chiến dịch này trước đó." };
                 }
 
-            
+             
                 var participation = new CampaignParticipation
                 {
                     CampaignId = dto.CampaignId,
-                    PublisherId = dto.PublisherId,
-                    ShortLink = dto.ShortLink,
+                    PublisherId = publisherId, 
+                    ShortLink = "ShortLink",
                     Status = CampaignParticipationStatus.Pending,
                     CreateAt = DateTime.UtcNow
                 };
@@ -394,7 +406,7 @@ namespace ClickFlow.BLL.Services.Implements
 
                 return new BaseResponse { IsSuccess = true, Message = "Đăng ký chiến dịch thành công. Vui lòng chờ xử lý." };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new BaseResponse { IsSuccess = false, Message = "Đã xảy ra lỗi khi đăng ký chiến dịch." };
             }

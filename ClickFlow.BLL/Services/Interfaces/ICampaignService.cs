@@ -21,7 +21,7 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<PaginatedList<CampaignResponseForPublisherDTO>> GetAllCampaignForPublisher(int publisherId, int pageIndex, int pageSize);
         Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize);
         Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(int advertiserId, CampaignParticipationStatus? campaignParticipationStatus, int pageIndex, int pageSize);
-        Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto);
+        Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto, int userId);
         Task<CampaignResponseDTO> GetCampaignById(int id);
         Task<BaseResponse> ValidateCampaignForTraffic(int campaignId);
         Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatuses(List<CampaignStatus>? statuses, int pageIndex, int pageSize);
