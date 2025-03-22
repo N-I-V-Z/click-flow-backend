@@ -79,8 +79,8 @@ namespace ClickFlow.BLL.Services.Implements
 
                 var queryBuilder = CreateQueryBuilder().WithInclude(
                     x => x.Campaign, 
-                    x => x.Advertiser, 
-                    x => x.Publisher, 
+                    //x => x.Advertiser, 
+                    //x => x.Publisher, 
                     x => x.Publisher.ApplicationUser, 
                     x => x.Advertiser.ApplicationUser);
                 if (!string.IsNullOrEmpty(dto.Keyword))
@@ -110,8 +110,8 @@ namespace ClickFlow.BLL.Services.Implements
                     .WithPredicate(x => x.Id == id)
                     .WithInclude(
                         x => x.Campaign,
-                        x => x.Advertiser,
-                        x => x.Publisher,
+                        //x => x.Advertiser,
+                        //x => x.Publisher,
                         x => x.Publisher.ApplicationUser,
                         x => x.Advertiser.ApplicationUser);
 

@@ -23,5 +23,6 @@ namespace ClickFlow.BLL.DTOs.TrafficDTOs
         public int CampaignId { get; set; }
         [Required(ErrorMessage = "PublisherId không được để trống.")]
         public int PublisherId { get; set; }
+		public bool? IsValid { get; set; }
 	}
 }
