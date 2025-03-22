@@ -271,5 +271,37 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
+
+		public async Task TransferTrafficToClosedTraffic()
+		{
+			try
+			{
+				await _unitOfWork.BeginTransactionAsync();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+				var trafficClosedRepo = _unitOfWork.GetRepo<ClosedTraffic>();
+
+				var queryBuilder = CreateQueryBuilder();
+				var queryOptions = queryBuilder
+					.WithInclude(x => x.CampaignParticipation.Campaign)
+					.WithPredicate(x => 
+						(x.CampaignParticipation.Campaign.EndDate <= DateOnly.FromDateTime(DateTime.UtcNow)) ||
+						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Canceled) || 
+						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Completed)
+					);
+
+				var traffics = trafficRepo.Get(queryBuilder.Build());
+				await trafficClosedRepo.CreateAllAsync(_mapper.Map<List<ClosedTraffic>>(traffics.ToList()));
+				await _unitOfWork.SaveChangesAsync();
+				await trafficRepo.DeleteAllAsync(traffics.ToList());
+				await _unitOfWork.SaveAsync();
+				await _unitOfWork.CommitTransactionAsync();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
 	}
 }

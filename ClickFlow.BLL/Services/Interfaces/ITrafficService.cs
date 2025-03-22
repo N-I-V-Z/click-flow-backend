@@ -14,5 +14,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<TrafficResponseDTO> GetByIdAsync(int id);
 		Task<BaseResponse> ValidateTraffic(TrafficCreateDTO dto);
 		Task<string> CreateAsync(TrafficCreateDTO dto);
+		Task TransferTrafficToClosedTraffic();
 	}
 }
