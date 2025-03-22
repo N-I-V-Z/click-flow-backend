@@ -134,6 +134,7 @@ namespace ClickFlow.API.ConfigExtensions
                     await context.Publishers.AddRangeAsync(
                         new Publisher
                         {
+                            Id = 2,
                             UserId = 2
                         }
                     );
@@ -147,6 +148,7 @@ namespace ClickFlow.API.ConfigExtensions
                     await context.Advertisers.AddRangeAsync(
                         new Advertiser
                         {
+                            Id = 3,
                             CompanyName = "ABC",
                             IntroductionWebsite = "ABC",
                             StaffSize = 0,
@@ -175,7 +177,7 @@ namespace ClickFlow.API.ConfigExtensions
                     await context.Campaigns.AddRangeAsync(
                         new Campaign
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             Budget = 1000000,
                             Commission = 10000,
                             Description = "ABC",
@@ -187,12 +189,13 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "abc",
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            AverageStarRate = 4.9,
                             Percents = 10
                         },
                         new Campaign
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             Budget = 2000000,
                             Commission = 15000,
                             Description = "DEF",
@@ -204,12 +207,13 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.FoodAndBeverage,
                             TypePay = TypePay.CPA,
-                            Image = "def",
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            AverageStarRate = 4.5,
                             Percents = 15
                         },
                         new Campaign
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             Budget = 500000,
                             Commission = 5000,
                             Description = "XYZ",
@@ -221,12 +225,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Pending,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPS,
-                            Image = "xyz",
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
                             Percents = 20
                         },
                         new Campaign
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             Budget = 1000000,
                             Commission = 10000,
                             Description = "Chiến dịch quảng cáo sản phẩm ABC",
@@ -238,11 +242,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            AverageStarRate = 4.5
                         },
                         new Campaign
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             Budget = 2000000,
                             Commission = 20000,
                             Description = "Chiến dịch quảng cáo sản phẩm XYZ",
@@ -254,11 +259,12 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Tourism,
                             TypePay = TypePay.CPA,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            AverageStarRate = 4.6
                         },
                         new Campaign
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             Budget = 1500000,
                             Commission = 15000,
                             Description = "Chiến dịch quảng cáo sản phẩm DEF",
@@ -335,17 +341,19 @@ namespace ClickFlow.API.ConfigExtensions
                     await context.Feedbacks.AddRangeAsync(
                         new Feedback
                         {
-                            CampaignId = 1, // Campaign ABC
+                            CampaignId = 1, 
                             Description = "Great campaign!",
                             StarRate = 5,
-                            Timestamp = DateTime.UtcNow
+                            Timestamp = DateTime.UtcNow,
+                            FeedbackerId = 2
                         },
                         new Feedback
                         {
-                            CampaignId = 1, // Campaign ABC
+                            CampaignId = 2,
                             Description = "Could be better.",
                             StarRate = 3,
-                            Timestamp = DateTime.UtcNow.AddDays(-1)
+                            Timestamp = DateTime.UtcNow.AddDays(-1),
+                            FeedbackerId = 2
                         }
                     );
                     await context.SaveChangesAsync();
@@ -360,7 +368,7 @@ namespace ClickFlow.API.ConfigExtensions
                         {
                             CampaignId = 1,
                             CreateAt = DateTime.UtcNow,
-                            PublisherId = 1,
+                            PublisherId = 2,
                             Status = CampaignParticipationStatus.Pending,
 
                         }

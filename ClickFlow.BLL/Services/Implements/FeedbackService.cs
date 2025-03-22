@@ -13,7 +13,7 @@ namespace ClickFlow.BLL.Services.Implements
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
+       
         public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -25,13 +25,27 @@ namespace ClickFlow.BLL.Services.Implements
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                var repo = _unitOfWork.GetRepo<Feedback>();
+                var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
+                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
                 var feedback = _mapper.Map<Feedback>(dto);
                 feedback.Timestamp = DateTime.Now;
 
-                await repo.CreateAsync(feedback);
+                await feedbackRepo.CreateAsync(feedback);
                 await _unitOfWork.SaveChangesAsync();
+
+              
+                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                    .WithPredicate(x => x.Id == feedback.CampaignId)
+                    .WithInclude(x => x.Feedbacks)
+                    .Build());
+
+                if (campaign != null)
+                {
+                    campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
+                    await campaignRepo.UpdateAsync(campaign);
+                    await _unitOfWork.SaveChangesAsync();
+                }
 
                 await _unitOfWork.CommitTransactionAsync();
                 return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được tạo thành công." };
@@ -48,9 +62,10 @@ namespace ClickFlow.BLL.Services.Implements
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                var repo = _unitOfWork.GetRepo<Feedback>();
+                var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
+                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
-                var feedback = await repo.GetSingleAsync(new QueryBuilder<Feedback>()
+                var feedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
                     .WithPredicate(x => x.Id == dto.Id)
                     .WithTracking(false)
                     .Build());
@@ -61,8 +76,20 @@ namespace ClickFlow.BLL.Services.Implements
                 }
 
                 _mapper.Map(dto, feedback);
-                await repo.UpdateAsync(feedback);
+                await feedbackRepo.UpdateAsync(feedback);
                 await _unitOfWork.SaveChangesAsync();
+
+                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                    .WithPredicate(x => x.Id == feedback.CampaignId)
+                    .WithInclude(x => x.Feedbacks)
+                    .Build());
+
+                if (campaign != null)
+                {
+                    campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
+                    await campaignRepo.UpdateAsync(campaign);
+                    await _unitOfWork.SaveChangesAsync();
+                }
 
                 await _unitOfWork.CommitTransactionAsync();
                 return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được cập nhật thành công." };
@@ -79,9 +106,10 @@ namespace ClickFlow.BLL.Services.Implements
             try
             {
                 await _unitOfWork.BeginTransactionAsync();
-                var repo = _unitOfWork.GetRepo<Feedback>();
+                var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
+                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
-                var feedback = await repo.GetSingleAsync(new QueryBuilder<Feedback>()
+                var feedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
                     .WithPredicate(x => x.Id == id)
                     .WithTracking(false)
                     .Build());
@@ -91,8 +119,22 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Phản hồi không tồn tại." };
                 }
 
-                await repo.DeleteAsync(feedback);
+                var campaignId = feedback.CampaignId;
+                await feedbackRepo.DeleteAsync(feedback);
                 await _unitOfWork.SaveChangesAsync();
+
+                // Tính toán lại AverageStarRate
+                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                    .WithPredicate(x => x.Id == campaignId)
+                    .WithInclude(x => x.Feedbacks)
+                    .Build());
+
+                if (campaign != null)
+                {
+                    campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
+                    await campaignRepo.UpdateAsync(campaign);
+                    await _unitOfWork.SaveChangesAsync();
+                }
 
                 await _unitOfWork.CommitTransactionAsync();
                 return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được xóa thành công." };

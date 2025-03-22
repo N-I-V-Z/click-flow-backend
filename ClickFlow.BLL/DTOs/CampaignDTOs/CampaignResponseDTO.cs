@@ -24,6 +24,8 @@ namespace ClickFlow.BLL.DTOs.CampaignDTOs
         public int? Commission { get; set; }
         public int? Percents { get; set; }
         public string Image { get; set; }
+        public double? AverageStarRate { get; set; }
+
         public int? AdvertiserId { get; set; }
         public AdvertiserResponseDTO? Advertiser { get; set; }
     }
