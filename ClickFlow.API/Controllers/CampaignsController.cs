@@ -232,8 +232,8 @@ namespace ClickFlow.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-all-campaign-for-publisher/{publisherId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetAllCampaignForPublisher([FromRoute] int publisherId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
+        [Route("get-all-campaign-for-publisher/{pageIndex}/{pageSize}")]
+        public async Task<IActionResult> GetAllCampaignForPublisher([FromRoute] int pageIndex, [FromRoute] int pageSize)
         {
             try
             {
@@ -247,7 +247,7 @@ namespace ClickFlow.API.Controllers
                     return GetError("Page Size phải là số nguyên dương.");
                 }
 
-                var data = await _campaignService.GetAllCampaignForPublisher(publisherId, pageIndex, pageSize);
+                var data = await _campaignService.GetAllCampaignForPublisher(UserId, pageIndex, pageSize);
                 var response = new PagingDTO<CampaignResponseForPublisherDTO>(data);
                 if (response == null) return GetError();
                 return GetSuccess(response);
