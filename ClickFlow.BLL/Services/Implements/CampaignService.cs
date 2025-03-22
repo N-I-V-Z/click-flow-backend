@@ -20,15 +20,15 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAdvertiserService _advertiserService;
-        private readonly ICampaignBudgetService _campaignBudgetService;
+    
      
 
-        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService, ICampaignBudgetService campaignBudgetService)
+        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _advertiserService = advertiserService;
-            _campaignBudgetService = campaignBudgetService;
+          
         }
 
         public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
@@ -339,7 +339,7 @@ namespace ClickFlow.BLL.Services.Implements
 
             return _mapper.Map<CampaignResponseDTO>(campaign);
         }
-        public async Task<string> ValidateCampaignForTraffic(int campaignId)
+        public async Task<BaseResponse> ValidateCampaignForTraffic(int campaignId)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
@@ -348,28 +348,26 @@ namespace ClickFlow.BLL.Services.Implements
 
             if (campaign == null)
             {
-                return "Chiến dịch không tồn tại.";
+                return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không tồn tại." };
             }
-
 
             if (campaign.Status != CampaignStatus.Activing)
             {
-                return "Chiến dịch không ở trạng thái hoạt động.";
+                return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không ở trạng thái hoạt động." };
             }
-
 
             DateOnly currentTime = DateOnly.FromDateTime(DateTime.UtcNow);
             if (currentTime < campaign.StartDate || currentTime > campaign.EndDate)
             {
-                return "Chiến dịch không trong thời gian hoạt động.";
+                return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không trong thời gian hoạt động." };
             }
 
             if (campaign.Advertiser != null && campaign.Advertiser.ApplicationUser.IsDeleted)
             {
-                return "Nhà quảng cáo của chiến dịch này đã bị khóa.";
+                return new BaseResponse { IsSuccess = false, Message = "Nhà quảng cáo của chiến dịch này đã bị khóa." };
             }
 
-            return null;
+            return new BaseResponse { IsSuccess = true, Message = "Chiến dịch hợp lệ để chạy traffic." };
         }
         public async Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto)
         {
@@ -446,10 +444,23 @@ namespace ClickFlow.BLL.Services.Implements
 
             foreach (var campaign in campaigns)
             {
-                await _campaignBudgetService.CheckAndStopCampaignIfBudgetExceededAsync(campaign.Id);
+                await CheckAndStopCampaignIfBudgetExceededAsync(campaign.Id);
             }
         }
+        public async Task CheckAndStopCampaignIfBudgetExceededAsync(int campaignId)
+        {
+            var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+            var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                .WithPredicate(c => c.Id == campaignId)
+                .Build());
 
+            if (campaign != null && campaign.RemainingBudget <= 0)
+            {
+                campaign.Status = CampaignStatus.Completed;
+                await campaignRepo.UpdateAsync(campaign);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
 
     }
 }
