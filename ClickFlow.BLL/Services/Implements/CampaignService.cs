@@ -20,15 +20,15 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAdvertiserService _advertiserService;
-        private readonly ICampaignBudgetService _campaignBudgetService;
+    
      
 
-        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService, ICampaignBudgetService campaignBudgetService)
+        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _advertiserService = advertiserService;
-            _campaignBudgetService = campaignBudgetService;
+          
         }
 
         public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
@@ -446,10 +446,23 @@ namespace ClickFlow.BLL.Services.Implements
 
             foreach (var campaign in campaigns)
             {
-                await _campaignBudgetService.CheckAndStopCampaignIfBudgetExceededAsync(campaign.Id);
+                await CheckAndStopCampaignIfBudgetExceededAsync(campaign.Id);
             }
         }
+        public async Task CheckAndStopCampaignIfBudgetExceededAsync(int campaignId)
+        {
+            var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+            var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                .WithPredicate(c => c.Id == campaignId)
+                .Build());
 
+            if (campaign != null && campaign.RemainingBudget <= 0)
+            {
+                campaign.Status = CampaignStatus.Completed;
+                await campaignRepo.UpdateAsync(campaign);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
 
     }
 }
