@@ -339,7 +339,7 @@ namespace ClickFlow.BLL.Services.Implements
 
             return _mapper.Map<CampaignResponseDTO>(campaign);
         }
-        public async Task<string> ValidateCampaignForTraffic(int campaignId)
+        public async Task<BaseResponse> ValidateCampaignForTraffic(int campaignId)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
@@ -348,28 +348,26 @@ namespace ClickFlow.BLL.Services.Implements
 
             if (campaign == null)
             {
-                return "Chiến dịch không tồn tại.";
+                return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không tồn tại." };
             }
-
 
             if (campaign.Status != CampaignStatus.Activing)
             {
-                return "Chiến dịch không ở trạng thái hoạt động.";
+                return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không ở trạng thái hoạt động." };
             }
-
 
             DateOnly currentTime = DateOnly.FromDateTime(DateTime.UtcNow);
             if (currentTime < campaign.StartDate || currentTime > campaign.EndDate)
             {
-                return "Chiến dịch không trong thời gian hoạt động.";
+                return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không trong thời gian hoạt động." };
             }
 
             if (campaign.Advertiser != null && campaign.Advertiser.ApplicationUser.IsDeleted)
             {
-                return "Nhà quảng cáo của chiến dịch này đã bị khóa.";
+                return new BaseResponse { IsSuccess = false, Message = "Nhà quảng cáo của chiến dịch này đã bị khóa." };
             }
 
-            return null;
+            return new BaseResponse { IsSuccess = true, Message = "Chiến dịch hợp lệ để chạy traffic." };
         }
         public async Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto)
         {
