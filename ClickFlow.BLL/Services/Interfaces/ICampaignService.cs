@@ -28,6 +28,7 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatuses(List<CampaignStatus>? statuses, int pageIndex, int pageSize);
         Task UpdateCampaignBudgetAsync(int campaignId, int revenue);
         Task CheckAndStopExpiredCampaigns();
+        Task CheckAndStopCampaignIfBudgetExceededAsync(int campaignId);
 
     }
 }
