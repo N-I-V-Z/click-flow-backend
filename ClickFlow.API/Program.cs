@@ -45,6 +45,11 @@ namespace ClickFlow.API
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
 
+
+
+		
+            builder.Services.AddHostedService<CampaignCheckerService>();
+
             builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
 

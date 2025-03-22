@@ -15,6 +15,7 @@ namespace ClickFlow.BLL.DTOs.CampaignDTOs
         public string Description { get; set; }
         public string OriginURL { get; set; }
         public int Budget { get; set; }
+        public int RemainingBudget { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public TypePay TypePay { get; set; }

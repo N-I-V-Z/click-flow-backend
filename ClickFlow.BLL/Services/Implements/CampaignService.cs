@@ -9,6 +9,7 @@ using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Linq;
 
@@ -19,12 +20,15 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAdvertiserService _advertiserService;
+        private readonly ICampaignBudgetService _campaignBudgetService;
+     
 
-        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService)
+        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService, ICampaignBudgetService campaignBudgetService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _advertiserService = advertiserService;
+            _campaignBudgetService = campaignBudgetService;
         }
 
         public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
@@ -50,6 +54,7 @@ namespace ClickFlow.BLL.Services.Implements
                 var campaign = _mapper.Map<Campaign>(dto);
          
                 campaign.AdvertiserId = advertiser.Id;
+                campaign.RemainingBudget = campaign.Budget;
               
                 campaign.Status = CampaignStatus.Pending;
          
@@ -412,5 +417,39 @@ namespace ClickFlow.BLL.Services.Implements
                 return new BaseResponse { IsSuccess = false, Message = "Đã xảy ra lỗi khi đăng ký chiến dịch." };
             }
         }
+
+        public async Task UpdateCampaignBudgetAsync(int campaignId, int revenue)
+        {
+            var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+            var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+                .WithPredicate(c => c.Id == campaignId)
+                .Build());
+
+            if (campaign != null)
+            {
+                campaign.RemainingBudget -= revenue;
+                await campaignRepo.UpdateAsync(campaign);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+        public async Task CheckAndStopExpiredCampaigns()
+        {
+            var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+
+            var campaigns = await campaignRepo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(c => c.Status == CampaignStatus.Activing && !c.IsDeleted)
+                .WithOrderBy(query => query.OrderBy(c => c.RemainingBudget))
+                .Build())
+                .Select(c => new { c.Id, c.RemainingBudget })
+                .Take(100)
+                .ToListAsync();
+
+            foreach (var campaign in campaigns)
+            {
+                await _campaignBudgetService.CheckAndStopCampaignIfBudgetExceededAsync(campaign.Id);
+            }
+        }
+
+
     }
 }
