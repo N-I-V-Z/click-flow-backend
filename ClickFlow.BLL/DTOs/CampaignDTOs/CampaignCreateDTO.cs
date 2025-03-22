@@ -1,4 +1,5 @@
-﻿using ClickFlow.DAL.Enums;
+﻿using ClickFlow.BLL.Helpers.Validations;
+using ClickFlow.DAL.Enums;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -33,6 +34,12 @@ namespace ClickFlow.BLL.DTOs.CampaignDTOs
 
         [Required(ErrorMessage = "Loại chiến dịch không được để trống.")]
         public Industry TypeCampaign { get; set; }
+
+        //[EitherCommissionOrPercents]
+        //public int? Commission { get; set; }
+
+        //[EitherCommissionOrPercents]
+        //public int? Percents { get; set; }
 
         public int? Commission { get; set; }
         public int? Percents { get; set; }
