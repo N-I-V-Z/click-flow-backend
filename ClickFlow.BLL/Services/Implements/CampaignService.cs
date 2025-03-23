@@ -20,15 +20,16 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAdvertiserService _advertiserService;
+        private readonly ITrafficService _trafficService;
 
 
 
-        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService)
+        public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService, ITrafficService trafficService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _advertiserService = advertiserService;
-
+            _trafficService = trafficService;
         }
 
         public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
@@ -214,62 +215,61 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatuses(List<CampaignStatus>? statuses, int pageIndex, int pageSize)
-        {
-            var repo = _unitOfWork.GetRepo<Campaign>();
-            var campaigns = repo.Get(new QueryBuilder<Campaign>()
-                .WithPredicate(x => !x.IsDeleted && (statuses == null || statuses.Count == 0 || statuses.Contains(x.Status)))
-                .WithInclude(x => x.Advertiser)
-                .Build());
-
-            var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
-            var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
-            return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
-        }
-
         public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(
-        int advertiserId,
-        CampaignParticipationStatus? campaignParticipationStatus,
-        int pageIndex,
-        int pageSize)
+            int advertiserId,
+            CampaignParticipationStatus? campaignParticipationStatus,
+            int pageIndex,
+            int pageSize)
         {
             var repo = _unitOfWork.GetRepo<CampaignParticipation>();
 
-
             var campaignParticipations = repo.Get(new QueryBuilder<CampaignParticipation>()
                 .WithPredicate(x => x.Campaign.Advertiser.UserId == advertiserId
-                && (!campaignParticipationStatus.HasValue || x.Status == campaignParticipationStatus))
+                    && (!campaignParticipationStatus.HasValue || x.Status == campaignParticipationStatus))
                 .WithInclude(x => x.Campaign)
                 .WithInclude(x => x.Publisher)
                 .WithInclude(x => x.Publisher.ApplicationUser)
                 .Build());
 
+       
             var pagedCampaigns = await PaginatedList<CampaignParticipation>.CreateAsync(campaignParticipations, pageIndex, pageSize);
 
-
             var queryOptions = new QueryBuilder<CampaignParticipation>()
-            .WithInclude(x => x.Publisher)
-            .Build();
+                .WithInclude(x => x.Publisher)
+                .Build();
 
             var allCampaignParticipations = repo.Get(queryOptions).ToList();
 
+            // Tính TotalCampaigns cho từng publisher
             var publisherCampaignCount = allCampaignParticipations
                 .GroupBy(x => x.PublisherId)
                 .Select(g => new { PublisherId = g.Key, TotalCampaigns = g.Count() })
                 .ToDictionary(x => x.PublisherId, x => x.TotalCampaigns);
 
-
+          
             var response = _mapper.Map<List<CampaignParticipationResponseDTO>>(pagedCampaigns);
 
+            // Lấy danh sách các publisherId duy nhất từ response
+            var publisherIds = response.Select(x => x.PublisherId).Distinct().ToList();
 
+            // Tính DailyTraffic cho tất cả publisher
+            var avgTrafficDict = new Dictionary<int, int>();
+            foreach (var publisherId in publisherIds)
+            {
+                avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaign(publisherId);
+            }
+
+            // Gán TotalCampaigns và DailyTraffic vào từng CampaignParticipationResponseDTO
             foreach (var item in response)
             {
                 item.TotalCampaigns = publisherCampaignCount.ContainsKey(item.PublisherId)
                     ? publisherCampaignCount[item.PublisherId]
                     : 0;
-                item.DailyTraffic = 0;
+
+                item.DailyTraffic = avgTrafficDict.GetValueOrDefault(item.PublisherId, 0);
             }
 
+           
             return new PaginatedList<CampaignParticipationResponseDTO>(response, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
@@ -384,6 +384,18 @@ namespace ClickFlow.BLL.Services.Implements
             }
 
             return _mapper.Map<CampaignResponseDTO>(campaign);
+        }
+        public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatuses(List<CampaignStatus>? statuses, int pageIndex, int pageSize)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
+            var campaigns = repo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(x => !x.IsDeleted && (statuses == null || statuses.Count == 0 || statuses.Contains(x.Status)))
+                .WithInclude(x => x.Advertiser)
+                .Build());
+
+            var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
+            var result = _mapper.Map<List<CampaignResponseDTO>>(pagedCampaigns);
+            return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
         public async Task<CampaignResponseForPublisherDTO> GetCampaignByIdForPublisher(int campaignId, int publisherId)
