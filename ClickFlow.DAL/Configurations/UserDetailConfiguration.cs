@@ -29,7 +29,7 @@ namespace ClickFlow.DAL.Configurations
                    .IsRequired(false);        
 
             builder.HasOne(ud => ud.User)
-                   .WithOne() // Nếu ApplicationUser không có navigation property cho UserDetail
+                   .WithOne(u => u.UserDetail)
                    .HasForeignKey<UserDetail>(ud => ud.ApplicationUserId)
                    .IsRequired();
         }

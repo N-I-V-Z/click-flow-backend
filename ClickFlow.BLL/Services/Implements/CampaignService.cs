@@ -181,8 +181,6 @@ namespace ClickFlow.BLL.Services.Implements
             var campaigns = repo.Get(new QueryBuilder<Campaign>()
                 .WithPredicate(x => !x.IsDeleted)
                 .WithInclude(x => x.Advertiser.ApplicationUser)
-
-
                 .Build());
 
             var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
@@ -548,6 +546,39 @@ namespace ClickFlow.BLL.Services.Implements
                 await _unitOfWork.SaveChangesAsync();
             }
         }
+        public async Task<int> GetCampaignCountByStatuses(List<CampaignStatus>? statuses)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
+            var campaigns = repo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(x => !x.IsDeleted && (statuses == null || statuses.Count == 0 || statuses.Contains(x.Status)))
+                .Build());
 
+            return await campaigns.CountAsync();
+        }
+        public async Task<int> GetPublisherParticipationCountByStatusForAdvertiser(
+    int advertiserId,
+    CampaignParticipationStatus? campaignParticipationStatus)
+        {
+            var repo = _unitOfWork.GetRepo<CampaignParticipation>();
+
+            var campaignParticipations = repo.Get(new QueryBuilder<CampaignParticipation>()
+                .WithPredicate(x => x.Campaign.Advertiser.UserId == advertiserId
+                    && (!campaignParticipationStatus.HasValue || x.Status == campaignParticipationStatus.Value))
+                .Build());
+
+            return await campaignParticipations.CountAsync();
+        }
+
+        public async Task<int> GetCampaignCountByAdvertiserId(int advertiserId, CampaignStatus? status)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
+            var campaigns = repo.Get(new QueryBuilder<Campaign>()
+                .WithPredicate(x => !x.IsDeleted
+                           && x.AdvertiserId == advertiserId
+                           && (!status.HasValue || x.Status == status))
+                .Build());
+
+            return await campaigns.CountAsync();
+        }
     }
 }

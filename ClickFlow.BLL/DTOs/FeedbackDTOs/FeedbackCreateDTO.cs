@@ -19,8 +19,7 @@ namespace ClickFlow.BLL.DTOs.FeedbackDTOs
         [Required(ErrorMessage = "ID chiến dịch không được để trống.")]
         public int CampaignId { get; set; }
 
-        [Required(ErrorMessage = "ID người đánh giá không được để trống.")]
-        public int FeedbackerId { get; set; }
+       
     }
 
     public class FeedbackUpdateDTO

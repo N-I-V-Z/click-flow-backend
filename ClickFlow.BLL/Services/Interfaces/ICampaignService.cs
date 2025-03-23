@@ -31,6 +31,10 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task UpdateCampaignBudgetAsync(int campaignId, int revenue);
         Task CheckAndStopExpiredCampaigns();
         Task CheckAndStopCampaignIfBudgetExceededAsync(int campaignId);
+        Task<int> GetPublisherParticipationCountByStatusForAdvertiser(int advertiserId,
+    CampaignParticipationStatus? campaignParticipationStatus);
+        Task<int> GetCampaignCountByStatuses(List<CampaignStatus>? statuses);
+        Task<int> GetCampaignCountByAdvertiserId(int advertiserId, CampaignStatus? status);
 
     }
 }

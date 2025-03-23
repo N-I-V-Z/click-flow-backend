@@ -355,7 +355,59 @@ namespace ClickFlow.API.Controllers
             }
             return BadRequest(response);
         }
-
+        [HttpGet("campaigns/count-by-statuses")]
+        public async Task<IActionResult> GetCampaignCountByStatuses([FromQuery] List<CampaignStatus>? statuses)
+        {
+            try
+            {
+                var count = await _campaignService.GetCampaignCountByStatuses(statuses);
+                return GetSuccess(count);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return GetError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+        [HttpGet("campaign-participations/count-by-status-for-advertiser")]
+        public async Task<IActionResult> GetPublisherParticipationCountByStatusForAdvertiser(
+        [FromQuery] CampaignParticipationStatus? campaignParticipationStatus)
+        {
+            try
+            {
+                var count = await _campaignService.GetPublisherParticipationCountByStatusForAdvertiser(
+                    UserId,
+                    campaignParticipationStatus);
+                return GetSuccess(count);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return GetError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+        [HttpGet("campaigns/count-by-advertiser/{advertiserId}")]
+        public async Task<IActionResult> GetCampaignCountByAdvertiserId(
+    [FromRoute] int advertiserId,
+    [FromQuery] CampaignStatus? status)
+        {
+            try
+            {
+                var count = await _campaignService.GetCampaignCountByAdvertiserId(advertiserId, status);
+                return GetSuccess(count);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return GetError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
 
     }
