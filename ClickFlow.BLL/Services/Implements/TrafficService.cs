@@ -9,6 +9,7 @@ using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
+using System.Linq;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -53,7 +54,7 @@ namespace ClickFlow.BLL.Services.Implements
 					.WithPredicate(x => x.CampaignId == dto.CampaignId && x.PublisherId == dto.PublisherId).Build());
 
 				var queryBuilder = CreateQueryBuilder();
-				var checkIpQueryOptions = queryBuilder.WithPredicate(x => 
+				var checkIpQueryOptions = queryBuilder.WithPredicate(x =>
 					x.CampaignParticipationId == cp.Id &&
 					x.IpAddress.Equals(dto.IpAddress) &&
 					x.IsValid == true
@@ -132,7 +133,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var queryBuilder = CreateQueryBuilder().WithInclude(
 					//x => x.CampaignParticipation, 
-					x => x.CampaignParticipation.Campaign, 
+					x => x.CampaignParticipation.Campaign,
 					x => x.CampaignParticipation.Publisher.ApplicationUser);
 				if (!string.IsNullOrEmpty(dto.Keyword))
 				{
@@ -158,10 +159,10 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var queryBuilder = CreateQueryBuilder();
 				var queryOptions = queryBuilder
-                    .WithPredicate(x => x.Id == id)
+					.WithPredicate(x => x.Id == id)
 					.WithInclude(
 						//x => x.CampaignParticipation,
-						x => x.CampaignParticipation.Campaign, 
+						x => x.CampaignParticipation.Campaign,
 						x => x.CampaignParticipation.Publisher.ApplicationUser);
 
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
@@ -186,7 +187,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var queryOptions = queryBuilder
 					.WithInclude(
 						//x => x.CampaignParticipation, 
-						x => x.CampaignParticipation.Campaign, 
+						x => x.CampaignParticipation.Campaign,
 						x => x.CampaignParticipation.Publisher.ApplicationUser)
 					.WithPredicate(x => x.CampaignParticipation.Publisher.ApplicationUser.Id == id);
 
@@ -218,7 +219,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var queryBuilder = CreateQueryBuilder();
 				var queryOptions = queryBuilder.WithInclude(
 						//x => x.CampaignParticipation,
-						x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser, 
+						x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser,
 						x => x.CampaignParticipation.Publisher.ApplicationUser)
 					.WithPredicate(x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser.Id == id);
 
@@ -283,9 +284,9 @@ namespace ClickFlow.BLL.Services.Implements
 				var queryBuilder = CreateQueryBuilder();
 				var queryOptions = queryBuilder
 					.WithInclude(x => x.CampaignParticipation.Campaign)
-					.WithPredicate(x => 
+					.WithPredicate(x =>
 						(x.CampaignParticipation.Campaign.EndDate <= DateOnly.FromDateTime(DateTime.UtcNow)) ||
-						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Canceled) || 
+						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Canceled) ||
 						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Completed)
 					);
 
@@ -300,6 +301,46 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				Console.WriteLine(ex.ToString());
 				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
+
+		public async Task<int> AverageTrafficInCampaign(int publisherId)
+		{
+			try
+			{
+				var cPRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var ctRepo = _unitOfWork.GetRepo<ClosedTraffic>();
+				var cRepo = _unitOfWork.GetRepo<Campaign>();
+				var campaignList = await cPRepo.GetAllAsync(new QueryBuilder<CampaignParticipation>()
+					.WithPredicate(x => x.PublisherId == publisherId)
+					.Build()
+					);
+
+				var campaignIds = campaignList.Select(x => x.CampaignId).ToList();
+
+				var campaigns = await cRepo.GetAllAsync(new QueryBuilder<Campaign>()
+					.WithPredicate(x => campaignIds.Contains(x.Id) &&
+										 (x.Status == CampaignStatus.Completed || x.Status == CampaignStatus.Canceled))
+					.Build());
+
+				var campaignParticipationIds = campaignList.Select(x => x.Id).ToList();
+				var traffics = await ctRepo.GetAllAsync(new QueryBuilder<ClosedTraffic>()
+					.WithPredicate(x => campaignParticipationIds.Contains((int)x.CampaignParticipationId))
+					.Build());
+
+				var trafficCountByCampaign = traffics.GroupBy(x => x.CampaignParticipationId).ToDictionary(g => g.Key, g => g.Count());
+
+				var avgTraffic = campaignList
+					.Where(x => campaigns.Any(c => c.Id == x.CampaignId))
+					.Select(x => trafficCountByCampaign.GetValueOrDefault(x.Id, 0))
+					.Average();
+
+				return (int) avgTraffic;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
 				throw;
 			}
 		}

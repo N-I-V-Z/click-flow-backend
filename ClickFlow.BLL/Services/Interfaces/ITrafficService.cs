@@ -15,5 +15,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<BaseResponse> ValidateTraffic(TrafficCreateDTO dto);
 		Task<string> CreateAsync(TrafficCreateDTO dto);
 		Task TransferTrafficToClosedTraffic();
+		Task<int> AverageTrafficInCampaign(int publisherId);
 	}
 }
