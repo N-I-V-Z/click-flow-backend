@@ -149,5 +149,23 @@ namespace ClickFlow.API.Controllers
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
 			}
 		}
+
+		[Authorize]
+		[HttpGet("count/{campaignId}")]
+		public async Task<IActionResult> GetCountTrafficByCampaignId(int campaignId)
+		{
+			try
+			{
+				var response = await _trafficService.CountAllTrafficByCampaign(campaignId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
 	}
 }

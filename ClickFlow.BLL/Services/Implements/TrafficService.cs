@@ -344,5 +344,72 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
+
+		public async Task<int> CountAllTrafficByCampaign(int campaignId)
+		{
+			try
+			{
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+
+				// Lấy campaign
+				var campaign = await campaignRepo.GetSingleAsync(
+					new QueryBuilder<Campaign>()
+						.WithPredicate(x => x.Id == campaignId)
+						.Build()
+				);
+
+				if (campaign == null)
+				{
+					throw new Exception($"Campaign with ID {campaignId} not found.");
+				}
+
+				var campaignParticipations = await cpRepo.GetAllAsync(
+					new QueryBuilder<CampaignParticipation>()
+						.WithPredicate(x => x.CampaignId == campaignId)
+						.Build()
+				);
+
+				var campaignParticipationIds = campaignParticipations.Select(x => x.Id).ToList();
+
+				if (!campaignParticipationIds.Any())
+				{
+					return 0;
+				}
+
+				if (campaign.Status == CampaignStatus.Activing ||
+					campaign.Status == CampaignStatus.Pending ||
+					campaign.Status == CampaignStatus.Approved)
+				{
+					var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+					var traffics = await trafficRepo.GetAllAsync(
+						new QueryBuilder<Traffic>()
+							.WithPredicate(x => campaignParticipationIds.Contains((int)x.CampaignParticipationId))
+							.Build()
+					);
+
+					return traffics.Count();
+				}
+				else
+				{
+					var ctrafficRepo = _unitOfWork.GetRepo<ClosedTraffic>();
+
+					var closedTraffics = await ctrafficRepo.GetAllAsync(
+						new QueryBuilder<ClosedTraffic>()
+							.WithPredicate(x => campaignParticipationIds.Contains((int)x.CampaignParticipationId))
+							.Build()
+					);
+
+					return closedTraffics.Count();
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+
 	}
 }
