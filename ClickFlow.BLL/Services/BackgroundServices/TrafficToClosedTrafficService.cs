@@ -21,7 +21,7 @@ namespace ClickFlow.BLL.Services.BackgroundServices
 		{
 			_logger.LogInformation("TrafficToClosedTrafficService started.");
 
-			_timer = new Timer(async _ => await DoWork(), null, TimeSpan.Zero, TimeSpan.FromSeconds(20));
+			_timer = new Timer(async _ => await DoWork(), null, TimeSpan.Zero, TimeSpan.FromDays(1));
 
 			return Task.CompletedTask;
 		}
