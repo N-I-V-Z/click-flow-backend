@@ -16,5 +16,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<string> CreateAsync(TrafficCreateDTO dto);
 		Task TransferTrafficToClosedTraffic();
 		Task<int> AverageTrafficInCampaign(int publisherId);
+		Task<int> CountAllTrafficByCampaign(int campaignId);
 	}
 }
