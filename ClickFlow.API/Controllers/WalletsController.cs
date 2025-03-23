@@ -24,14 +24,7 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-                var userId = User.FindFirst("Id")?.Value;
-
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-                }
-
-                var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
+                var response = await _walletService.GetWalletByUserIdAsync(UserId);
                 if (response == null) return GetNotFound("Không có dữ liệu.");
                 return Ok(response);
             }
