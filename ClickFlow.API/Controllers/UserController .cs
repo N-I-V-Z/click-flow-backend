@@ -37,7 +37,7 @@ namespace ClickFlow.API.Controllers
                 }
 
                 var data = await _userService.GetUsersByRoleAsync(role, pageIndex, pageSize);
-                var response = new PagingDTO<UserViewDTO>(data);
+                var response = new PagingDTO<ApplicationUserResponseDTO>(data);
                 if (response == null) return GetError();
                 return GetSuccess(response);
             }

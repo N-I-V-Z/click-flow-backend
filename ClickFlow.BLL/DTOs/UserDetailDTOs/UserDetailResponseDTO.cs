@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.DTOs.UserDetailDTOs
 {
-    public class UserDetailViewDTO
+    public class UserDetailResponseDTO
     {
         public int Id { get; set; }
         public DateTime? DateOfBirth { get; set; }
