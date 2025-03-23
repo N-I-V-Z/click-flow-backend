@@ -291,10 +291,10 @@ namespace ClickFlow.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-campaign-by-id/{id}")]
-        public async Task<IActionResult> GetCampaignById(int id)
+        [Route("get-campaign-by-id-for-publisher/{id}")]
+        public async Task<IActionResult> GetCampaignByIdForPublisher(int id)
         {
-            var response = await _campaignService.GetCampaignById(id);
+            var response = await _campaignService.GetCampaignByIdForPublisher(id, UserId);
             if (response == null) return GetError("Chiến dịch không tồn tại.");
             return GetSuccess(response);
         }

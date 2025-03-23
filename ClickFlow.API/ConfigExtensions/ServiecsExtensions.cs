@@ -355,6 +355,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Timestamp = DateTime.UtcNow.AddDays(-1),
                             FeedbackerId = 2
                         }
+
                     );
                     await context.SaveChangesAsync();
                 }
