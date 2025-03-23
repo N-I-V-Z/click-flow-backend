@@ -55,7 +55,7 @@ namespace ClickFlow.API.Controllers
         public async Task<IActionResult> CreateFeedback(FeedbackCreateDTO dto)
         {
             if (!ModelState.IsValid) return ModelInvalid();
-            var response = await _feedbackService.CreateFeedback(dto);
+            var response = await _feedbackService.CreateFeedback(dto, UserId);
             if (!response.IsSuccess) return SaveError(response);
             return SaveSuccess(response);
         }
@@ -66,7 +66,7 @@ namespace ClickFlow.API.Controllers
         public async Task<IActionResult> UpdateFeedback(FeedbackUpdateDTO dto)
         {
             if (!ModelState.IsValid) return ModelInvalid();
-            var response = await _feedbackService.UpdateFeedback(dto);
+            var response = await _feedbackService.UpdateFeedback(dto, UserId);
             if (!response.IsSuccess) return SaveError(response);
             return SaveSuccess(response);
         }

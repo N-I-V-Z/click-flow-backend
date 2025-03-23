@@ -6,8 +6,8 @@ namespace ClickFlow.BLL.Services.Interfaces
 {
 	public interface IFeedbackService
 	{
-        Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto);
-        Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto);
+        Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto, int feedbackerId);
+        Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto, int feedbackerId);
         Task<BaseResponse> DeleteFeedback(int id);
 
         Task<PaginatedList<FeedbackResponseDTO>> GetAllFeedbacks(int pageIndex, int pageSize);

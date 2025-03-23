@@ -20,7 +20,7 @@ namespace ClickFlow.BLL.Services.Implements
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto)
+        public async Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto, int feedbackerId)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ClickFlow.BLL.Services.Implements
             }
         }
 
-        public async Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto)
+        public async Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto, int feedbackerId)
         {
             try
             {
@@ -163,7 +163,9 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Feedback>();
             var feedbacks = repo.Get(new QueryBuilder<Feedback>()
                 .WithPredicate(x => x.CampaignId == campaignId)
-                .WithInclude(x => x.Campaign, x => x.Feedbacker)
+                .WithInclude(x => x.Feedbacker)               
+                .WithInclude(f => f.Feedbacker.ApplicationUser)
+                .WithInclude(f => f.Feedbacker.ApplicationUser.UserDetail)
                 .Build());
 
             var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);

@@ -13,7 +13,7 @@ namespace ClickFlow.DAL.Entities
         public string FullName { get; set; }
         public Role Role { get; set; }
         public bool IsDeleted { get; set; }
-        // Navigation properties
+        public UserDetail UserDetail { get; set; }
         public Advertiser? Advertiser { get; set; }
         public Publisher? Publisher { get; set; }
         public Wallet? Wallet { get; set; }
