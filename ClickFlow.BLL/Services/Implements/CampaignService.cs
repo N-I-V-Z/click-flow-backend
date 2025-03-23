@@ -20,25 +20,25 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAdvertiserService _advertiserService;
-    
-     
+
+
 
         public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _advertiserService = advertiserService;
-          
+
         }
 
         public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
         {
             try
             {
-              
+
                 await _unitOfWork.BeginTransactionAsync();
 
-               
+
                 var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();
 
 
@@ -48,17 +48,17 @@ namespace ClickFlow.BLL.Services.Implements
                 {
                     return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy Advertiser." };
                 }
-        
+
                 var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
                 var campaign = _mapper.Map<Campaign>(dto);
-         
+
                 campaign.AdvertiserId = advertiser.Id;
                 campaign.RemainingBudget = campaign.Budget;
-              
+
                 campaign.Status = CampaignStatus.Pending;
-         
-                await campaignRepo.CreateAsync(campaign);           
+
+                await campaignRepo.CreateAsync(campaign);
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -67,7 +67,7 @@ namespace ClickFlow.BLL.Services.Implements
             }
             catch (Exception ex)
             {
-                await _unitOfWork.RollBackAsync();         
+                await _unitOfWork.RollBackAsync();
                 throw new Exception("Đã xảy ra lỗi khi tạo chiến dịch.", ex);
             }
         }
@@ -180,9 +180,9 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Campaign>();
             var campaigns = repo.Get(new QueryBuilder<Campaign>()
                 .WithPredicate(x => !x.IsDeleted)
-                .WithInclude(x => x.Advertiser.ApplicationUser)   
+                .WithInclude(x => x.Advertiser.ApplicationUser)
 
-                
+
                 .Build());
 
             var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaigns, pageIndex, pageSize);
@@ -229,19 +229,52 @@ namespace ClickFlow.BLL.Services.Implements
             return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(int advertiserId, CampaignParticipationStatus? campaignParticipationStatus, int pageIndex, int pageSize)
+        public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(
+        int advertiserId,
+        CampaignParticipationStatus? campaignParticipationStatus,
+        int pageIndex,
+        int pageSize)
         {
             var repo = _unitOfWork.GetRepo<CampaignParticipation>();
+
+
             var campaignParticipations = repo.Get(new QueryBuilder<CampaignParticipation>()
                 .WithPredicate(x => x.Campaign.Advertiser.UserId == advertiserId
                 && (!campaignParticipationStatus.HasValue || x.Status == campaignParticipationStatus))
                 .WithInclude(x => x.Campaign)
+                .WithInclude(x => x.Publisher)
+                .WithInclude(x => x.Publisher.ApplicationUser)
                 .Build());
 
             var pagedCampaigns = await PaginatedList<CampaignParticipation>.CreateAsync(campaignParticipations, pageIndex, pageSize);
+
+
+            var queryOptions = new QueryBuilder<CampaignParticipation>()
+            .WithInclude(x => x.Publisher)
+            .Build();
+
+            var allCampaignParticipations = repo.Get(queryOptions).ToList();
+
+            var publisherCampaignCount = allCampaignParticipations
+                .GroupBy(x => x.PublisherId)
+                .Select(g => new { PublisherId = g.Key, TotalCampaigns = g.Count() })
+                .ToDictionary(x => x.PublisherId, x => x.TotalCampaigns);
+
+
             var response = _mapper.Map<List<CampaignParticipationResponseDTO>>(pagedCampaigns);
+
+
+            foreach (var item in response)
+            {
+                item.TotalCampaigns = publisherCampaignCount.ContainsKey(item.PublisherId)
+                    ? publisherCampaignCount[item.PublisherId]
+                    : 0;
+                item.DailyTraffic = 0;
+            }
+
             return new PaginatedList<CampaignParticipationResponseDTO>(response, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
+
 
         public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus? status, int pageIndex, int pageSize)
         {
@@ -281,21 +314,21 @@ namespace ClickFlow.BLL.Services.Implements
             var campaignsQuery = campaignRepo.Get(new QueryBuilder<Campaign>()
                 .WithPredicate(x => !x.IsDeleted && x.Status == CampaignStatus.Activing)
                 .WithInclude(x => x.Advertiser)
-                .WithInclude(x => x.CampaignParticipations.Where(p => p.PublisherId == publisherId)) 
+                .WithInclude(x => x.CampaignParticipations.Where(p => p.PublisherId == publisherId))
                 .Build());
 
-            
+
             var pagedCampaigns = await PaginatedList<Campaign>.CreateAsync(campaignsQuery, pageIndex, pageSize);
 
-     
+
             var mappedCampaigns = _mapper.Map<List<CampaignResponseForPublisherDTO>>(pagedCampaigns);
 
-          
+
             var participationDict = pagedCampaigns
-                .SelectMany(c => c.CampaignParticipations) 
+                .SelectMany(c => c.CampaignParticipations)
                 .ToDictionary(p => p.CampaignId, p => p.Status);
 
-          
+
             foreach (var campaignDto in mappedCampaigns)
             {
                 if (participationDict.TryGetValue(campaignDto.Id, out var status))
@@ -304,14 +337,14 @@ namespace ClickFlow.BLL.Services.Implements
                 }
             }
 
-        
+
             return new PaginatedList<CampaignResponseForPublisherDTO>(mappedCampaigns, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
         public async Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();
 
-          
+
             var currentCampaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
                 .WithPredicate(x => x.Id == campaignId && !x.IsDeleted)
                 .Build());
@@ -321,22 +354,22 @@ namespace ClickFlow.BLL.Services.Implements
                 throw new Exception("Chiến dịch không tồn tại hoặc đã bị xóa.");
             }
 
-           
+
             var campaignsQuery = repo.Get(new QueryBuilder<Campaign>()
-                .WithPredicate(x => !x.IsDeleted && x.TypeCampaign == currentCampaign.TypeCampaign && x.Status == CampaignStatus.Activing && x.AverageStarRate.HasValue && x.Id != campaignId) 
+                .WithPredicate(x => !x.IsDeleted && x.TypeCampaign == currentCampaign.TypeCampaign && x.Status == CampaignStatus.Activing && x.AverageStarRate.HasValue && x.Id != campaignId)
                 .WithInclude(x => x.Advertiser)
                 .WithOrderBy(query => query.OrderByDescending(c => c.AverageStarRate))
                 .Build());
 
-          
+
             var topCampaigns = await campaignsQuery
                 .Take(10)
                 .ToListAsync();
 
-           
+
             var result = _mapper.Map<List<CampaignResponseDTO>>(topCampaigns);
 
-        
+
             return new PaginatedList<CampaignResponseDTO>(result, topCampaigns.Count, pageIndex, pageSize);
         }
         public async Task<CampaignResponseDTO> GetCampaignById(int id)
@@ -387,10 +420,10 @@ namespace ClickFlow.BLL.Services.Implements
         public async Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto, int userId)
         {
             try
-            {               
+            {
                 var publisherRepo = _unitOfWork.GetRepo<Publisher>();
                 var publisher = await publisherRepo.GetSingleAsync(new QueryBuilder<Publisher>()
-                    .WithPredicate(x => x.UserId == userId) 
+                    .WithPredicate(x => x.UserId == userId)
                     .Build());
 
                 if (publisher == null)
@@ -398,9 +431,9 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Người dùng không phải Publisher hoặc chưa được đăng ký." };
                 }
 
-                int publisherId = publisher.Id; 
+                int publisherId = publisher.Id;
 
-               
+
                 var campaignRepo = _unitOfWork.GetRepo<Campaign>();
                 var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
                     .WithPredicate(x => x.Id == dto.CampaignId && !x.IsDeleted && x.Status == CampaignStatus.Activing)
@@ -411,7 +444,7 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Chiến dịch không tồn tại hoặc không ở trạng thái hoạt động." };
                 }
 
-               
+
                 var participationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
                 var existingParticipation = await participationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
                     .WithPredicate(x => x.PublisherId == publisherId && x.CampaignId == dto.CampaignId)
@@ -422,11 +455,11 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Bạn đã đăng ký chiến dịch này trước đó." };
                 }
 
-             
+
                 var participation = new CampaignParticipation
                 {
                     CampaignId = dto.CampaignId,
-                    PublisherId = publisherId, 
+                    PublisherId = publisherId,
                     ShortLink = "ShortLink",
                     Status = CampaignParticipationStatus.Pending,
                     CreateAt = DateTime.UtcNow

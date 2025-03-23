@@ -1,4 +1,5 @@
-﻿using ClickFlow.DAL.Enums;
+﻿using ClickFlow.BLL.DTOs.AdvertiserDTOs;
+using ClickFlow.DAL.Enums;
 
 namespace ClickFlow.BLL.DTOs.ApplicationUserDTOs
 {
@@ -7,5 +8,8 @@ namespace ClickFlow.BLL.DTOs.ApplicationUserDTOs
         public string FullName { get; set; }
         public Role Role { get; set; }
         public bool IsDeleted { get; set; }
+        public string? Email { get; set; }
+
+        public AdvertiserResponseDTO? Advertiser { get; set; }
     }
 }

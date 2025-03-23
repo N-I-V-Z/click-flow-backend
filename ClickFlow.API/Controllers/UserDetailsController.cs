@@ -83,7 +83,7 @@ namespace ClickFlow.API.Controllers
                     return GetError("Page Size phải là số nguyên dương.");
                 }
                 var data = await _userDetailService.GetAllUserDetails(pageIndex, pageSize);
-                var response = new PagingDTO<UserDetailViewDTO>(data);
+                var response = new PagingDTO<UserDetailResponseDTO>(data);
                 if (response == null) return GetError();
                 return GetSuccess(response);
             }
@@ -113,7 +113,7 @@ namespace ClickFlow.API.Controllers
                     return GetError("Page Size phải là số nguyên dương.");
                 }
                 var data = await _userDetailService.GetAllUserDetailsByName(pageIndex, pageSize, name);
-                var response = new PagingDTO<UserDetailViewDTO>(data);
+                var response = new PagingDTO<UserDetailResponseDTO>(data);
                 if (response == null) return GetError();
                 return GetSuccess(response);
             }

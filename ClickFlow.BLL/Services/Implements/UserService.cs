@@ -20,7 +20,7 @@ namespace ClickFlow.BLL.Services.Implements
             _mapper = mapper;
         }
 
-        public async Task<PaginatedList<UserViewDTO>> GetUsersByRoleAsync(Role role, int pageIndex, int pageSize)
+        public async Task<PaginatedList<ApplicationUserResponseDTO>> GetUsersByRoleAsync(Role role, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<ApplicationUser>();
 
@@ -30,8 +30,8 @@ namespace ClickFlow.BLL.Services.Implements
                 .Build());
 
             var pagedUsers = await PaginatedList<ApplicationUser>.CreateAsync(users, pageIndex, pageSize);
-            var result = _mapper.Map<List<UserViewDTO>>(pagedUsers);
-            return new PaginatedList<UserViewDTO>(result, pagedUsers.TotalItems, pageIndex, pageSize);
+            var result = _mapper.Map<List<ApplicationUserResponseDTO>>(pagedUsers);
+            return new PaginatedList<ApplicationUserResponseDTO>(result, pagedUsers.TotalItems, pageIndex, pageSize);
         }
     }
 }

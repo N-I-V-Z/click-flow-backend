@@ -84,18 +84,18 @@ namespace ClickFlow.BLL.Services.Implements
             return new BaseResponse { IsSuccess = false, Message = "Không tồn tại người dùng." };
         }
 
-        public async Task<PaginatedList<UserDetailViewDTO>> GetAllUserDetails(int pageIndex, int pageSize)
+        public async Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetails(int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
                                         .WithPredicate(x => true)
                                         .Build());
             var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
-            var resultDTO = _mapper.Map<List<UserDetailViewDTO>>(pagedRecords);
-            return new PaginatedList<UserDetailViewDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
+            var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
+            return new PaginatedList<UserDetailResponseDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<PaginatedList<UserDetailViewDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name)
+        public async Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name)
         {
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
@@ -106,11 +106,11 @@ namespace ClickFlow.BLL.Services.Implements
                 loadedRecords = loadedRecords.Where(x => x.User.FullName.Contains(name));
             }
             var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
-            var resultDTO = _mapper.Map<List<UserDetailViewDTO>>(pagedRecords);
-            return new PaginatedList<UserDetailViewDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
+            var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
+            return new PaginatedList<UserDetailResponseDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
         }
 
-        public async Task<UserDetailViewDTO> GetUserDetailByUserId(int userId)
+        public async Task<UserDetailResponseDTO> GetUserDetailByUserId(int userId)
         {
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var response = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
@@ -118,7 +118,7 @@ namespace ClickFlow.BLL.Services.Implements
                                                     .WithTracking(false)
                                                     .Build());
             if (response == null) return null;
-            return _mapper.Map<UserDetailViewDTO>(response);
+            return _mapper.Map<UserDetailResponseDTO>(response);
         }
     }
 }

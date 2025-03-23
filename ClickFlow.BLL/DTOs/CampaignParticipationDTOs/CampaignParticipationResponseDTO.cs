@@ -14,5 +14,7 @@ namespace ClickFlow.BLL.DTOs.CampaignParticipationDTOs
         public PublisherResponseDTO Publisher { get; set; }
         public int CampaignId { get; set; }
         public CampaignResponseDTO Campaign { get; set; }
+        public int TotalCampaigns { get; set; }
+        public int DailyTraffic { get; set; } = 0;
     }
 }

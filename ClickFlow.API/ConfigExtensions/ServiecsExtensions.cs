@@ -289,11 +289,11 @@ namespace ClickFlow.API.ConfigExtensions
                     await context.Reports.AddRangeAsync(
                         new Report
                         {
-                            AdvertiserId = 1,
+                            AdvertiserId = 3,
                             CampaignId = 1,
                             CreateAt = DateTime.UtcNow,
                             EvidenceURL = "https://abc.com",
-                            PublisherId = 1,
+                            PublisherId = 2,
                             Reason = "ABC",
                             Status = ReportStatus.Pending
                         }

@@ -7,6 +7,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 {
     public interface IUserService
 	{
-        Task<PaginatedList<UserViewDTO>> GetUsersByRoleAsync(Role role, int pageIndex, int pageSize);
+        Task<PaginatedList<ApplicationUserResponseDTO>> GetUsersByRoleAsync(Role role, int pageIndex, int pageSize);
     }
 }

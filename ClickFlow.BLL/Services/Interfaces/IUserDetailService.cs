@@ -13,8 +13,8 @@ namespace ClickFlow.BLL.Services.Interfaces
     {
         Task<BaseResponse> CreateUpdateUserDetail(UserDetailRequestDTO dto, int userId);
         Task<BaseResponse> DeleteUserDetail(int userId);
-        Task<PaginatedList<UserDetailViewDTO>> GetAllUserDetails(int pageIndex, int pageSize);
-        Task<PaginatedList<UserDetailViewDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name);
-        Task<UserDetailViewDTO> GetUserDetailByUserId(int userId);
+        Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetails(int pageIndex, int pageSize);
+        Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name);
+        Task<UserDetailResponseDTO> GetUserDetailByUserId(int userId);
     }
 }
