@@ -387,6 +387,33 @@ namespace ClickFlow.BLL.Services.Implements
 
             return _mapper.Map<CampaignResponseDTO>(campaign);
         }
+
+        public async Task<CampaignResponseForPublisherDTO> GetCampaignByIdForPublisher(int campaignId, int publisherId)
+        {
+            var repo = _unitOfWork.GetRepo<Campaign>();
+
+            var campaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
+                .WithPredicate(x => x.Id == campaignId && !x.IsDeleted && x.Status == CampaignStatus.Activing)
+                .WithInclude(x => x.Advertiser)
+                .WithInclude(x => x.CampaignParticipations.Where(p => p.PublisherId == publisherId))
+                .Build());
+
+            if (campaign == null)
+            {
+                return null;
+            }
+
+            var response = _mapper.Map<CampaignResponseForPublisherDTO>(campaign);
+
+            var participation = campaign.CampaignParticipations.FirstOrDefault();
+            if (participation != null)
+            {
+                response.PublisherStatus = participation.Status;
+            }
+
+            return response;
+        }
+
         public async Task<BaseResponse> ValidateCampaignForTraffic(int campaignId)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();
