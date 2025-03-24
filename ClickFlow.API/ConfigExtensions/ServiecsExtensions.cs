@@ -189,7 +189,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851222/wcaqmitrttp7iiri3x8t.jpg",
                             AverageStarRate = 4.9,
                             Percents = 0
                         },
@@ -207,7 +207,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.FoodAndBeverage,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851547/lb8cyg207pet4ico46sz.jpg",
                             AverageStarRate = 4.5,
                             Percents = 0
                         },
@@ -225,7 +225,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Pending,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851626/jojc35fbdbncr0ctie1c.png",
                             Percents = 0
                         },
                         new Campaign
@@ -242,7 +242,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851547/lb8cyg207pet4ico46sz.jpg",
                             AverageStarRate = 4.5
                         },
                         new Campaign
@@ -259,7 +259,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Tourism,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851547/lb8cyg207pet4ico46sz.jpg",
                             AverageStarRate = 4.6
                         },
                         new Campaign
@@ -276,7 +276,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Pending,
                             TypeCampaign = Industry.FoodAndBeverage,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851222/wcaqmitrttp7iiri3x8t.jpg"
                         }
                     );
                     await context.SaveChangesAsync();
