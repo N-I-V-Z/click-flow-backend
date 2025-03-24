@@ -274,6 +274,71 @@ namespace ClickFlow.BLL.Services.Implements
         }
 
 
+        public async Task<BaseResponse> UpdateCampaignParticipationStatus(
+            int publisherId,
+            int advertiserId,
+            int campaignParticipationId,
+            CampaignParticipationStatus newStatus)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();
+                var advertiser = await advertiserRepo.GetSingleAsync(new QueryBuilder<Advertiser>()
+                    .WithPredicate(x => x.Id == advertiserId)
+                    .Build());
+
+                if (advertiser == null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy Advertiser." };
+                }
+
+                var publisherRepo = _unitOfWork.GetRepo<Publisher>();
+                var publisher = await publisherRepo.GetSingleAsync(new QueryBuilder<Publisher>()
+                    .WithPredicate(x => x.Id == publisherId)
+                    .Build());
+
+                if (publisher == null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy Publisher." };
+                }
+
+                var participationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+                var participation = await participationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
+                    .WithPredicate(x => x.Id == campaignParticipationId
+                        && x.PublisherId == publisherId
+                        && x.Campaign.AdvertiserId == advertiserId)
+                    .WithInclude(x => x.Campaign)
+                    .Build());
+
+                if (participation == null)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy thông tin tham gia chiến dịch." };
+                }
+
+                if (participation.Status == newStatus)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Trạng thái đã được cập nhật trước đó." };
+                }
+
+                participation.Status = newStatus;
+
+                await participationRepo.UpdateAsync(participation);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return new BaseResponse { IsSuccess = true, Message = "Cập nhật trạng thái thành công." };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollBackAsync();
+                return new BaseResponse { IsSuccess = false, Message = $"Đã xảy ra lỗi: {ex.Message}" };
+            }
+        }
+
+
+
         public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus? status, int pageIndex, int pageSize)
         {
             var repo = _unitOfWork.GetRepo<Campaign>();

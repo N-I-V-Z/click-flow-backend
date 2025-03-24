@@ -30,6 +30,7 @@ namespace ClickFlow.BLL.Services.Implements
 
                 var feedback = _mapper.Map<Feedback>(dto);
                 feedback.Timestamp = DateTime.Now;
+                feedback.FeedbackerId = feedbackerId;
 
                 await feedbackRepo.CreateAsync(feedback);
                 await _unitOfWork.SaveChangesAsync();
