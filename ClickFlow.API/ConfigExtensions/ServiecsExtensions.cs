@@ -341,7 +341,7 @@ namespace ClickFlow.API.ConfigExtensions
                     await context.Feedbacks.AddRangeAsync(
                         new Feedback
                         {
-                            CampaignId = 1, 
+                            CampaignId = 1,
                             Description = "Great campaign!",
                             StarRate = 5,
                             Timestamp = DateTime.UtcNow,
@@ -371,7 +371,20 @@ namespace ClickFlow.API.ConfigExtensions
                             CreateAt = DateTime.UtcNow,
                             PublisherId = 2,
                             Status = CampaignParticipationStatus.Pending,
-
+                        },
+                        new CampaignParticipation
+                        {
+                            CampaignId = 2,
+                            CreateAt = DateTime.UtcNow,
+                            PublisherId = 2,
+                            Status = CampaignParticipationStatus.Participated,
+                        },
+                        new CampaignParticipation
+                        {
+                            CampaignId = 3,
+                            CreateAt = DateTime.UtcNow,
+                            PublisherId = 2,
+                            Status = CampaignParticipationStatus.Rejected,
                         }
                     );
                     await context.SaveChangesAsync();

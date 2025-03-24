@@ -58,7 +58,7 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse
                     {
                         IsSuccess = false,
-                        Message = "Chiến dịch hoặc publisher không hợp lệ"
+                        Message = "Publihser chưa tham gia chiến dịch này"
                     };
                 }
 
@@ -74,7 +74,7 @@ namespace ClickFlow.BLL.Services.Implements
             }
         }
 
-        public async Task<bool> IsValidTraffic(TrafficCreateDTO dto)
+        public async Task<bool> IsValidTraffic(TrafficCreateDTO dto, string IpAddress)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace ClickFlow.BLL.Services.Implements
                 var queryBuilder = CreateQueryBuilder();
                 var checkIpQueryOptions = queryBuilder.WithPredicate(x =>
                     x.CampaignParticipationId == cp.Id &&
-                    x.IpAddress.Equals(dto.IpAddress) &&
+                    x.IpAddress.Equals(IpAddress) &&
                     x.IsValid == true
                 );
 
@@ -104,7 +104,7 @@ namespace ClickFlow.BLL.Services.Implements
                 throw;
             }
         }
-        public async Task<string> CreateAsync(TrafficCreateDTO dto)
+        public async Task<string> CreateAsync(TrafficCreateDTO dto, string remoteIp)
         {
             try
             {
@@ -116,12 +116,14 @@ namespace ClickFlow.BLL.Services.Implements
                 var campaignParticipartion = await cpRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
                     .WithPredicate(x => x.CampaignId == dto.CampaignId && x.PublisherId == dto.PublisherId)
                     .Build());
-                // traffic được tạo
-                var newTraffic = _mapper.Map<Traffic>(dto);
-                newTraffic.Timestamp = DateTime.UtcNow;
-                newTraffic.CampaignParticipationId = campaignParticipartion.Id;
 
-                if (dto.IsValid == true)
+                var newTraffic = _mapper.Map<Traffic>(dto);
+                newTraffic.Timestamp = dto.Timestamp ?? DateTime.UtcNow;
+                newTraffic.CampaignParticipationId = campaignParticipartion.Id;
+                newTraffic.IpAddress = remoteIp;
+                newTraffic.IsValid = await IsValidTraffic(dto, remoteIp);
+
+                if (newTraffic.IsValid == true)
                 {
                     if (campagin.TypePay == TypePay.CPC)
                     {

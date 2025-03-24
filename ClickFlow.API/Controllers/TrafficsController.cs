@@ -145,9 +145,9 @@ namespace ClickFlow.API.Controllers
                     return SaveError(checkTraffic.Message);
                 }
 
-				dto.IsValid = await _trafficService.IsValidTraffic(dto);
+                var remoteIp = HttpContext.Connection.RemoteIpAddress.ToString();
 
-				var response = await _trafficService.CreateAsync(dto);
+                var response = await _trafficService.CreateAsync(dto, remoteIp);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}

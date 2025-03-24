@@ -13,11 +13,10 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<PaginatedList<TrafficResponseDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto);
 		Task<TrafficResponseDTO> GetByIdAsync(int id);
 		Task<BaseResponse> ValidateTraffic(TrafficCreateDTO dto);
-		Task<string> CreateAsync(TrafficCreateDTO dto);
+		Task<string> CreateAsync(TrafficCreateDTO dto, string remoteIp);
 		Task TransferTrafficToClosedTraffic();
 		Task<int> AverageTrafficInCampaign(int publisherId);
 		Task<int> CountAllTrafficByCampaign(int campaignId);
-		Task<bool> IsValidTraffic(TrafficCreateDTO dto);
-
+		Task<bool> IsValidTraffic(TrafficCreateDTO dto, string IpAddress);
     }
 }
