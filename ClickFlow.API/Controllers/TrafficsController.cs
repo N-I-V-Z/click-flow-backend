@@ -133,9 +133,19 @@ namespace ClickFlow.API.Controllers
 			{
 				var checkCampaign = await _campaignService.ValidateCampaignForTraffic(dto.CampaignId);
 
+				if (!checkCampaign.IsSuccess)
+				{
+					return SaveError(checkCampaign.Message);
+				}
+
 				var checkTraffic = await _trafficService.ValidateTraffic(dto);
 
-				dto.IsValid = checkTraffic.IsSuccess || checkCampaign.IsSuccess;
+                if (!checkTraffic.IsSuccess)
+                {
+                    return SaveError(checkTraffic.Message);
+                }
+
+				dto.IsValid = await _trafficService.IsValidTraffic(dto);
 
 				var response = await _trafficService.CreateAsync(dto);
 				if (response == null) return SaveError();
