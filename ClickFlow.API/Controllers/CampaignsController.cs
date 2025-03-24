@@ -2,6 +2,7 @@
 using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
+using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
@@ -409,6 +410,36 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [HttpPut("update-status/{publisherId}/{campaignParticipationId}/{newStatus}")]
+        public async Task<IActionResult> UpdateParticipationStatus( [FromRoute] int publisherId, [FromRoute] int campaignParticipationId, [FromRoute] CampaignParticipationStatus newStatus)
+        {
+            try
+            {
+                
+                var response = await _campaignService.UpdateCampaignParticipationStatus(
+                    publisherId,
+                    UserId,
+                    campaignParticipationId,
+                    newStatus);
 
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, new BaseResponse
+                {
+                    IsSuccess = false,
+                    Message = "Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau."
+                });
+            }
+        }
     }
 }
