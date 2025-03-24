@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  # Database MSSQL
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_container
+    ports:
+      - "1433:1433" # Expose cổng SQL Server
+    environment:
+      SA_PASSWORD: "ThisIsStrongPassword@12345"  # Mật khẩu admin
+      ACCEPT_EULA: "Y"  # Đồng ý với EULA
+
+  # Backend .NET
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: click_flow_backend_container
+    depends_on:
+      - mssql  # Đảm bảo MSSQL chạy trước khi backend khởi động
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=ClickFlowDB;User=sa;Password=ThisIsStrongPassword@12345;TrustServerCertificate=True;
+    ports:
+      - "7087:5000" # Mở cổng API
+    restart: always # Tự khởi động lại khi lỗi
+    networks:
+      - app_network # Tham gia vào mạng dùng chung
+
+networks:
+  app_network:
+    driver: bridge # Mạng nội bộ giữa backend và frontend

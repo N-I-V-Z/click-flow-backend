@@ -17,5 +17,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task TransferTrafficToClosedTraffic();
 		Task<int> AverageTrafficInCampaign(int publisherId);
 		Task<int> CountAllTrafficByCampaign(int campaignId);
-	}
+		Task<bool> IsValidTraffic(TrafficCreateDTO dto);
+
+    }
 }
