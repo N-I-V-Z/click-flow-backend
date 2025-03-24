@@ -312,31 +312,41 @@ namespace ClickFlow.BLL.Services.Implements
 				var cPRepo = _unitOfWork.GetRepo<CampaignParticipation>();
 				var ctRepo = _unitOfWork.GetRepo<ClosedTraffic>();
 				var cRepo = _unitOfWork.GetRepo<Campaign>();
+
 				var campaignList = await cPRepo.GetAllAsync(new QueryBuilder<CampaignParticipation>()
 					.WithPredicate(x => x.PublisherId == publisherId)
-					.Build()
-					);
+					.Build());
+
+				if (!campaignList.Any()) return 0; 
 
 				var campaignIds = campaignList.Select(x => x.CampaignId).ToList();
 
 				var campaigns = await cRepo.GetAllAsync(new QueryBuilder<Campaign>()
 					.WithPredicate(x => campaignIds.Contains(x.Id) &&
-										 (x.Status == CampaignStatus.Completed || x.Status == CampaignStatus.Canceled))
+										(x.Status == CampaignStatus.Completed || x.Status == CampaignStatus.Canceled))
 					.Build());
 
-				var campaignParticipationIds = campaignList.Select(x => x.Id).ToList();
-				var traffics = await ctRepo.GetAllAsync(new QueryBuilder<ClosedTraffic>()
-					.WithPredicate(x => campaignParticipationIds.Contains((int)x.CampaignParticipationId))
-					.Build());
+				if (!campaigns.Any()) return 0; 
 
-				var trafficCountByCampaign = traffics.GroupBy(x => x.CampaignParticipationId).ToDictionary(g => g.Key, g => g.Count());
-
-				var avgTraffic = campaignList
+				var validCampaignParticipationIds = campaignList
 					.Where(x => campaigns.Any(c => c.Id == x.CampaignId))
-					.Select(x => trafficCountByCampaign.GetValueOrDefault(x.Id, 0))
-					.Average();
+					.Select(x => x.Id)
+					.ToList();
 
-				return (int) avgTraffic;
+				if (!validCampaignParticipationIds.Any()) return 0;
+
+				var traffics = await ctRepo.GetAllAsync(new QueryBuilder<ClosedTraffic>()
+					.WithPredicate(x => validCampaignParticipationIds.Contains((int)x.CampaignParticipationId))
+					.Build());
+
+				if (!traffics.Any()) return 0;
+
+				var trafficCountByCampaign = traffics
+					.GroupBy(x => x.CampaignParticipationId)
+					.Select(g => g.Count())
+					.ToList();
+
+				return trafficCountByCampaign.Any() ? (int)trafficCountByCampaign.Average() : 0;
 			}
 			catch (Exception ex)
 			{
@@ -344,6 +354,7 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
+
 
 		public async Task<int> CountAllTrafficByCampaign(int campaignId)
 		{
