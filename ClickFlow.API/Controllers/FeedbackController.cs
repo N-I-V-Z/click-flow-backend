@@ -16,6 +16,7 @@ namespace ClickFlow.API.Controllers
             _feedbackService = feedbackService;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-all-feedbacks/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetAllFeedbacks(int pageIndex, int pageSize)
@@ -24,6 +25,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-feedbacks-by-campaign/{campaignId}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetFeedbacksByCampaignId(int campaignId, int pageIndex, int pageSize)
@@ -32,7 +34,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
-
+        [Authorize]
         [HttpGet]
         [Route("get-feedbacks-by-feedbacker/{feedbackerId}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetFeedbacksByFeedbackerId(int feedbackerId, int pageIndex, int pageSize)
@@ -41,6 +43,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-feedback-by-id/{id}")]
         public async Task<IActionResult> GetFeedbackById(int id)
@@ -50,6 +53,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("create-feedback")]
         public async Task<IActionResult> CreateFeedback(FeedbackCreateDTO dto)
@@ -60,7 +64,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
-      
+        [Authorize]
         [HttpPut]
         [Route("update-feedback")]
         public async Task<IActionResult> UpdateFeedback(FeedbackUpdateDTO dto)
@@ -71,7 +75,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
-      
+        [Authorize]
         [HttpDelete]
         [Route("delete-feedback/{id}")]
         public async Task<IActionResult> DeleteFeedback(int id)
