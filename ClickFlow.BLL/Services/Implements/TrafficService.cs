@@ -108,9 +108,11 @@ namespace ClickFlow.BLL.Services.Implements
         {
             try
             {
-
+                await _unitOfWork.BeginTransactionAsync();
                 var trafficRepo = _unitOfWork.GetRepo<Traffic>();
                 var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+                var walletRepo = _unitOfWork.GetRepo<Wallet>();
+                var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(x => x.UserId == dto.PublisherId).Build());
                 var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
                 var campagin = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>().WithPredicate(x => x.Id == dto.CampaignId).Build());
                 var campaignParticipartion = await cpRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
@@ -128,6 +130,9 @@ namespace ClickFlow.BLL.Services.Implements
                     if (campagin.TypePay == TypePay.CPC)
                     {
                         newTraffic.Revenue = campagin.Commission;
+                        wallet.Balance += newTraffic.Revenue ?? 0;
+                        await walletRepo.UpdateAsync(wallet);
+                        await _unitOfWork.SaveChangesAsync();
                     }
                 }
                 else
@@ -137,6 +142,7 @@ namespace ClickFlow.BLL.Services.Implements
 
                 await trafficRepo.CreateAsync(newTraffic);
                 var saver = await _unitOfWork.SaveAsync();
+                await _unitOfWork.CommitTransactionAsync();
                 if (!saver)
                 {
                     return String.Empty;
@@ -148,6 +154,7 @@ namespace ClickFlow.BLL.Services.Implements
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                await _unitOfWork.RollBackAsync();
                 throw;
             }
         }
@@ -381,7 +388,6 @@ namespace ClickFlow.BLL.Services.Implements
                 throw;
             }
         }
-
 
         public async Task<int> CountAllTrafficByCampaign(int campaignId)
         {

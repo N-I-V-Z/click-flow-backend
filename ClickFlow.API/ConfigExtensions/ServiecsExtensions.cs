@@ -206,7 +206,7 @@ namespace ClickFlow.API.ConfigExtensions
                             StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.FoodAndBeverage,
-                            TypePay = TypePay.CPA,
+                            TypePay = TypePay.CPC,
                             Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
                             AverageStarRate = 4.5,
                             Percents = 15
