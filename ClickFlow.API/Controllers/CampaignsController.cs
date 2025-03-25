@@ -6,6 +6,7 @@ using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -21,7 +22,7 @@ namespace ClickFlow.API.Controllers
             _campaignService = campaignService;
         }
 
-
+        [Authorize]
         [HttpGet]
         [Route("get-all-campaigns/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetAllCampaigns([FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -52,6 +53,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-campaigns-except-from-pending/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetCampaignsExceptFromPending([FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -82,7 +84,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpGet]
         [Route("get-campaigns-by-status/{status}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetCampaignsByStatus([FromRoute] CampaignStatus? status, [FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -112,6 +114,7 @@ namespace ClickFlow.API.Controllers
                 return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
             }
         }
+        [Authorize]
         [HttpGet]
         [Route("get-campaigns-by-statuses/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetCampaignsByStatuses([FromQuery] List<CampaignStatus>? statuses, [FromQuery] int pageIndex, [FromQuery] int pageSize)
@@ -142,6 +145,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-publisher-paticipation-by-status-for-advertiser/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetPublisherPaticipationByStatusForAdvertiser([FromQuery] CampaignParticipationStatus? campaignParticipationStatus, [FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -171,6 +175,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-campaigns-by-advertiser/{advertiserId}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetCampaignsByAdvertiserId([FromRoute] int advertiserId, [FromQuery] CampaignStatus? status, [FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -201,7 +206,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpGet]
         [Route("get-campaigns-joined-by-publisher/{publisherId}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetCampaignsJoinedByPublisher([FromRoute] int publisherId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -232,6 +237,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-all-campaign-for-publisher/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetAllCampaignForPublisher([FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -261,6 +267,8 @@ namespace ClickFlow.API.Controllers
                 return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
             }
         }
+
+        [Authorize]
         [HttpGet]
         [Route("get-similar-campaigns/{campaignId}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetSimilarCampaignsByTypeCampaign([FromRoute] int campaignId, [FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -291,6 +299,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("get-campaign-by-id-for-publisher/{id}")]
         public async Task<IActionResult> GetCampaignByIdForPublisher(int id)
@@ -300,7 +309,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
-
+        [Authorize]
         [HttpPost]
         [Route("create-campaign")]
         public async Task<IActionResult> CreateCampaign(CampaignCreateDTO dto)
@@ -311,7 +320,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
-
+        [Authorize]
         [HttpPut]
         [Route(("update-campaign"))]
         public async Task<IActionResult> UpdateCampaign([FromBody]  CampaignUpdateDTO dto)
@@ -322,6 +331,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
+        [Authorize]
         [HttpPut]
         [Route("update-campaign-status")]
         public async Task<IActionResult> UpdateCampaignStatus(CampaignUpdateStatusDTO dto)
@@ -337,7 +347,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
-
+        [Authorize]
         [HttpDelete]
         [Route("delete-campaign/{id}")]
         public async Task<IActionResult> DeleteCampaign(int id)
@@ -346,6 +356,8 @@ namespace ClickFlow.API.Controllers
             if (!response.IsSuccess) return SaveError(response);
             return SaveSuccess(response);
         }
+
+        [Authorize]
         [HttpPost("register")]
         public async Task<IActionResult> RegisterForCampaign([FromBody] CampaignParticipationCreateDTO dto)
         {
@@ -356,6 +368,8 @@ namespace ClickFlow.API.Controllers
             }
             return BadRequest(response);
         }
+
+        [Authorize]
         [HttpGet("campaigns/count-by-statuses")]
         public async Task<IActionResult> GetCampaignCountByStatuses([FromQuery] List<CampaignStatus>? statuses)
         {
@@ -372,6 +386,8 @@ namespace ClickFlow.API.Controllers
                 return GetError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
             }
         }
+
+        [Authorize]
         [HttpGet("campaign-participations/count-by-status-for-advertiser")]
         public async Task<IActionResult> GetPublisherParticipationCountByStatusForAdvertiser(
         [FromQuery] CampaignParticipationStatus? campaignParticipationStatus)
@@ -391,10 +407,12 @@ namespace ClickFlow.API.Controllers
                 return GetError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
             }
         }
+
+        [Authorize]
         [HttpGet("campaigns/count-by-advertiser/{advertiserId}")]
         public async Task<IActionResult> GetCampaignCountByAdvertiserId(
-    [FromRoute] int advertiserId,
-    [FromQuery] CampaignStatus? status)
+            [FromRoute] int advertiserId,
+            [FromQuery] CampaignStatus? status)
         {
             try
             {
@@ -410,6 +428,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("update-status/{publisherId}/{campaignParticipationId}/{newStatus}")]
         public async Task<IActionResult> UpdateParticipationStatus( [FromRoute] int publisherId, [FromRoute] int campaignParticipationId, [FromRoute] CampaignParticipationStatus newStatus)
         {

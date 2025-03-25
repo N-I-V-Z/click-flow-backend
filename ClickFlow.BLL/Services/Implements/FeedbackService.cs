@@ -28,6 +28,18 @@ namespace ClickFlow.BLL.Services.Implements
                 var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
                 var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
+                var existingFeedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
+            .WithPredicate(x => x.CampaignId == dto.CampaignId && x.FeedbackerId == feedbackerId)
+            .Build());
+
+                if (existingFeedback != null)
+                {
+                    return new BaseResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Bạn đã đánh giá chiến dịch này rồi. Mỗi người chỉ được đánh giá một lần."
+                    };
+                }
                 var feedback = _mapper.Map<Feedback>(dto);
                 feedback.Timestamp = DateTime.Now;
                 feedback.FeedbackerId = feedbackerId;

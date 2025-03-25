@@ -189,9 +189,9 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851222/wcaqmitrttp7iiri3x8t.jpg",
                             AverageStarRate = 4.9,
-                            Percents = 10
+                            Percents = 0
                         },
                         new Campaign
                         {
@@ -207,9 +207,9 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.FoodAndBeverage,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851547/lb8cyg207pet4ico46sz.jpg",
                             AverageStarRate = 4.5,
-                            Percents = 15
+                            Percents = 0
                         },
                         new Campaign
                         {
@@ -224,9 +224,9 @@ namespace ClickFlow.API.ConfigExtensions
                             StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
                             Status = CampaignStatus.Pending,
                             TypeCampaign = Industry.Education,
-                            TypePay = TypePay.CPS,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
-                            Percents = 20
+                            TypePay = TypePay.CPC,
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851626/jojc35fbdbncr0ctie1c.png",
+                            Percents = 0
                         },
                         new Campaign
                         {
@@ -242,7 +242,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Education,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851547/lb8cyg207pet4ico46sz.jpg",
                             AverageStarRate = 4.5
                         },
                         new Campaign
@@ -258,8 +258,8 @@ namespace ClickFlow.API.ConfigExtensions
                             StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
                             Status = CampaignStatus.Activing,
                             TypeCampaign = Industry.Tourism,
-                            TypePay = TypePay.CPA,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp",
+                            TypePay = TypePay.CPC,
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851547/lb8cyg207pet4ico46sz.jpg",
                             AverageStarRate = 4.6
                         },
                         new Campaign
@@ -276,7 +276,7 @@ namespace ClickFlow.API.ConfigExtensions
                             Status = CampaignStatus.Pending,
                             TypeCampaign = Industry.FoodAndBeverage,
                             TypePay = TypePay.CPC,
-                            Image = "https://res.cloudinary.com/detykxgzs/image/upload/v1741893995/kmneq8vnkryegmurnknr.webp"
+                            Image = "http://res.cloudinary.com/detykxgzs/image/upload/v1742851222/wcaqmitrttp7iiri3x8t.jpg"
                         }
                     );
                     await context.SaveChangesAsync();
