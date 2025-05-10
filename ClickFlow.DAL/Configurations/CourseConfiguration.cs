@@ -17,9 +17,10 @@ namespace ClickFlow.DAL.Configurations
 			builder.Property(c => c.UpdateAt).IsRequired(false);
 			builder.Property(c => c.CreateById).IsRequired();
 			builder.Property(c => c.Price).IsRequired();
-			builder.Property(c => c.LessonLearned).IsRequired();
-			builder.Property(c => c.Content).IsRequired();
-			builder.Property(c => c.Description).IsRequired();
+			builder.Property(c => c.AvgRate).IsRequired(false);
+			builder.Property(c => c.LessonLearned).IsRequired(false);
+			builder.Property(c => c.Content).IsRequired(false);
+			builder.Property(c => c.Description).IsRequired(false);
 		}
 	}
 }
