@@ -409,8 +409,114 @@ namespace ClickFlow.API.ConfigExtensions
                     );
                     await context.SaveChangesAsync();
                 }
-                #endregion
-            }
-        }
+				#endregion
+
+				#region Seeding Courses
+				if (!context.Courses.Any())
+				{
+					await context.Courses.AddRangeAsync(
+						new Course
+						{
+							Title = "Khóa học Digital Marketing Cơ Bản",
+							Price = 500_000,
+							LessonLearned = "Hiểu rõ các kênh marketing số, biết cách chạy quảng cáo cơ bản.",
+							Description = "Khóa học dành cho người mới bắt đầu, giúp bạn làm quen với khái niệm và công cụ Digital Marketing.",
+							Content = "1. Giới thiệu Digital Marketing\n2. Các kênh marketing phổ biến\n3. Chạy quảng cáo Facebook cơ bản",
+							CreateById = 1,
+							CreateAt = DateTime.UtcNow,
+						},
+						new Course
+						{
+							Title = "Tối Ưu Hóa Chuyển Đổi Trong Affiliate",
+							Price = 750_000,
+							LessonLearned = "Nắm được cách tối ưu phễu bán hàng và tăng tỷ lệ chuyển đổi.",
+							Description = "Hướng dẫn từng bước cải thiện hiệu suất tiếp thị liên kết thông qua tối ưu hóa trang đích và nội dung.",
+							Content = "1. Hiểu về hành vi khách hàng\n2. Thiết kế trang đích hiệu quả\n3. A/B Testing cho affiliate",
+							CreateById = 1,
+							CreateAt = DateTime.UtcNow,
+						},
+						new Course
+						{
+							Title = "SEO Cho Affiliate Website",
+							Price = 650_000,
+							LessonLearned = "Tự tay SEO website để tăng lượng truy cập tự nhiên.",
+							Description = "Tìm hiểu và ứng dụng SEO vào website affiliate nhằm tăng hiệu quả tiếp cận khách hàng.",
+							Content = "1. Cấu trúc website chuẩn SEO\n2. Nghiên cứu từ khóa\n3. Backlink và nội dung chuẩn SEO",
+							CreateById = 1,
+							CreateAt = DateTime.UtcNow,
+						}
+					);
+
+					await context.SaveChangesAsync();
+				}
+				#endregion
+
+				#region Seeding Videos
+				if (!context.Videos.Any())
+				{
+					await context.Videos.AddRangeAsync(
+						new Video
+						{
+							Link = "https://youtu.be/1_fullstack_intro",
+							CourseId = 1,
+							Title = "Giới thiệu khóa học Fullstack .NET & React"
+						},
+						new Video
+						{
+							Link = "https://youtu.be/2_dotnet_api",
+							CourseId = 1,
+							Title = "Xây dựng API với ASP.NET Core"
+						},
+						new Video
+						{
+							Link = "https://youtu.be/3_react_ui",
+							CourseId = 1,
+							Title = "Xây dựng UI với React & TailwindCSS"
+						},
+
+						new Video
+						{
+							Link = "https://youtu.be/4_node_intro",
+							CourseId = 2,
+							Title = "Giới thiệu tối ưu Node.js"
+						},
+						new Video
+						{
+							Link = "https://youtu.be/5_async_node",
+							CourseId = 2,
+							Title = "Quản lý bất đồng bộ hiệu quả trong Node.js"
+						},
+						new Video
+						{
+							Link = "https://youtu.be/6_cache_node",
+							CourseId = 2,
+							Title = "Caching với Redis trong Node.js"
+						},
+
+						new Video
+						{
+							Link = "https://youtu.be/7_figma_uiux",
+							CourseId = 3,
+							Title = "Làm quen với UI/UX & Figma"
+						},
+						new Video
+						{
+							Link = "https://youtu.be/8_wireframe",
+							CourseId = 3,
+							Title = "Thiết kế Wireframe & Prototype"
+						},
+						new Video
+						{
+							Link = "https://youtu.be/9_designsystem",
+							CourseId = 3,
+							Title = "Xây dựng Design System chuyên nghiệp"
+						}
+					);
+
+					await context.SaveChangesAsync();
+				}
+				#endregion
+			}
+		}
     }
 }
