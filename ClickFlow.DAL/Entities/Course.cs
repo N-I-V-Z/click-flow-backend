@@ -9,6 +9,7 @@
 		public int CreateById { get; set; }
 		public ApplicationUser CreateBy { get; set; }
 		public int Price { get; set; }
+		public double? AvgRate { get; set; }
 		public string LessonLearned { get; set; }
 		public string Content { get; set; }
 		public string Description { get; set; }

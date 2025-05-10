@@ -9,6 +9,5 @@
 		public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<CampaignParticipation>? CampaignParticipations { get; set; }
         public ICollection<CoursePublisher>? CoursePublishers { get; set; }
-		public ICollection<QuestionAndAnswer>? QuestionAndAnswers { get; set; }
 	}
 }
