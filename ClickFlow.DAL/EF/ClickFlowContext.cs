@@ -19,7 +19,6 @@ namespace ClickFlow.DAL.EF
         #region DbSet
 
         #endregion
-
         public DbSet<Advertiser> Advertisers { get; set; }
         public DbSet<Campaign> Campaigns { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
@@ -32,7 +31,10 @@ namespace ClickFlow.DAL.EF
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
-
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<CoursePublisher> CoursePublishers { get; set; }
+        public DbSet<Video> Videos { get; set; }
+        public DbSet<QuestionAndAnswer> QuestionAndAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,6 +54,10 @@ namespace ClickFlow.DAL.EF
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new UserDetailConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
+            modelBuilder.ApplyConfiguration(new CourseConfiguration());
+            modelBuilder.ApplyConfiguration(new CoursePublisherConfiguration());
+            modelBuilder.ApplyConfiguration(new VideoConfiguration());
+            modelBuilder.ApplyConfiguration(new QuestionAndAnswerConfiguration());
 
             modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
             {
