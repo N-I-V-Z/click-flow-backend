@@ -1,13 +1,9 @@
 ﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
-using ClickFlow.BLL.DTOs.TransactionDTOs;
-using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
