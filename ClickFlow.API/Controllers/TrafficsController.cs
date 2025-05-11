@@ -3,6 +3,7 @@ using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -139,11 +140,15 @@ namespace ClickFlow.API.Controllers
                 if (!checkTraffic.IsSuccess)
                 {
                     return SaveError(checkTraffic.Message);
-                }
+				}
 
-                var remoteIp = HttpContext.Connection.RemoteIpAddress.ToString();
+				var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
 
-                var response = await _trafficService.CreateAsync(dto, remoteIp);
+				if (string.IsNullOrEmpty(ip))
+				{
+					ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+				}
+				var response = await _trafficService.CreateAsync(dto, ip);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
