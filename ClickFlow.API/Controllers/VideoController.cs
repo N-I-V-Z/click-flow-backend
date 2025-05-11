@@ -11,15 +11,11 @@ namespace ClickFlow.API.Controllers
 	public class VideoController : BaseAPIController
 	{
 		private readonly IVideoService _videoService;
-		private readonly ICourseService _courseService;
 
-		public VideoController(IVideoService videoService, ICourseService courseService)
+		public VideoController(IVideoService videoService)
 		{
 			_videoService = videoService;
-			_courseService = courseService;
-
 		}
-
 
 		[Authorize(Roles = "Admin, Publisher")]
 		[HttpGet("course/{courseId}")]

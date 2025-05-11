@@ -51,7 +51,11 @@ namespace ClickFlow.BLL.Services.Implements
             {
                 var campaignParticipationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
                 var cp = await campaignParticipationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
-                    .WithPredicate(x => x.CampaignId == dto.CampaignId && x.PublisherId == dto.PublisherId && x.Status == CampaignParticipationStatus.Participated).Build());
+                    .WithPredicate(x => 
+                        x.CampaignId == dto.CampaignId && 
+                        x.PublisherId == dto.PublisherId && 
+                        x.Status == CampaignParticipationStatus.Participated
+                    ).Build());
 
                 if (cp == null)
                 {
@@ -80,15 +84,23 @@ namespace ClickFlow.BLL.Services.Implements
             {
                 var campaignParticipationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
                 var cp = await campaignParticipationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
-                    .WithPredicate(x => x.CampaignId == dto.CampaignId && x.PublisherId == dto.PublisherId && x.Status == CampaignParticipationStatus.Participated).Build());
-                var queryBuilder = CreateQueryBuilder();
+                    .WithPredicate(x => 
+                        x.CampaignId == dto.CampaignId && 
+                        x.PublisherId == dto.PublisherId && 
+                        x.Status == CampaignParticipationStatus.Participated
+                    ).Build());
+
+				var today = DateTime.UtcNow.Date;
+
+				var queryBuilder = CreateQueryBuilder();
                 var checkIpQueryOptions = queryBuilder.WithPredicate(x =>
                     x.CampaignParticipationId == cp.Id &&
                     x.IpAddress.Equals(IpAddress) &&
-                    x.IsValid == true
+                    x.IsValid == true &&
+                    x.Timestamp.Date == today.Date
                 );
 
-                var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
                 bool checkIpAddress = await trafficRepo.GetSingleAsync(checkIpQueryOptions.Build()) == null;
 
                 if (!checkIpAddress)
