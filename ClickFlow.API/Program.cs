@@ -64,7 +64,7 @@ namespace ClickFlow.API
 
 			builder.Services.AddBLLServices();
 
-			builder.Services.AddHostedService<CampaignCheckerService>();
+			builder.Services.AddHostedService<CampaignExpiredCheckerService>();
 			builder.Services.AddHostedService<TrafficToClosedTrafficService>();
 
 			builder.Services.AddAuthentication(options =>

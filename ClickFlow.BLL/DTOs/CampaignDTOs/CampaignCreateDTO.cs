@@ -14,9 +14,11 @@ namespace ClickFlow.BLL.DTOs.CampaignDTOs
         public string Description { get; set; }
 
         [Required(ErrorMessage = "URL gốc không được để trống.")]
+        [Url(ErrorMessage = "URL gốc không hợp lệ.")]
         public string OriginURL { get; set; }
 
         [Required(ErrorMessage = "Ngân sách không được để trống.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Ngân sách phải là số dương.")]
         public int Budget { get; set; }
 
         [Required(ErrorMessage = "Ngày bắt đầu không được để trống.")]
@@ -41,7 +43,9 @@ namespace ClickFlow.BLL.DTOs.CampaignDTOs
         //[EitherCommissionOrPercents]
         //public int? Percents { get; set; }
 
+        [Range(0, int.MaxValue, ErrorMessage = "Commission phải là số không âm.")]
         public int? Commission { get; set; }
+        [Range(0, 100, ErrorMessage = "Percents phải nằm trong khoảng 0 đến 100.")]
         public int? Percents { get; set; }
         public string Image { get; set; }
     }
