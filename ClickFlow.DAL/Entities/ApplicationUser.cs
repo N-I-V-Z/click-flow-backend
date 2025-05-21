@@ -1,14 +1,9 @@
 ﻿using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.DAL.Entities
 {
-    public class ApplicationUser : IdentityUser<int>
+	public class ApplicationUser : IdentityUser<int>
     {
         public string FullName { get; set; }
         public Role Role { get; set; }
@@ -20,5 +15,6 @@ namespace ClickFlow.DAL.Entities
 
         public ICollection<Post> Posts { get; set; }
         public ICollection<Comment> Comments { get; set; }
+        public ICollection<CoursePublisher>? CoursePublishers { get; set; }
     }
 }

@@ -8,5 +8,6 @@
 		public ICollection<Report>? Reports { get; set; }
 		public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<CampaignParticipation>? CampaignParticipations { get; set; }
-    }
+        public ICollection<CoursePublisher>? CoursePublishers { get; set; }
+	}
 }
