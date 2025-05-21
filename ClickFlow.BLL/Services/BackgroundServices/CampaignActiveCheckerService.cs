@@ -15,9 +15,8 @@ namespace ClickFlow.BLL.Services.BackgroundServices
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
-		{
-			// Khởi tạo Timer với chu kỳ 5 phút
-			_timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+		{		
+			_timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromDays(1));
 			return Task.CompletedTask;
 		}
 
@@ -26,7 +25,7 @@ namespace ClickFlow.BLL.Services.BackgroundServices
 			using (var scope = _serviceProvider.CreateScope())
 			{
 				var campaignService = scope.ServiceProvider.GetRequiredService<ICampaignService>();
-				await campaignService.CheckAndStopExpiredCampaigns();
+				await campaignService.UpdateCampaignActiveStatus();
 			}
 		}
 

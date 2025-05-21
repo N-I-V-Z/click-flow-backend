@@ -50,6 +50,20 @@ namespace ClickFlow.BLL.Services.Implements
                     return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy Advertiser." };
                 }
 
+                DateTime startDate = DateTime.ParseExact(dto.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime endDate = DateTime.ParseExact(dto.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                DateTime currentTime = DateTime.UtcNow.Date;
+
+                if (startDate >= endDate)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Ngày bắt đầu không được lớn hơn ngày kêt thúc" };
+                }
+                if (startDate >= currentTime)
+                {
+                    return new BaseResponse { IsSuccess = false, Message = "Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại." };
+                }
+
+
                 var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
                 var campaign = _mapper.Map<Campaign>(dto);
@@ -590,6 +604,19 @@ namespace ClickFlow.BLL.Services.Implements
                 campaign.RemainingBudget -= revenue;
                 await campaignRepo.UpdateAsync(campaign);
                 await _unitOfWork.SaveChangesAsync();
+            }
+        }
+        public async Task UpdateCampaignActiveStatus()
+        {
+            var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+
+            var campaigns = await campaignRepo.Get(new QueryBuilder<Campaign>()
+              .WithPredicate(c => c.Status == CampaignStatus.Approved && !c.IsDeleted).Build()).ToListAsync();
+
+            DateOnly currentTime = DateOnly.FromDateTime(DateTime.UtcNow);
+            foreach (var c in campaigns)
+            {
+                if (c.StartDate == currentTime) c.Status = CampaignStatus.Activing;
             }
         }
         public async Task CheckAndStopExpiredCampaigns()
