@@ -34,6 +34,8 @@ namespace ClickFlow.DAL.EF
         public DbSet<Course> Courses { get; set; }
         public DbSet<CoursePublisher> CoursePublishers { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +58,8 @@ namespace ClickFlow.DAL.EF
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
             modelBuilder.ApplyConfiguration(new CoursePublisherConfiguration());
             modelBuilder.ApplyConfiguration(new VideoConfiguration());
+            modelBuilder.ApplyConfiguration(new PostConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentConfiguration());
 
             modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
             {
