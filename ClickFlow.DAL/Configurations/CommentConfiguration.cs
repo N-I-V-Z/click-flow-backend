@@ -22,12 +22,12 @@ namespace ClickFlow.DAL.Configurations
                 .HasMaxLength(1000);
 
             builder.Property(c => c.CreatedAt)
-                .IsRequired();        
+                .IsRequired();
 
             builder.HasOne(c => c.Post)
                 .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(c => c.ParentComment)
                 .WithMany(c => c.Replies)
@@ -37,7 +37,12 @@ namespace ClickFlow.DAL.Configurations
             builder.HasOne(c => c.Author)
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.AuthorId)
-                .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(c => c.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false);
+
         }
     }
 }
