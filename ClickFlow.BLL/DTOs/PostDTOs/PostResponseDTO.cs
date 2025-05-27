@@ -1,4 +1,4 @@
-﻿using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
+using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.DAL.Enums;
 using System;
 using System.Collections.Generic;
