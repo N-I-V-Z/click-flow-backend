@@ -16,7 +16,7 @@ namespace ClickFlow.API.Controllers
             _postService = postService;
         }
 
-     
+        [Authorize]
         [HttpGet]
         [Route("get-all-posts/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetAllPosts(int pageIndex, int pageSize)
@@ -25,7 +25,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
-     
+        [Authorize]
         [HttpGet]
         [Route("get-posts-by-author/{authorId}/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize)
@@ -34,7 +34,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
-     
+        [Authorize]
         [HttpGet]
         [Route("get-post-by-id/{id}")]
         public async Task<IActionResult> GetPostById(int id)
@@ -44,7 +44,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
-     
+        [Authorize]
         [HttpPost]
         [Route("create-post")]
         public async Task<IActionResult> CreatePost(PostCreateDTO dto)
@@ -55,7 +55,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
-     
+        [Authorize]
         [HttpPut]
         [Route("update-post")]
         public async Task<IActionResult> UpdatePost(PostUpdateDTO dto)
@@ -66,7 +66,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
-    
+        [Authorize]
         [HttpDelete]
         [Route("delete-post/{id}")]
         public async Task<IActionResult> DeletePost(int id)

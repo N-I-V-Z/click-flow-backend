@@ -1,4 +1,5 @@
-﻿using ClickFlow.DAL.Enums;
+﻿using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
+using ClickFlow.DAL.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace ClickFlow.BLL.DTOs.PostDTOs
         public DateTime CreatedAt { get; set; }
         public int View { get; set; }
         public int FeedbackNumber { get; set; }
-        public string AuthorName { get; set; }
+        public ApplicationUserResponseDTO Author { get; set; }
+
     }
 }

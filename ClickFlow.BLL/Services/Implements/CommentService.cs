@@ -123,8 +123,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Comment>();
             var query = repo.Get(new QueryBuilder<Comment>()
                 .WithPredicate(c => c.PostId == postId && !c.IsDeleted)
-                .WithInclude(c => c.Author)
-                //.WithOrderByDescending(c => c.CreatedAt)
+                .WithInclude(c => c.Author)             
                 .Build());
 
             var paged = await PaginatedList<Comment>.CreateAsync(query, pageIndex, pageSize);

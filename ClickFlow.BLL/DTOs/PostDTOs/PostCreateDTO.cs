@@ -9,7 +9,7 @@ namespace ClickFlow.BLL.DTOs.PostDTOs
 {
     public class PostCreateDTO
     {
-        public string Tittle {  get; set; }
+        public string Title {  get; set; }
         public string Content { get; set; }
         public Topic Topic { get; set; }
     }
