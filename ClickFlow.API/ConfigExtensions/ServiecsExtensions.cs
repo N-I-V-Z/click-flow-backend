@@ -515,8 +515,113 @@ namespace ClickFlow.API.ConfigExtensions
 
 					await context.SaveChangesAsync();
 				}
-				#endregion
-			}
-		}
+                #endregion
+                #region Seeding Posts
+                if (!context.Posts.Any())
+                {
+                    var admin = await context.Users.FirstOrDefaultAsync(u => u.UserName == "admin");
+                    var publisher = await context.Users.FirstOrDefaultAsync(u => u.UserName == "publisher");
+                    var advertiser = await context.Users.FirstOrDefaultAsync(u => u.UserName == "advertiser");
+
+                    if (admin != null && publisher != null && advertiser != null)
+                    {
+                        await context.Posts.AddRangeAsync(
+                            new Post
+                            {
+                                Title = "Chào mừng đến với ClickFlow!",
+                                Content = "Đây là bài viết đầu tiên để giới thiệu nền tảng của chúng tôi.",
+                                CreatedAt = DateTime.UtcNow,
+                                AuthorId = admin.Id,
+                                Topic = Topic.QA,
+                                View = 100,
+                                FeedbackNumber = 5,
+                                IsDeleted = false
+                            },
+                            new Post
+                            {
+                                Title = "5 mẹo quảng cáo hiệu quả",
+                                Content = "Trong bài viết này, chúng tôi chia sẻ 5 mẹo giúp bạn chạy quảng cáo hiệu quả hơn.",
+                                CreatedAt = DateTime.UtcNow.AddDays(-2),
+                                AuthorId = publisher.Id,
+                                Topic = Topic.Tips,
+                                View = 250,
+                                FeedbackNumber = 12,
+                                IsDeleted = false
+                            },
+                            new Post
+                            {
+                                Title = "Chính sách mới cho nhà quảng cáo",
+                                Content = "ClickFlow vừa cập nhật chính sách mới, hãy đọc kỹ để tránh vi phạm nhé!",
+                                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                                AuthorId = advertiser.Id,
+                                Topic = Topic.Other,
+                                View = 80,
+                                FeedbackNumber = 3,
+                                IsDeleted = false
+                            }
+                        );
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+                #endregion
+                #region Seeding Comments
+                if (!context.Comments.Any())
+                {
+                    var admin = await context.Users.FirstOrDefaultAsync(u => u.UserName == "admin");
+                    var publisher = await context.Users.FirstOrDefaultAsync(u => u.UserName == "publisher");
+                    var advertiser = await context.Users.FirstOrDefaultAsync(u => u.UserName == "advertiser");
+
+                    var post1 = await context.Posts.FirstOrDefaultAsync(p => p.Title == "Chào mừng đến với ClickFlow!");
+                    var post2 = await context.Posts.FirstOrDefaultAsync(p => p.Title == "5 mẹo quảng cáo hiệu quả");
+                    var post3 = await context.Posts.FirstOrDefaultAsync(p => p.Title == "Chính sách mới cho nhà quảng cáo");
+
+                    if (admin != null && publisher != null && advertiser != null &&
+                        post1 != null && post2 != null && post3 != null)
+                    {
+                        await context.Comments.AddRangeAsync(
+                            new Comment
+                            {
+                                Content = "Cảm ơn admin vì bài viết hữu ích!",
+                                CreatedAt = DateTime.UtcNow,
+                                AuthorId = publisher.Id,
+                                PostId = post1.Id,
+                                IsDeleted = false
+                            },
+                            new Comment
+                            {
+                                Content = "Bài này thực sự giúp mình tối ưu quảng cáo.",
+                                CreatedAt = DateTime.UtcNow.AddMinutes(-30),
+                                AuthorId = advertiser.Id,
+                                PostId = post2.Id,
+                                IsDeleted = false
+                            },
+                            new Comment
+                            {
+                                Content = "Có thể giải thích thêm về chính sách mới không?",
+                                CreatedAt = DateTime.UtcNow.AddHours(-2),
+                                AuthorId = admin.Id,
+                                PostId = post3.Id,
+                                IsDeleted = false
+                            },
+                            // Reply to the third comment
+                            new Comment
+                            {
+                                Content = "Mình nghĩ chính sách đó tập trung vào nội dung quảng cáo.",
+                                CreatedAt = DateTime.UtcNow.AddHours(-1),
+                                AuthorId = publisher.Id,
+                                PostId = post3.Id,
+                                ParentCommentId = 3, // Giả sử ID của comment phía trên sẽ là 3
+                                IsDeleted = false
+                            }
+                        );
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+                #endregion
+
+            }
+        }
     }
 }

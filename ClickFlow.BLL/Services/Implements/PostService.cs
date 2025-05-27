@@ -83,7 +83,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Post>();
             var posts = repo.Get(new QueryBuilder<Post>()
                 .WithPredicate(p => !p.IsDeleted)
-                .WithInclude(p => p.Author)
+                .WithInclude(p => p.Author.UserDetail)             
                 .Build());
 
             var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
@@ -96,7 +96,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Post>();
             var post = await repo.GetSingleAsync(new QueryBuilder<Post>()
                 .WithPredicate(p => p.Id == id && !p.IsDeleted)
-                .WithInclude(p => p.Author)
+                .WithInclude(p => p.Author.UserDetail)
                 .Build());
             return post == null ? null : _mapper.Map<PostResponseDTO>(post);
         }
@@ -106,7 +106,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Post>();
             var posts = repo.Get(new QueryBuilder<Post>()
                 .WithPredicate(p => p.AuthorId == authorId && !p.IsDeleted)
-                .WithInclude(p => p.Author)
+                .WithInclude(p => p.Author.UserDetail)
                 .Build());
 
             var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
