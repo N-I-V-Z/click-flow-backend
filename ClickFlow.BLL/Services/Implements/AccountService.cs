@@ -7,6 +7,7 @@ using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -30,14 +31,16 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IIdentityService _identityService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AccountService(IIdentityService identityService, IUnitOfWork unitOfWork,
-                               IEmailService emailService, IConfiguration configuration)
+                               IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _identityService = identityService;
             _emailService = emailService;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<AuthenResultDTO> GenerateTokenAsync(ApplicationUser user)
         {
@@ -71,6 +74,7 @@ namespace ClickFlow.BLL.Services.Implements
                 var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
                 var refreshToken = GenerateRefreshToken();
+
                 var refreshTokenInDb = new RefreshToken
                 {
                     Id = Guid.NewGuid(),
@@ -82,6 +86,15 @@ namespace ClickFlow.BLL.Services.Implements
                     IssuedAt = DateTime.Now,
                     ExpiredAt = DateTime.Now.AddDays(1),
                 };
+                var refreshTokenOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // chỉ bật nếu chạy HTTPS, nếu chạy local HTTP thì để false
+                    SameSite = SameSiteMode.Strict,
+                    Expires = refreshTokenInDb.ExpiredAt
+                };
+
+                _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, refreshTokenOptions);
 
                 await _unitOfWork.BeginTransactionAsync();
 
@@ -100,8 +113,7 @@ namespace ClickFlow.BLL.Services.Implements
 
                 return new AuthenResultDTO
                 {
-                    Token = accessToken,
-                    RefreshToken = refreshToken,
+                    Token = accessToken,                
                 };
             }
             catch (Exception)
@@ -112,103 +124,66 @@ namespace ClickFlow.BLL.Services.Implements
             }
         }
 
-        public async Task<BaseResponse> CheckToRenewTokenAsync(AuthenResultDTO authenResult)
+        public async Task<BaseResponse> CheckToRenewTokenAsync(ApplicationUser user)
         {
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var secretKeyBytes = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]);
-            var tokenValidateParam = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            var refreshTokenRepo = _unitOfWork.GetRepo<RefreshToken>();
+            var refreshToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(refreshToken))
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidAudience = _configuration["JWT:ValidAudience"],
-                ValidIssuer = _configuration["JWT:ValidIssuer"],
-                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-                ClockSkew = TimeSpan.Zero,
-
-                ValidateLifetime = false
-            };
-
-            try
-            {
-                var tokenInVerification = jwtTokenHandler.ValidateToken(authenResult.Token, tokenValidateParam, out var validatedToken);
-
-                if (validatedToken is JwtSecurityToken jwtSecurityToken)
-                {
-                    Console.WriteLine("Algorithm: " + jwtSecurityToken.Header.Alg);
-                    Console.WriteLine(SecurityAlgorithms.HmacSha512);
-                    var result = jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase);
-                    if (!result)
-                    {
-                        return new BaseResponse
-                        {
-                            IsSuccess = false,
-                            Message = "Access token không hợp lệ"
-                        };
-                    }
-                }
-
-                var utcExpireDate = long.Parse(tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
-
-                var expireDate = ConvertUnixTimeToDateTime(utcExpireDate);
-                if (expireDate > DateTime.UtcNow)
-                {
-                    return new BaseResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Access token chưa hết hạn."
-                    };
-                }
-                var refreshTokenRepo = _unitOfWork.GetRepo<RefreshToken>();
-                var storedToken = await refreshTokenRepo.GetSingleAsync(new QueryBuilder<RefreshToken>()
-                                                                        .WithPredicate(x => x.Token.Equals(authenResult.RefreshToken))
-                                                                        .WithTracking(false)
-                                                                        .Build());
-                if (storedToken == null)
-                {
-                    return new BaseResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Refresh Token không tồn tại."
-                    };
-                }
-
-                if (storedToken.IsUsed)
-                {
-                    return new BaseResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Refresh token đã được sử dụng."
-                    };
-                }
-                if (storedToken.IsRevoked)
-                {
-                    return new BaseResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Refresh token đã bị thu hồi."
-                    };
-                }
-
-                var jti = tokenInVerification.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
-                if (storedToken.JwtId != jti)
-                {
-                    return new BaseResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Token không khớp."
-                    };
-                }
                 return new BaseResponse
                 {
-                    IsSuccess = true,
-                    Message = "Token hợp lệ."
+                    IsSuccess = false,
+                    Message = "Refresh Token không tồn tại trong cookie."
                 };
             }
-            catch (Exception)
+
+            var storedToken = await refreshTokenRepo.GetSingleAsync(new QueryBuilder<RefreshToken>()
+                                                                     .WithPredicate(x => x.Token.Equals(refreshToken) && x.UserId == user.Id)
+                                                                     .WithTracking(false)
+                                                                     .Build());
+            if (storedToken == null)
             {
-                throw;
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Message = "Refresh Token không tồn tại trong hệ thống."
+                };
             }
+
+            if (storedToken.IsUsed)
+            {
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Message = "Refresh token đã được sử dụng."
+                };
+            }
+
+            if (storedToken.IsRevoked)
+            {
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Message = "Refresh token đã bị thu hồi."
+                };
+            }
+            if (storedToken.ExpiredAt < DateTime.UtcNow)
+            {
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    Message = "Refresh token đã hết hạn."
+                };
+            }
+
+            return new BaseResponse
+            {
+                IsSuccess = true,
+                Message = "Refresh token hợp lệ."
+            };
         }
+
 
         public async Task<BaseResponse> SendEmailConfirmation(ApplicationUser user)
         {
