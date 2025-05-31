@@ -149,5 +149,23 @@ namespace ClickFlow.API.Controllers
                 return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
             }
         }
-    }
+
+		[Authorize]
+		[HttpGet("message-type")]
+		public IActionResult GetMessageTypeList()
+		{
+			try
+			{
+				var list = EnumHelper.GetEnumList<MessageType>();
+				return list.Any() ? GetSuccess(list) : GetNotFound("Danh sách trống.");
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+	}
 }
