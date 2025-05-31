@@ -16,6 +16,7 @@ namespace ClickFlow.API.Controllers
             _postService = postService;
         }
 
+
         [Authorize]
         [HttpGet]
         [Route("get-all-posts/{pageIndex}/{pageSize}")]
@@ -24,6 +25,7 @@ namespace ClickFlow.API.Controllers
             var response = await _postService.GetAllPosts(pageIndex, pageSize);
             return GetSuccess(response);
         }
+
 
         [Authorize]
         [HttpGet]
@@ -34,6 +36,7 @@ namespace ClickFlow.API.Controllers
             return GetSuccess(response);
         }
 
+
         [Authorize]
         [HttpGet]
         [Route("get-post-by-id/{id}")]
@@ -43,6 +46,7 @@ namespace ClickFlow.API.Controllers
             if (response == null) return GetError("Bài viết không tồn tại.");
             return GetSuccess(response);
         }
+
 
         [Authorize]
         [HttpPost]
@@ -55,6 +59,7 @@ namespace ClickFlow.API.Controllers
             return SaveSuccess(response);
         }
 
+
         [Authorize]
         [HttpPut]
         [Route("update-post")]
@@ -65,6 +70,7 @@ namespace ClickFlow.API.Controllers
             if (!response.IsSuccess) return SaveError(response);
             return SaveSuccess(response);
         }
+
 
         [Authorize]
         [HttpDelete]

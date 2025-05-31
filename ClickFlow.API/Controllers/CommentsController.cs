@@ -1,4 +1,4 @@
-﻿using ClickFlow.BLL.DTOs.CommentDTOs;
+using ClickFlow.BLL.DTOs.CommentDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +17,7 @@ namespace ClickFlow.API.Controllers
             _commentService = commentService;
         }
 
+
         [Authorize]
         [HttpPost("create-comment")]
         public async Task<IActionResult> Create([FromBody] CommentCreateDTO dto)
@@ -25,6 +26,7 @@ namespace ClickFlow.API.Controllers
             var response = await _commentService.CreateComment(dto, UserId);
             return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
         }
+
 
         [Authorize]
         [HttpPut("update-comment")]
@@ -35,6 +37,7 @@ namespace ClickFlow.API.Controllers
             return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
         }
 
+
         [Authorize]
         [HttpDelete("delete-comment/{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -43,6 +46,7 @@ namespace ClickFlow.API.Controllers
             return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
         }
 
+
         [Authorize]
         [HttpGet("get-comment-by-id{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -50,6 +54,7 @@ namespace ClickFlow.API.Controllers
             var comment = await _commentService.GetCommentById(id);
             return comment == null ? GetError("Không tìm thấy bình luận.") : GetSuccess(comment);
         }
+
 
         [Authorize]
         [HttpGet("get-comment-by-post-id/{postId}/{pageIndex}/{pageSize}")]
