@@ -516,6 +516,7 @@ namespace ClickFlow.API.ConfigExtensions
 					await context.SaveChangesAsync();
 				}
                 #endregion
+
                 #region Seeding Posts
                 if (!context.Posts.Any())
                 {
@@ -565,6 +566,7 @@ namespace ClickFlow.API.ConfigExtensions
                     }
                 }
                 #endregion
+
                 #region Seeding Comments
                 if (!context.Comments.Any())
                 {
@@ -619,9 +621,59 @@ namespace ClickFlow.API.ConfigExtensions
                         await context.SaveChangesAsync();
                     }
                 }
-                #endregion
+				#endregion
 
-            }
-        }
+				#region Seeding Conversation
+				if (!context.Conversations.Any())
+				{
+                    await context.Conversations.AddRangeAsync(
+                        new Conversation
+                        {
+                            CreatedAt = DateTime.UtcNow,
+                            User1Id = 1,
+                            User2Id = 2,
+                        },
+						new Conversation
+						{
+							CreatedAt = DateTime.UtcNow,
+							User1Id = 1,
+							User2Id = 3,
+						}
+					);
+
+					await context.SaveChangesAsync();
+				}
+				#endregion
+
+				#region Seeding Message
+				if (!context.Messages.Any())
+				{
+					await context.Messages.AddRangeAsync(
+						new Message
+                        {
+                            ConversationId = 1,
+                            IsRead = false,
+                            SenderId = 2,
+                            SentAt = DateTime.UtcNow,
+                            Text = "Chào",
+                            Type = MessageType.Text
+                        },
+						new Message
+						{
+							ConversationId = 2,
+							IsRead = false,
+							SenderId = 3,
+							SentAt = DateTime.UtcNow,
+							Text = "Chào",
+							Type = MessageType.Text
+						}
+					);
+
+					await context.SaveChangesAsync();
+				}
+				#endregion
+
+			}
+		}
     }
 }

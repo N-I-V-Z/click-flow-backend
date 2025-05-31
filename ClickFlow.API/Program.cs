@@ -1,17 +1,19 @@
 
 using ClickFlow.API.ConfigExtensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using ClickFlow.BLL.Helpers.Config;
+using ClickFlow.BLL.Services.BackgroundServices;
+using ClickFlow.BLL.Services.Implements;
+using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.EF;
+using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using ClickFlow.DAL.EF;
 using System.Text.Json.Serialization;
-using ClickFlow.BLL.Helpers.Config;
-using Microsoft.Extensions.Options;
-using ClickFlow.DAL.Entities;
-using ClickFlow.BLL.Services.BackgroundServices;
 
 namespace ClickFlow.API
 {
@@ -40,7 +42,8 @@ namespace ClickFlow.API
 			builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
 			builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<VnPayConfiguration>>().Value);
 
-
+			builder.Services.Configure<PusherConfiguration>(builder.Configuration.GetSection("PusherConfiguration"));
+			builder.Services.AddScoped<IPusherService, PusherService>();
 
 			builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
 

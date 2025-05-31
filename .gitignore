@@ -29,5 +29,3 @@ appsettings.Production.json
 .DS_Store
 *.suo
 *.ntvs*
-
-/ClickFlow.DAL/Migrations
