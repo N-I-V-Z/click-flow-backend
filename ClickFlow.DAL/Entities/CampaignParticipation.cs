@@ -13,7 +13,5 @@ namespace ClickFlow.DAL.Entities
         public int CampaignId { get; set; }
         public Campaign Campaign { get; set; }
         public ICollection<Traffic>? Traffics { get; set; }
-        public ICollection<ClosedTraffic>? ClosedTraffics { get; set; }
-
     }
 }

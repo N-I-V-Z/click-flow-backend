@@ -841,8 +841,8 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "118.69.71.45",
 							IsValid = true,
 							ReferrerURL = "https://techblog.vn/abc-erp-review",
-							Revenue = 25000,
-							Timestamp = DateTime.UtcNow.AddDays(-20)
+							Timestamp = DateTime.UtcNow.AddDays(-20),
+							ClickId = Guid.NewGuid().ToString(),
 						},
 						new Traffic
 						{
@@ -852,8 +852,8 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "14.169.85.142",
 							IsValid = true,
 							ReferrerURL = "https://techblog.vn/erp-solutions",
-							Revenue = 25000,
-							Timestamp = DateTime.UtcNow.AddDays(-18)
+							Timestamp = DateTime.UtcNow.AddDays(-18),
+							ClickId = Guid.NewGuid().ToString(),
 						},
 						new Traffic
 						{
@@ -863,8 +863,8 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "123.21.58.97",
 							IsValid = true,
 							ReferrerURL = "https://techblog.vn/business-software",
-							Revenue = 25000,
-							Timestamp = DateTime.UtcNow.AddDays(-15)
+							Timestamp = DateTime.UtcNow.AddDays(-15),
+							ClickId = Guid.NewGuid().ToString()
 						},
 
 						// Traffic cho CampaignParticipation 2 (Publisher 2 - Green Foods)
@@ -876,8 +876,8 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "171.244.136.78",
 							IsValid = true,
 							ReferrerURL = "https://healthyfood.vn/green-foods",
-							Revenue = 22000,
-							Timestamp = DateTime.UtcNow.AddDays(-16)
+							Timestamp = DateTime.UtcNow.AddDays(-16),
+							ClickId = Guid.NewGuid().ToString()
 						},
 						new Traffic
 						{
@@ -887,8 +887,8 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "113.185.44.219",
 							IsValid = true,
 							ReferrerURL = "https://healthyfood.vn/organic-review",
-							Revenue = 22000,
-							Timestamp = DateTime.UtcNow.AddDays(-12)
+							Timestamp = DateTime.UtcNow.AddDays(-12),
+							ClickId = Guid.NewGuid().ToString()
 						},
 
 						// Traffic cho CampaignParticipation 4 (Publisher 3 - ABC ERP)
@@ -900,8 +900,8 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "27.72.145.33",
 							IsValid = true,
 							ReferrerURL = "https://biztech.com.vn/erp-software",
-							Revenue = 25000,
-							Timestamp = DateTime.UtcNow.AddDays(-19)
+							Timestamp = DateTime.UtcNow.AddDays(-19),
+							ClickId = Guid.NewGuid().ToString()
 						},
 						new Traffic
 						{
@@ -911,7 +911,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "116.109.25.184",
 							IsValid = true,
 							ReferrerURL = "https://biztech.com.vn/business-solutions",
-							Revenue = 25000,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-14)
 						},
 
@@ -924,7 +924,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "125.235.4.167",
 							IsValid = true,
 							ReferrerURL = "https://fintech.vn/banking-apps",
-							Revenue = 15000,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-13)
 						},
 						new Traffic
@@ -935,7 +935,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "210.245.87.92",
 							IsValid = true,
 							ReferrerURL = "https://fintech.vn/mobile-banking",
-							Revenue = 15000,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-10)
 						},
 
@@ -948,7 +948,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "103.57.149.201",
 							IsValid = true,
 							ReferrerURL = "https://codingvn.com/free-courses",
-							Revenue = 18000,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-8)
 						},
 						new Traffic
@@ -959,7 +959,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "1.54.238.119",
 							IsValid = true,
 							ReferrerURL = "https://learntech.vn/programming",
-							Revenue = 18000,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-7)
 						},
 						new Traffic
@@ -970,7 +970,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "58.187.96.245",
 							IsValid = true,
 							ReferrerURL = "https://dulichvn.com/tour-mien-bac",
-							Revenue = 28000,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-3)
 						},
 
@@ -983,7 +983,7 @@ namespace ClickFlow.API.ConfigExtensions
 							IpAddress = "192.168.1.1", // Local IP - invalid
 							IsValid = false,
 							ReferrerURL = "https://techblog.vn/test",
-							Revenue = 0,
+							ClickId = Guid.NewGuid().ToString(),
 							Timestamp = DateTime.UtcNow.AddDays(-5)
 						}
 					);

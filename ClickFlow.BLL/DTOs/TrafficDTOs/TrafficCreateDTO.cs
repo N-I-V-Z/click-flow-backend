@@ -7,7 +7,6 @@ namespace ClickFlow.BLL.DTOs.TrafficDTOs
 		[Required(ErrorMessage = "DeviceType không được để trống.")]
 		[MaxLength(100, ErrorMessage = "DeviceType không quá 100 ký tự.")]
 		public string DeviceType { get; set; }
-		public string OrderId { get; set; }
 		[Required(ErrorMessage = "Browser không được để trống.")]
 		[MaxLength(100, ErrorMessage = "Browser không quá 100 ký tự.")]
 		public string Browser { get; set; }

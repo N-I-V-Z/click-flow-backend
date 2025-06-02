@@ -25,7 +25,6 @@ namespace ClickFlow.DAL.EF
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<CampaignParticipation> CampaignParticipations { get; set; }
         public DbSet<Traffic> Traffics { get; set; }
-        public DbSet<ClosedTraffic> ClosedTraffics { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<UserDetail> UserDetail { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
@@ -46,7 +45,6 @@ namespace ClickFlow.DAL.EF
             modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
             modelBuilder.ApplyConfiguration(new AdvertiserConfiguration());
             modelBuilder.ApplyConfiguration(new CampaignConfiguration());
-            modelBuilder.ApplyConfiguration(new ClosedTrafficConfiguration());
             modelBuilder.ApplyConfiguration(new FeedbackConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentMethodConfiguration());
             modelBuilder.ApplyConfiguration(new PublisherConfiguration());
