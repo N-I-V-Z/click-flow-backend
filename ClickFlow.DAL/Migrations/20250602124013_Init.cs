@@ -698,49 +698,21 @@ namespace ClickFlow.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClosedTraffics",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    IpAddress = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IsValid = table.Column<bool>(type: "bit", nullable: true),
-                    Revenue = table.Column<int>(type: "int", nullable: true),
-                    DeviceType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    OrderId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Browser = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    ReferrerURL = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CampaignParticipationId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClosedTraffics", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ClosedTraffics_CampaignParticipations_CampaignParticipationId",
-                        column: x => x.CampaignParticipationId,
-                        principalSchema: "dbo",
-                        principalTable: "CampaignParticipations",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Traffics",
                 schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ClickId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsClosed = table.Column<bool>(type: "bit", nullable: false),
+                    IsValid = table.Column<bool>(type: "bit", nullable: false),
                     IpAddress = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IsValid = table.Column<bool>(type: "bit", nullable: true),
-                    Revenue = table.Column<int>(type: "int", nullable: true),
                     DeviceType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    OrderId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Browser = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     ReferrerURL = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CampaignParticipationId = table.Column<int>(type: "int", nullable: true)
+                    CampaignParticipationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -750,7 +722,35 @@ namespace ClickFlow.DAL.Migrations
                         column: x => x.CampaignParticipationId,
                         principalSchema: "dbo",
                         principalTable: "CampaignParticipations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Conversion",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClickId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClickId1 = table.Column<int>(type: "int", nullable: false),
+                    EventType = table.Column<int>(type: "int", nullable: false),
+                    Revenue = table.Column<int>(type: "int", nullable: true),
+                    OrderId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Conversion", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Conversion_Traffics_ClickId1",
+                        column: x => x.ClickId1,
+                        principalSchema: "dbo",
+                        principalTable: "Traffics",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -798,12 +798,6 @@ namespace ClickFlow.DAL.Migrations
                 column: "AdvertiserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClosedTraffics_CampaignParticipationId",
-                schema: "dbo",
-                table: "ClosedTraffics",
-                column: "CampaignParticipationId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Comments_AuthorId",
                 schema: "dbo",
                 table: "Comments",
@@ -832,6 +826,12 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo",
                 table: "Conversations",
                 column: "User2Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Conversion_ClickId1",
+                schema: "dbo",
+                table: "Conversion",
+                column: "ClickId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CoursePublishers_ApplicationUserId",
@@ -932,6 +932,13 @@ namespace ClickFlow.DAL.Migrations
                 column: "CampaignParticipationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Traffics_ClickId",
+                schema: "dbo",
+                table: "Traffics",
+                column: "ClickId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_WalletId",
                 schema: "dbo",
                 table: "Transactions",
@@ -982,11 +989,11 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "ClosedTraffics",
+                name: "Comments",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Comments",
+                name: "Conversion",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -1011,10 +1018,6 @@ namespace ClickFlow.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reports",
-                schema: "dbo");
-
-            migrationBuilder.DropTable(
-                name: "Traffics",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -1046,11 +1049,11 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Conversations",
+                name: "Traffics",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "CampaignParticipations",
+                name: "Conversations",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -1063,6 +1066,10 @@ namespace ClickFlow.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Courses",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "CampaignParticipations",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
