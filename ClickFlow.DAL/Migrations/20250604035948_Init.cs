@@ -717,6 +717,7 @@ namespace ClickFlow.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Traffics", x => x.Id);
+                    table.UniqueConstraint("AK_Traffics_ClickId", x => x.ClickId);
                     table.ForeignKey(
                         name: "FK_Traffics_CampaignParticipations_CampaignParticipationId",
                         column: x => x.CampaignParticipationId,
@@ -727,30 +728,29 @@ namespace ClickFlow.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Conversion",
+                name: "Conversions",
                 schema: "dbo",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClickId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClickId1 = table.Column<int>(type: "int", nullable: false),
-                    EventType = table.Column<int>(type: "int", nullable: false),
+                    ClickId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Revenue = table.Column<int>(type: "int", nullable: true),
-                    OrderId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Conversion", x => x.Id);
+                    table.PrimaryKey("PK_Conversions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Conversion_Traffics_ClickId1",
-                        column: x => x.ClickId1,
+                        name: "FK_Conversions_Traffics_ClickId",
+                        column: x => x.ClickId,
                         principalSchema: "dbo",
                         principalTable: "Traffics",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ClickId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -828,10 +828,10 @@ namespace ClickFlow.DAL.Migrations
                 column: "User2Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Conversion_ClickId1",
+                name: "IX_Conversions_ClickId",
                 schema: "dbo",
-                table: "Conversion",
-                column: "ClickId1");
+                table: "Conversions",
+                column: "ClickId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CoursePublishers_ApplicationUserId",
@@ -993,7 +993,7 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Conversion",
+                name: "Conversions",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

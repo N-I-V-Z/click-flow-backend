@@ -136,7 +136,7 @@ namespace ClickFlow.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-		[HttpPut("status/{transactionId}")]
+		[HttpPut("{transactionId}/status")]
 		public async Task<IActionResult> UpdateStatusTransaction(int transactionId, [FromBody] TransactionUpdateStatusDTO dto)
 		{
 			try

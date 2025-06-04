@@ -16,29 +16,29 @@ namespace ClickFlow.DAL.EF
 
         }
 
-        #region DbSet
+		#region DbSet
+		public DbSet<Advertiser> Advertisers { get; set; }
+		public DbSet<Campaign> Campaigns { get; set; }
+		public DbSet<Feedback> Feedbacks { get; set; }
+		public DbSet<Publisher> Publishers { get; set; }
+		public DbSet<CampaignParticipation> CampaignParticipations { get; set; }
+		public DbSet<Traffic> Traffics { get; set; }
+		public DbSet<Transaction> Transactions { get; set; }
+		public DbSet<UserDetail> UserDetail { get; set; }
+		public DbSet<Wallet> Wallets { get; set; }
+		public DbSet<Report> Reports { get; set; }
+		public DbSet<PaymentMethod> PaymentMethods { get; set; }
+		public DbSet<Course> Courses { get; set; }
+		public DbSet<CoursePublisher> CoursePublishers { get; set; }
+		public DbSet<Video> Videos { get; set; }
+		public DbSet<Post> Posts { get; set; }
+		public DbSet<Comment> Comments { get; set; }
+		public DbSet<Conversation> Conversations { get; set; }
+		public DbSet<Message> Messages { get; set; }
+		public DbSet<Conversion> Conversions { get; set; }
+		#endregion
 
-        #endregion
-        public DbSet<Advertiser> Advertisers { get; set; }
-        public DbSet<Campaign> Campaigns { get; set; }
-        public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<Publisher> Publishers { get; set; }
-        public DbSet<CampaignParticipation> CampaignParticipations { get; set; }
-        public DbSet<Traffic> Traffics { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<UserDetail> UserDetail { get; set; }
-        public DbSet<Wallet> Wallets { get; set; }
-        public DbSet<Report> Reports { get; set; }
-        public DbSet<PaymentMethod> PaymentMethods { get; set; }
-        public DbSet<Course> Courses { get; set; }
-        public DbSet<CoursePublisher> CoursePublishers { get; set; }
-        public DbSet<Video> Videos { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<Comment> Comments { get; set; }
-        public DbSet<Conversation> Conversations { get; set; }
-        public DbSet<Message> Messages { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("dbo");
             base.OnModelCreating(modelBuilder);
@@ -62,8 +62,9 @@ namespace ClickFlow.DAL.EF
             modelBuilder.ApplyConfiguration(new CommentConfiguration());
             modelBuilder.ApplyConfiguration(new ConversationConfiguration());
             modelBuilder.ApplyConfiguration(new MessageConfiguration());
+            modelBuilder.ApplyConfiguration(new ConversionConfiguration());
 
-            modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
+			modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
             {
                 entity.ToTable("UserLogin");
                 entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });

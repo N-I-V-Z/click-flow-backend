@@ -43,7 +43,7 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
-		public async Task<IActionResult> GetAllReports([FromQuery] PagingRequestDTO dto)
+		public async Task<IActionResult> GetAllReports([FromQuery] ReportGetAllDTO dto)
         {
             try
             {
@@ -61,27 +61,6 @@ namespace ClickFlow.API.Controllers
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
 			}
 		}
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("status")]
-        public async Task<IActionResult> GetReportsByStatus([FromQuery] ReportsGetByStatusDTO dto)
-        {
-            try
-            {
-                var data = await _reportService.GetByStatusAsync(dto);
-                var response = new PagingDTO<ReportResponseDTO>(data);
-
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
-                return GetSuccess(response);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-            }
-        }
 
         [Authorize(Roles = "Advertiser")]
 		[HttpPost]
@@ -105,14 +84,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin, Advertiser")]
-		[HttpPut("status/{reportId}")]
-		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatus status)
+		[HttpPut("{reportId}/status")]
+		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatusDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _reportService.UpdateStatusReportAsync(reportId, status);
+				var response = await _reportService.UpdateStatusReportAsync(reportId, dto.Status);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
@@ -126,14 +105,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
-		[HttpPut("response/{reportId}")]
-		public async Task<IActionResult> UpdateResponseReport(int reportId, [FromBody] string response)
+		[HttpPut("{reportId}/response")]
+		public async Task<IActionResult> UpdateResponseReport(int reportId, [FromBody] ReportUpdateResponseDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var result = await _reportService.UpdateResponseReportAsync(reportId, response);
+				var result = await _reportService.UpdateResponseReportAsync(reportId, dto.Response);
 				if (result == null) return SaveError();
 				return SaveSuccess(result);
 			}
