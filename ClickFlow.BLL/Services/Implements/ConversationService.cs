@@ -2,37 +2,21 @@
 using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.DTOs.ConversationDTOs;
 using ClickFlow.BLL.DTOs.MessageDTOs;
-using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
-using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class ConversationService : IConversationService
+	public class ConversationService : BaseServices<Conversation, ConversationResponseDTO>, IConversationService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public ConversationService(IUnitOfWork unitOfWork, IMapper mapper)
+		public ConversationService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-		}
-
-		protected virtual QueryBuilder<Conversation> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Conversation>()
-								.WithTracking(false);
-
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Conversation>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
 		}
 
 		public async Task<ConversationResponseDTO> GetOrCreateAsync(int user1Id, int user2Id)

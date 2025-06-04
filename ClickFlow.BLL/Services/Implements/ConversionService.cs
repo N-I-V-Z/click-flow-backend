@@ -1,40 +1,23 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.ConversionDTOs;
-using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
-using CloudinaryDotNet;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class ConversionService : IConversionService
+	public class ConversionService : BaseServices<Conversion, ConversionResponseDTO>, IConversionService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public ConversionService(IUnitOfWork unitOfWork, IMapper mapper)
+		public ConversionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-		}
-
-		protected virtual QueryBuilder<Conversion> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Conversion>()
-								.WithTracking(false);
-
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Conversion>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
 		}
 
 		public async Task<ConversionResponseDTO> CreateAsync(ConversionCreateDTO dto)
@@ -96,16 +79,14 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var conversions = repo.Get(queryBuilder.Build());
 
-				var paged = await PaginatedList<Conversion>.CreateAsync(conversions, dto.PageIndex, dto.PageSize);
-				var result = _mapper.Map<List<ConversionResponseDTO>>(paged);
-				return new PaginatedList<ConversionResponseDTO>(result, paged.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(conversions, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.ToString());
 				throw;
 			}
-			
+
 		}
 
 		public async Task<ConversionResponseDTO> GetByIdAsync(int id)
@@ -123,7 +104,7 @@ namespace ClickFlow.BLL.Services.Implements
 				Console.WriteLine(ex.ToString());
 				throw;
 			}
-			
+
 		}
 
 		public async Task<ConversionResponseDTO> UpdateStatusAsync(int id, ConversionUpdateStatusDTO dto)
@@ -147,7 +128,7 @@ namespace ClickFlow.BLL.Services.Implements
 				Console.WriteLine(ex.ToString());
 				throw;
 			}
-			
+
 		}
 	}
 }

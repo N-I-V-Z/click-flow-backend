@@ -45,6 +45,25 @@ namespace ClickFlow.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Plans",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MaxCampaigns = table.Column<int>(type: "int", nullable: false),
+                    MaxClicksPerMonth = table.Column<int>(type: "int", nullable: false),
+                    MaxConversionsPerMonth = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Plans", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 schema: "dbo",
                 columns: table => new
@@ -572,6 +591,40 @@ namespace ClickFlow.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserPlans",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CurrentClicks = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    CurrentConversions = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    CurrentCampaigns = table.Column<int>(type: "int", nullable: false, defaultValue: 0)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPlans_Plans_PlanId",
+                        column: x => x.PlanId,
+                        principalSchema: "dbo",
+                        principalTable: "Plans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserPlans_Publishers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "dbo",
+                        principalTable: "Publishers",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transactions",
                 schema: "dbo",
                 columns: table => new
@@ -958,6 +1011,19 @@ namespace ClickFlow.DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserPlans_PlanId",
+                schema: "dbo",
+                table: "UserPlans",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPlans_UserId",
+                schema: "dbo",
+                table: "UserPlans",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
                 schema: "dbo",
                 table: "UserRoles",
@@ -1033,6 +1099,10 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "UserPlans",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "UserRoles",
                 schema: "dbo");
 
@@ -1058,6 +1128,10 @@ namespace ClickFlow.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Wallets",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "Plans",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

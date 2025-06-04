@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.ReportDTOs;
-using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -10,36 +9,15 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-    public class ReportService : IReportService
+    public class ReportService : BaseServices<Report, ReportResponseDTO>, IReportService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ReportService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ReportService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-        }
-        protected virtual QueryBuilder<Report> CreateQueryBuilder(string? search = null)
-        {
-            var queryBuilder = new QueryBuilder<Report>()
-                                .WithTracking(false);
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                var predicate = FilterHelper.BuildSearchExpression<Report>(search);
-                queryBuilder.WithPredicate(predicate);
-            }
-
-            return queryBuilder;
-        }
-
-        public async Task<PaginatedList<ReportResponseDTO>> GetPagedData(IQueryable<Report> query, int pageIndex, int pageSize)
-        {
-            var paginatedEntities = await PaginatedList<Report>.CreateAsync(query, pageIndex, pageSize);
-            var resultDto = _mapper.Map<List<ReportResponseDTO>>(paginatedEntities);
-
-            return new PaginatedList<ReportResponseDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
         }
 
         public async Task<ReportResponseDTO> CreateReportAsync(int advertiserId, ReportCreateDTO dto)
@@ -90,11 +68,9 @@ namespace ClickFlow.BLL.Services.Implements
 
                 var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-                var pagedRecords = await PaginatedList<Report>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-                var resultDTO = _mapper.Map<List<ReportResponseDTO>>(pagedRecords);
-                return new PaginatedList<ReportResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
-            }
-            catch (Exception ex)
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
+			}
+			catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw;

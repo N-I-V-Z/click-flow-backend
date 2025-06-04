@@ -10,37 +10,17 @@ using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class TransacsionService : ITransactionService
+	public class TransacsionService : BaseServices<Transaction, TransactionResponseDTO>, ITransactionService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public TransacsionService(IUnitOfWork unitOfWork, IMapper mapper)
+		public TransacsionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
-		protected virtual QueryBuilder<Transaction> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Transaction>()
-								.WithTracking(false);
 
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Transaction>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
-		}
-
-		public async Task<PaginatedList<TransactionResponseDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
-		{
-			var paginatedEntities = await PaginatedList<Transaction>.CreateAsync(query, pageIndex, pageSize);
-			var resultDto = _mapper.Map<List<TransactionResponseDTO>>(paginatedEntities);
-
-			return new PaginatedList<TransactionResponseDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
-		}
 		public async Task<TransactionResponseDTO> CreateTransactionAsync(TransactionCreateDTO dto)
 		{
 			try
@@ -128,11 +108,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var transactions = transactionRepo.Get(queryOptions.Build());
 
-				var results = _mapper.Map<List<TransactionResponseDTO>>(transactions);
-
-				var pageResults = await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
-
-				return pageResults;
+				return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -210,11 +186,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var transactions = transactionRepo.Get(queryOptions.Build());
 
-				var results = _mapper.Map<List<TransactionResponseDTO>>(transactions);
-
-				var pageResults = await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
-
-				return pageResults;
+				return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
