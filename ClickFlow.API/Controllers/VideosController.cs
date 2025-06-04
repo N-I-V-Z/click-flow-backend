@@ -7,11 +7,11 @@ namespace ClickFlow.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class VideoController : BaseAPIController
+	public class VideosController : BaseAPIController
 	{
 		private readonly IVideoService _videoService;
 
-		public VideoController(IVideoService videoService)
+		public VideosController(IVideoService videoService)
 		{
 			_videoService = videoService;
 		}
@@ -23,8 +23,6 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _videoService.GetAllVideosByCourseIdAsync(courseId);
-
-				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)

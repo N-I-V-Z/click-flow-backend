@@ -12,6 +12,9 @@ namespace ClickFlow.BLL.DTOs.PlanDTOs
 		public int MaxClicksPerMonth { get; set; }
 		[Required(ErrorMessage = "MaxConversionsPerMonth không được để trống.")]
 		public int MaxConversionsPerMonth { get; set; }
+		[Required(ErrorMessage = "Price không được để trống.")]
+		public decimal Price { get; set; }
+		public int? DurationDays { get; set; }
 		public string? Description { get; set; }
 	}
 }

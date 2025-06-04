@@ -109,6 +109,25 @@ namespace ClickFlow.API.ConfigExtensions
 			}
 			#endregion
 
+			#region Seeding Plan
+			if (!context.Plans.Any())
+			{
+				await context.Plans.AddAsync(new Plan
+				{
+					Name = "Free",
+					MaxCampaigns = 2,
+					MaxClicksPerMonth = 500,
+					MaxConversionsPerMonth = 50,
+					IsActive = true,
+					Description = "Gói Free vĩnh viễn: giới hạn 2 campaign, 500 clicks và 50 conversions mỗi tháng.",
+					Price = 0,
+					DurationDays = null
+				});
+
+				await context.SaveChangesAsync();
+			}
+			#endregion
+
 			if (env.IsDevelopment())
 			{
 				#region Seeding Users

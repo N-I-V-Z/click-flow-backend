@@ -11,6 +11,8 @@
 
 		public bool IsActive { get; set; } = true;
 		public string? Description { get; set; }
+		public decimal Price { get; set; }
+		public int? DurationDays { get; set; }
 
 		public ICollection<UserPlan> UserPlans { get; set; } = new List<UserPlan>();
 	}
