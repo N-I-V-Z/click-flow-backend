@@ -311,32 +311,33 @@ namespace ClickFlow.DAL.Migrations
 
                     b.Property<string>("ClickId")
                         .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ClickId1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventType")
-                        .HasColumnType("int");
 
                     b.Property<string>("OrderId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("Revenue")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClickId1");
+                    b.HasIndex("ClickId");
 
-                    b.ToTable("Conversion", "dbo");
+                    b.ToTable("Conversions", "dbo");
                 });
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Course", b =>
@@ -1054,8 +1055,9 @@ namespace ClickFlow.DAL.Migrations
                 {
                     b.HasOne("ClickFlow.DAL.Entities.Traffic", "Click")
                         .WithMany("Conversions")
-                        .HasForeignKey("ClickId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("ClickId")
+                        .HasPrincipalKey("ClickId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Click");

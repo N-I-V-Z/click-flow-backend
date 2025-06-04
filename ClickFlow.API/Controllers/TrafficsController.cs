@@ -162,7 +162,7 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize]
-		[HttpGet("count/{campaignId}")]
+		[HttpGet("{campaignId}/count")]
 		public async Task<IActionResult> GetCountTrafficByCampaignId(int campaignId)
 		{
 			try

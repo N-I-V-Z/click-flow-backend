@@ -1,12 +1,13 @@
-﻿using ClickFlow.DAL.Enums;
+﻿using ClickFlow.BLL.DTOs.TrafficDTOs;
+using ClickFlow.DAL.Enums;
 
-namespace ClickFlow.DAL.Entities
+namespace ClickFlow.BLL.DTOs.ConversionDTOs
 {
-	public class Conversion
+	public class ConversionResponseDTO
 	{
 		public int Id { get; set; }
 		public string ClickId { get; set; }
-		public Traffic Click { get; set; }
+		public TrafficResponseDTO Click { get; set; }
 		public ConversionEventType EventType { get; set; }
 		public int? Revenue { get; set; }
 		public string OrderId { get; set; }

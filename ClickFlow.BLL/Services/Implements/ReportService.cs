@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.ReportDTOs;
 using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
@@ -71,23 +70,24 @@ namespace ClickFlow.BLL.Services.Implements
             }
         }
 
-        public async Task<PaginatedList<ReportResponseDTO>> GetAllAsync(PagingRequestDTO dto)
+        public async Task<PaginatedList<ReportResponseDTO>> GetAllAsync(ReportGetAllDTO dto)
         {
             try
             {
                 var trafficRepo = _unitOfWork.GetRepo<Report>();
 
-                var queryBuilder = CreateQueryBuilder().WithInclude(
+                var queryBuilder = CreateQueryBuilder(dto.Keyword).WithInclude(
                     x => x.Campaign, 
                     //x => x.Advertiser, 
                     //x => x.Publisher, 
                     x => x.Publisher.ApplicationUser, 
                     x => x.Advertiser.ApplicationUser);
-                if (!string.IsNullOrEmpty(dto.Keyword))
+
+                if (dto.Status != null)
                 {
-                    var predicate = FilterHelper.BuildSearchExpression<Report>(dto.Keyword);
-                    queryBuilder.WithPredicate(predicate);
+                    queryBuilder.WithPredicate(x => x.Status == dto.Status);
                 }
+
                 var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
                 var pagedRecords = await PaginatedList<Report>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
@@ -172,39 +172,6 @@ namespace ClickFlow.BLL.Services.Implements
                 }
 
                 return _mapper.Map<ReportResponseDTO>(report);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                throw;
-            }
-        }
-
-        public async Task<PaginatedList<ReportResponseDTO>> GetByStatusAsync(ReportsGetByStatusDTO dto)
-        {
-            try
-            {
-                var trafficRepo = _unitOfWork.GetRepo<Report>();
-
-                var queryBuilder = CreateQueryBuilder()
-                    .WithInclude(
-                        x => x.Campaign,
-                        x => x.Advertiser,
-                        x => x.Publisher,
-                        x => x.Publisher.ApplicationUser,
-                        x => x.Advertiser.ApplicationUser)
-                    .WithPredicate(x => x.Status == dto.Status);
-
-                if (!string.IsNullOrEmpty(dto.Keyword))
-                {
-                    var predicate = FilterHelper.BuildSearchExpression<Report>(dto.Keyword);
-                    queryBuilder.WithPredicate(predicate);
-                }
-                var loadedRecords = trafficRepo.Get(queryBuilder.Build());
-
-                var pagedRecords = await PaginatedList<Report>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-                var resultDTO = _mapper.Map<List<ReportResponseDTO>>(pagedRecords);
-                return new PaginatedList<ReportResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
             }
             catch (Exception ex)
             {
