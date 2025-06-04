@@ -29,8 +29,8 @@ namespace ClickFlow.API.Controllers
 			{
 				var data = await _transactionService.GetAllTransactionsByUserIdAsync(UserId, dto);
 				var response = new PagingDTO<TransactionResponseDTO>(data);
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
-				return Ok(response);
+
+				return GetSuccess(response);
 			}
 			catch (Exception ex)
 			{
@@ -75,7 +75,7 @@ namespace ClickFlow.API.Controllers
 			{
 				var data = await _transactionService.GetAllTransactionsAsync(dto);
 				var response = new PagingDTO<TransactionResponseDTO>(data);
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+
 				return GetSuccess(response);
 			}
 			catch (Exception ex)

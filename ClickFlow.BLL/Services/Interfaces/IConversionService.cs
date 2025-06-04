@@ -1,4 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs.ConversionDTOs;
+using ClickFlow.BLL.DTOs.PublisherDTOs;
 using ClickFlow.DAL.Paging;
 
 namespace ClickFlow.BLL.Services.Interfaces
@@ -9,5 +10,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<ConversionResponseDTO> GetByIdAsync(int id);
 		Task<ConversionResponseDTO> CreateAsync(ConversionCreateDTO dto);
 		Task<ConversionResponseDTO> UpdateStatusAsync(int id, ConversionUpdateStatusDTO dto);
+		Task<PublisherResponseDTO> GetPublisherIdByClickId(string clickId);
 	}
 }

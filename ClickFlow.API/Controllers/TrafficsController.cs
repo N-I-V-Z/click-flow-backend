@@ -4,6 +4,7 @@ using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -13,11 +14,14 @@ namespace ClickFlow.API.Controllers
 	{
 		private readonly ITrafficService _trafficService;
 		private readonly ICampaignService _campaignService;
+		private readonly IUserPlanService _userPlanService;
 
-		public TrafficsController(ITrafficService trafficService, ICampaignService campaignService)
+
+		public TrafficsController(ITrafficService trafficService, ICampaignService campaignService, IUserPlanService userPlanService)
 		{
 			_trafficService = trafficService;
 			_campaignService = campaignService;
+			_userPlanService = userPlanService;
 		}
 
 		[Authorize]
@@ -47,7 +51,7 @@ namespace ClickFlow.API.Controllers
 			{
 				var data = await _trafficService.GetAllAsync(dto);
 				var response = new PagingDTO<TrafficResponseDTO>(data);
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -68,7 +72,6 @@ namespace ClickFlow.API.Controllers
 				var data = await _trafficService.GetAllByPublisherIdAsync(UserId, dto);
 				var response = new PagingDTO<TrafficResponseDTO>(data);
 
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -89,7 +92,6 @@ namespace ClickFlow.API.Controllers
 				var data = await _trafficService.GetAllByAdvertiserIdAsync(UserId, dto);
 				var response = new PagingDTO<TrafficResponseDTO>(data);
 
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -107,8 +109,9 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var response = await _trafficService.GetAllByCampaignIdAsync(campaignId, dto);
-				if (!response.Any()) return GetNotFound("Không có dữ liệu.");
+				var data = await _trafficService.GetAllByCampaignIdAsync(campaignId, dto);
+				var response = new PagingDTO<TrafficResponseDTO>(data);
+
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -121,44 +124,48 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+        public async Task<IActionResult> CreateTraffic([FromBody] TrafficCreateDTO dto)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
-				var checkCampaign = await _campaignService.ValidateCampaignForTraffic(dto.CampaignId);
+            try
+            {
+                // 1) Kiểm tra campaign
+                var checkCampaign = await _campaignService.ValidateCampaignForTraffic(dto.CampaignId);
+                if (!checkCampaign.IsSuccess)
+                    return SaveError(checkCampaign.Message);
 
-				if (!checkCampaign.IsSuccess)
-				{
-					return SaveError(checkCampaign.Message);
-				}
+                // 2) Kiểm tra traffic hợp lệ (ví dụ publisher đã tham gia)
+                var checkTraffic = await _trafficService.ValidateTraffic(dto);
+                if (!checkTraffic.IsSuccess)
+                    return SaveError(checkTraffic.Message);
 
-				var checkTraffic = await _trafficService.ValidateTraffic(dto);
+                // 3) Tính IP
+                var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (string.IsNullOrEmpty(ip))
+                    ip = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-				if (!checkTraffic.IsSuccess)
-				{
-					return SaveError(checkTraffic.Message);
-				}
+                // 4) Tăng click count, nếu hết quota quay về lỗi
+                //    PublisherId lấy từ dto.PublisherId (giả định DTO có trường này)
+                var canIncrease = await _userPlanService.IncreaseClickCountAsync(dto.PublisherId);
+                if (!canIncrease)
+                    return SaveError("Bạn đã hết hạn mức click cho gói hiện tại.");
 
-				var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                // 5) Ghi nhận traffic
+                var response = await _trafficService.CreateAsync(dto, ip);
+                if (response == null)
+                    return SaveError("Lưu traffic thất bại.");
 
-				if (string.IsNullOrEmpty(ip))
-				{
-					ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-				}
-				var response = await _trafficService.CreateAsync(dto, ip);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+            }
+        }
 
 		[Authorize]
 		[HttpGet("{campaignId}/count")]
