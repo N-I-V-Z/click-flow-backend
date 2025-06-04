@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using ClickFlow.BLL.DTOs.CourseDTOs;
 using ClickFlow.BLL.DTOs.VideoDTOs;
 using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
-using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 

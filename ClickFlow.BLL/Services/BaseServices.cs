@@ -6,7 +6,7 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services
 {
-    public abstract class BaseServices<TEntity, TDetailDto> where TEntity : class
+	public abstract class BaseServices<TEntity, TDetailDto> where TEntity : class
 	{
 		protected readonly IUnitOfWork _unitOfWork;
 		protected readonly IMapper _mapper;

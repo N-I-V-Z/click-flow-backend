@@ -1,13 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace ClickFlow.DAL.EF
 {
-    internal class ClickFlowContextFactory : IDesignTimeDbContextFactory<ClickFlowContext>
-    {
-        public ClickFlowContext CreateDbContext(string[] args)
-        {
+	internal class ClickFlowContextFactory : IDesignTimeDbContextFactory<ClickFlowContext>
+	{
+		public ClickFlowContext CreateDbContext(string[] args)
+		{
 			var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../ClickFlow.API");
 			IConfigurationRoot configuration = new ConfigurationBuilder()
 				.SetBasePath(basePath)
@@ -21,7 +21,7 @@ namespace ClickFlow.DAL.EF
 
 			return new ClickFlowContext(builder.Options);
 		}
-    }
+	}
 
 
 }

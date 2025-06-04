@@ -1,5 +1,4 @@
-﻿using ClickFlow.BLL.DTOs.PagingDTOs;
-using ClickFlow.BLL.DTOs.PlanDTOs;
+﻿using ClickFlow.BLL.DTOs.PlanDTOs;
 using ClickFlow.DAL.Paging;
 
 namespace ClickFlow.BLL.Services.Interfaces

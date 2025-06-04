@@ -1,12 +1,8 @@
 ﻿using ClickFlow.BLL.DTOs;
-using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.ReportDTOs;
-using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -44,13 +40,13 @@ namespace ClickFlow.API.Controllers
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
 		public async Task<IActionResult> GetAllReports([FromQuery] ReportGetAllDTO dto)
-        {
-            try
-            {
+		{
+			try
+			{
 				var data = await _reportService.GetAllAsync(dto);
-                var response = new PagingDTO<ReportResponseDTO>(data);
+				var response = new PagingDTO<ReportResponseDTO>(data);
 
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -62,7 +58,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-        [Authorize(Roles = "Advertiser")]
+		[Authorize(Roles = "Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO dto)
 		{
@@ -70,7 +66,7 @@ namespace ClickFlow.API.Controllers
 
 			try
 			{
-                var response = await _reportService.CreateReportAsync(UserId, dto);
+				var response = await _reportService.CreateReportAsync(UserId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}

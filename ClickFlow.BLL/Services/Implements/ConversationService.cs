@@ -65,7 +65,8 @@ namespace ClickFlow.BLL.Services.Implements
 					.WithInclude(x => x.Messages, x => x.User2, x => x.User1, x => x.User1.UserDetail, x => x.User2.UserDetail);
 				var conData = await conRepo.GetAllAsync(queryBuilder.Build());
 
-				return conData.Select(conversation => {
+				return conData.Select(conversation =>
+				{
 					var partner = conversation.User1Id == userId ? conversation.User2 : conversation.User1;
 					var partnerId = conversation.User1Id == userId ? conversation.User2Id : conversation.User1Id;
 

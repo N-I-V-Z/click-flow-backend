@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ClickFlow.DAL.UnitOfWork
 {
-    public class UnitOfWork : IUnitOfWork
+	public class UnitOfWork : IUnitOfWork
 	{
 		private readonly ClickFlowContext _context;
 		private readonly IServiceProvider _serviceProvider;

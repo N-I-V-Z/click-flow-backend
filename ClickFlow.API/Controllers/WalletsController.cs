@@ -1,9 +1,7 @@
 ﻿using ClickFlow.BLL.DTOs.WalletDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ClickFlow.API.Controllers
 {
@@ -18,26 +16,26 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-        [Authorize(Roles = "Publisher, Advertiser")]
-        [HttpGet("own")]
-        public async Task<IActionResult> GetOwnWallet()
-        {
-            try
-            {
-                var response = await _walletService.GetWalletByUserIdAsync(UserId);
-                if (response == null) return GetNotFound("Không có dữ liệu.");
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-            }
-        }
+		[Authorize(Roles = "Publisher, Advertiser")]
+		[HttpGet("own")]
+		public async Task<IActionResult> GetOwnWallet()
+		{
+			try
+			{
+				var response = await _walletService.GetWalletByUserIdAsync(UserId);
+				if (response == null) return GetNotFound("Không có dữ liệu.");
+				return Ok(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+			}
+		}
 
-        [Authorize(Roles = "Publisher, Advertiser")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPut("{walletId}")]
 		public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
 		{
