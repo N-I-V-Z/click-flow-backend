@@ -36,6 +36,8 @@ namespace ClickFlow.DAL.EF
 		public DbSet<Conversation> Conversations { get; set; }
 		public DbSet<Message> Messages { get; set; }
 		public DbSet<Conversion> Conversions { get; set; }
+		public DbSet<Plan> Plans { get; set; }
+		public DbSet<UserPlan> UserPlans { get; set; }
 		#endregion
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -63,6 +65,8 @@ namespace ClickFlow.DAL.EF
             modelBuilder.ApplyConfiguration(new ConversationConfiguration());
             modelBuilder.ApplyConfiguration(new MessageConfiguration());
             modelBuilder.ApplyConfiguration(new ConversionConfiguration());
+            modelBuilder.ApplyConfiguration(new PlanConfiguration());
+            modelBuilder.ApplyConfiguration(new UserPlanConfiguration());
 
 			modelBuilder.Entity<IdentityUserLogin<int>>(entity =>
             {

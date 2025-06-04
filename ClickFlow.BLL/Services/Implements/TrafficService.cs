@@ -9,42 +9,20 @@ using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
-using System.Linq;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class TrafficService : ITrafficService
+	public class TrafficService : BaseServices<Traffic, TrafficResponseDTO>, ITrafficService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper)
+		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
 
-		protected virtual QueryBuilder<Traffic> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Traffic>()
-								.WithTracking(false);
-
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Traffic>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
-		}
-
-		public async Task<PaginatedList<TrafficResponseDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
-		{
-			var paginatedEntities = await PaginatedList<Transaction>.CreateAsync(query, pageIndex, pageSize);
-			var resultDto = _mapper.Map<List<TrafficResponseDTO>>(paginatedEntities);
-
-			return new PaginatedList<TrafficResponseDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
-		}
 		public async Task<BaseResponse> ValidateTraffic(TrafficCreateDTO dto)
 		{
 			try
@@ -209,9 +187,7 @@ namespace ClickFlow.BLL.Services.Implements
 				}
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
-				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -266,9 +242,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
-				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -298,9 +272,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
-				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -329,9 +301,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficResponseDTO>>(pagedRecords);
-				return new PaginatedList<TrafficResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{

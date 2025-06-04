@@ -1,5 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs.ConversionDTOs;
 using ClickFlow.BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -14,7 +15,8 @@ namespace ClickFlow.API.Controllers
 		{
 			_conversionService = conversionService;
 		}
-		[HttpPost]
+
+		[HttpPost("postback")]
 		public async Task<IActionResult> Create([FromBody] ConversionCreateDTO dto)
 		{
 			if (!ModelState.IsValid)
@@ -32,6 +34,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
+		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> GetAll([FromQuery] ConversionGetAllDTO dto)
 		{
@@ -47,6 +50,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
+		[Authorize]
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetById(int id)
 		{
@@ -65,6 +69,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
+		[Authorize]
 		[HttpPut("{id}/status")]
 		public async Task<IActionResult> UpdateStatus(int id, [FromBody] ConversionUpdateStatusDTO dto)
 		{
