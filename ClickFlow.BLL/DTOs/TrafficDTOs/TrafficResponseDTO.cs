@@ -1,9 +1,8 @@
-﻿using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
-using ClickFlow.DAL.Entities;
+﻿using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.BLL.DTOs.TrafficDTOs
 {
-    public class TrafficResponseDTO
+	public class TrafficResponseDTO
 	{
 		public int Id { get; set; }
 		public string ClickId { get; set; }

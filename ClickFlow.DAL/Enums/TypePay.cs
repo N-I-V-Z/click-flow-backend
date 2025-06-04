@@ -2,8 +2,8 @@
 
 namespace ClickFlow.DAL.Enums
 {
-    public enum TypePay
-    {
+	public enum TypePay
+	{
 		[EnumMember(Value = "CPC")]
 		CPC,
 		[EnumMember(Value = "CPA")]

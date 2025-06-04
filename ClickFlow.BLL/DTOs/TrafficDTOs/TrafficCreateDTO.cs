@@ -14,9 +14,9 @@ namespace ClickFlow.BLL.DTOs.TrafficDTOs
 		[MaxLength(255, ErrorMessage = "ReferrerURL không quá 255 ký tự.")]
 		public string ReferrerURL { get; set; }
 		public DateTime? Timestamp { get; set; }
-        [Required(ErrorMessage = "CampaignId không được để trống.")]
-        public int CampaignId { get; set; }
-        [Required(ErrorMessage = "PublisherId không được để trống.")]
-        public int PublisherId { get; set; }
+		[Required(ErrorMessage = "CampaignId không được để trống.")]
+		public int CampaignId { get; set; }
+		[Required(ErrorMessage = "PublisherId không được để trống.")]
+		public int PublisherId { get; set; }
 	}
 }

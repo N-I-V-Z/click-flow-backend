@@ -1,41 +1,25 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.MessageDTOs;
-using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
-using ClickFlow.DAL.Enums;
-using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class MessageService : IMessageService
+	public class MessageService : BaseServices<Message, MessageResponseDTO>, IMessageService
 	{
 
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 		private readonly ICloudinaryService _cloudinaryService;
 
-		public MessageService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService)
+		public MessageService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 			_cloudinaryService = cloudinaryService;
 		}
 
-		protected virtual QueryBuilder<Message> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Message>()
-								.WithTracking(false);
-
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Message>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
-		}
 		public async Task<List<MessageResponseDTO>> GetMessagesAsync(int conversationId)
 		{
 			try

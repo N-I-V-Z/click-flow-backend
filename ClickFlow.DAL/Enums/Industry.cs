@@ -2,8 +2,8 @@
 
 namespace ClickFlow.DAL.Enums
 {
-    public enum Industry
-    {
+	public enum Industry
+	{
 		[EnumMember(Value = "Thực phẩm và đồ uống")]
 		FoodAndBeverage,
 		[EnumMember(Value = "Du lịch")]

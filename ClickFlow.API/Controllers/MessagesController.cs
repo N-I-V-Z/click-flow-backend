@@ -10,7 +10,7 @@ namespace ClickFlow.API.Controllers
 	public class MessagesController : BaseAPIController
 	{
 		private readonly IChatService _chatService;
-		public MessagesController(IChatService chatService) 
+		public MessagesController(IChatService chatService)
 		{
 			_chatService = chatService;
 		}
@@ -58,7 +58,7 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize]
-		[HttpPost("mark-as-read")] 
+		[HttpPost("mark-as-read")]
 		public async Task<IActionResult> MaskAsRead([FromBody] MessageMaskAsReadDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();

@@ -1,6 +1,6 @@
 ﻿using ClickFlow.DAL.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ClickFlow.DAL.Configurations
 {

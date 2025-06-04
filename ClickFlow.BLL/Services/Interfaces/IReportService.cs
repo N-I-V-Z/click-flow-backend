@@ -1,5 +1,4 @@
-﻿using ClickFlow.BLL.DTOs.PagingDTOs;
-using ClickFlow.BLL.DTOs.ReportDTOs;
+﻿using ClickFlow.BLL.DTOs.ReportDTOs;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 

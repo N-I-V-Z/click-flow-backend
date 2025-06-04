@@ -1,5 +1,4 @@
-﻿using ClickFlow.DAL.Entities;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace ClickFlow.BLL.DTOs.WalletDTOs
 {

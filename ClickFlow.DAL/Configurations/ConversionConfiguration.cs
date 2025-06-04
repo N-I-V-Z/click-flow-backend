@@ -1,5 +1,4 @@
 ﻿using ClickFlow.DAL.Entities;
-using ClickFlow.DAL.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

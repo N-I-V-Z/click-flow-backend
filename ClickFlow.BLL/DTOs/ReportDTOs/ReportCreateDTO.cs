@@ -2,7 +2,7 @@
 
 namespace ClickFlow.BLL.DTOs.ReportDTOs
 {
-    public class ReportCreateDTO
+	public class ReportCreateDTO
 	{
 		[Required(ErrorMessage = "Reason không được để trống.")]
 		[MaxLength(255, ErrorMessage = "Reason không được quá 255 ký tự.")]

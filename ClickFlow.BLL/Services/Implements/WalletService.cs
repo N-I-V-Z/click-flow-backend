@@ -26,7 +26,7 @@ namespace ClickFlow.BLL.Services.Implements
 				var createdWallet = _mapper.Map<Wallet>(dto);
 				createdWallet.UserId = userId;
 
-                await repo.CreateAsync(createdWallet);
+				await repo.CreateAsync(createdWallet);
 
 				var saver = await _unitOfWork.SaveAsync();
 				if (!saver)

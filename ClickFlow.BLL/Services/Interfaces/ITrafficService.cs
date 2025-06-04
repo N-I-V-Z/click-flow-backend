@@ -18,5 +18,5 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<int> AverageTrafficInCampaign(int publisherId);
 		Task<int> CountAllTrafficByCampaign(int campaignId);
 		Task<bool> IsValidTraffic(TrafficCreateDTO dto, string IpAddress);
-    }
+	}
 }

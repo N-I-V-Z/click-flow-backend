@@ -3,7 +3,6 @@ using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -24,9 +23,9 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet("{trafficId}")]
 		public async Task<IActionResult> GetTrafficById(int trafficId)
-        {
-            try
-            {
+		{
+			try
+			{
 				var response = await _trafficService.GetByIdAsync(trafficId);
 				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
@@ -43,12 +42,12 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet]
 		public async Task<IActionResult> GetTraffics([FromQuery] PagingRequestDTO dto)
-        {
-            try
-            {
+		{
+			try
+			{
 				var data = await _trafficService.GetAllAsync(dto);
-                var response = new PagingDTO<TrafficResponseDTO>(data);
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+				var response = new PagingDTO<TrafficResponseDTO>(data);
+				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -67,9 +66,9 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var data = await _trafficService.GetAllByPublisherIdAsync(UserId, dto);
-                var response = new PagingDTO<TrafficResponseDTO>(data);
+				var response = new PagingDTO<TrafficResponseDTO>(data);
 
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -88,9 +87,9 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var data = await _trafficService.GetAllByAdvertiserIdAsync(UserId, dto);
-                var response = new PagingDTO<TrafficResponseDTO>(data);
+				var response = new PagingDTO<TrafficResponseDTO>(data);
 
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -137,9 +136,9 @@ namespace ClickFlow.API.Controllers
 
 				var checkTraffic = await _trafficService.ValidateTraffic(dto);
 
-                if (!checkTraffic.IsSuccess)
-                {
-                    return SaveError(checkTraffic.Message);
+				if (!checkTraffic.IsSuccess)
+				{
+					return SaveError(checkTraffic.Message);
 				}
 
 				var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
