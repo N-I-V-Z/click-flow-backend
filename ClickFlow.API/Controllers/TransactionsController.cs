@@ -48,14 +48,21 @@ namespace ClickFlow.API.Controllers
 			{
 				var vnpayRes = _vnPayService.PaymentExcute(Request.Query);
 
+				if (!int.TryParse(vnpayRes.OrderId, out var transactionId))
+				{
+					throw new Exception("OrderId từ VnPay không hợp lệ.");
+				}
+
 				var transactionRes = await _transactionService.UpdateStatusTransactionAsync(
-					int.Parse(vnpayRes.OrderId),
+					transactionId,
 					new TransactionUpdateStatusDTO { Status = vnpayRes.IsSuccess });
 
 				if (!vnpayRes.IsSuccess)
 				{
-					return SaveError(transactionRes);
+					// Thanh toán VnPay thất bại: trả thông tin lỗi
+					return SaveError("Thanh toán không thành công: " + vnpayRes.VnPayResponseCode);
 				}
+
 				return SaveSuccess(transactionRes);
 			}
 			catch (Exception ex)
@@ -112,15 +119,15 @@ namespace ClickFlow.API.Controllers
 		[HttpPost("payment-url")]
 		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
 		{
+			if (dto == null || dto.Amount <= 0)
+			{
+				ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
+				return ModelInvalid();
+			}
+
 			try
 			{
-				if (dto == null || dto.Amount <= 0)
-				{
-					ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
-					return ModelInvalid();
-				}
-
-				var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, dto);
+				var paymentUrl = _vnPayService.CreatePaymentUrl(UserId, HttpContext, dto);
 				return GetSuccess(paymentUrl);
 			}
 			catch (Exception ex)

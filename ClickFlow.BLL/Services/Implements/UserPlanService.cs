@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.UserPlanDTOs;
+using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Queries;
@@ -7,7 +8,7 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class UserPlanService : BaseServices<UserPlan, UserPlanResponseDTO>
+	public class UserPlanService : BaseServices<UserPlan, UserPlanResponseDTO>, IUserPlanService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;

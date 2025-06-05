@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TransactionDTOs;
-using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -30,55 +29,48 @@ namespace ClickFlow.BLL.Services.Implements
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var walletRepo = _unitOfWork.GetRepo<Wallet>();
 
-				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
-					.WithPredicate(x => x.Id == dto.WalletId)
-					.WithTracking(false)
-					.Build()
-					);
+				// 1) Lấy Wallet bằng dto.WalletId
+				var wallet = await walletRepo.GetSingleAsync(
+					new QueryBuilder<Wallet>()
+						.WithPredicate(x => x.Id == dto.WalletId)
+						.WithTracking(false)
+						.Build());
 
-				Transaction newTransaction = null;
-				var createdTransaction = _mapper.Map<Transaction>(dto);
-				createdTransaction.PaymentDate = DateTime.UtcNow;
+				if (wallet == null)
+					throw new Exception("Ví không tồn tại.");
 
+				// 2) Khởi tạo đối tượng Transaction (pendding)
+				var newTransaction = _mapper.Map<Transaction>(dto);
+				newTransaction.PaymentDate = DateTime.UtcNow;
+				newTransaction.Status = false; // pending
+				newTransaction.Balance = wallet.Balance; // lưu số dư hiện tại
+
+				// 3) Tùy loại TransactionType
 				if (dto.TransactionType == TransactionType.Withdraw)
 				{
+					// Chỉ kiểm tra số dư tại thời điểm tạo request
 					if (wallet.Balance < dto.Amount)
-					{
-						throw new Exception("Số dư trong ví không đủ để rút.");
-					}
+						throw new Exception("Số dư trong ví không đủ để thực hiện rút tiền.");
 
-					if (dto.Status == true)
-						createdTransaction.Balance = wallet.Balance - dto.Amount;
-
-					newTransaction = await transactionRepo.CreateAsync(createdTransaction);
-					await _unitOfWork.SaveChangesAsync();
-
-					//if (dto.Status == true)
-					//{
-					//	wallet.Balance -= dto.Amount;
-					//	await walletRepo.UpdateAsync(wallet);
-					//}
-
+					// Khi pending, không trừ tiền ngay
+					// newTransaction.Balance = wallet.Balance; // đã gán ở trên
 				}
 				else if (dto.TransactionType == TransactionType.Deposit)
 				{
-					createdTransaction.Balance = wallet.Balance;
-
-					newTransaction = await transactionRepo.CreateAsync(createdTransaction);
+					// Pending deposit, không cộng tiền ngay
+					// newTransaction.Balance = wallet.Balance; // đã gán
 				}
 				else
 				{
 					throw new Exception("TransactionType không hợp lệ.");
 				}
-				var saver = await _unitOfWork.SaveAsync();
+
+				// 4) Lưu Transaction pending
+				var created = await transactionRepo.CreateAsync(newTransaction);
+				await _unitOfWork.SaveAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<TransactionResponseDTO>(newTransaction);
+				return _mapper.Map<TransactionResponseDTO>(created);
 			}
 			catch (Exception ex)
 			{
@@ -87,6 +79,7 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
+
 
 		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
 		{
@@ -98,13 +91,17 @@ namespace ClickFlow.BLL.Services.Implements
 					.WithTracking(false)
 					.Build());
 
+				if (wallet == null)
+				{
+					// Nếu không có ví, trả danh sách rỗng
+					return new PaginatedList<TransactionResponseDTO>(
+						Enumerable.Empty<TransactionResponseDTO>().ToList(),
+						0, dto.PageIndex, dto.PageSize);
+				}
+
 				var queryBuilder = CreateQueryBuilder(dto.Keyword);
 				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == wallet.Id);
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Transaction>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
+
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var transactions = transactionRepo.Get(queryOptions.Build());
 
@@ -131,13 +128,20 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var transaction = await transactionRepo.GetSingleAsync(queryOptions.Build());
 
-				if (transaction.Status == dto.Status) throw new Exception("Không thay đổi");
+				if (transaction == null)
+					throw new Exception("Transaction không tồn tại.");
+
+				if (transaction.Status == dto.Status)
+					throw new Exception("Không thay đổi trạng thái.");
 
 				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
 					.WithPredicate(x => x.Id == transaction.WalletId)
 					.WithTracking(false)
 					.Build()
 					);
+
+				if (wallet == null)
+					throw new Exception("Ví không tồn tại.");
 
 				transaction.Status = dto.Status;
 
@@ -146,20 +150,22 @@ namespace ClickFlow.BLL.Services.Implements
 					if (transaction.TransactionType == TransactionType.Deposit)
 					{
 						wallet.Balance += transaction.Amount;
-						transaction.Balance = wallet.Balance + transaction.Amount;
+						transaction.Balance = wallet.Balance;
 					}
 					else if (transaction.TransactionType == TransactionType.Withdraw)
 					{
-						if (wallet.Balance < transaction.Amount) throw new Exception("Số tiền trong ví không đủ để rút");
+						if (wallet.Balance < transaction.Amount)
+							throw new Exception("Số dư trong ví không đủ để rút.");
+
 						wallet.Balance -= transaction.Amount;
-						transaction.Balance = wallet.Balance - transaction.Amount;
+						transaction.Balance = wallet.Balance;
 					}
-					await transactionRepo.UpdateAsync(transaction);
-					await _unitOfWork.SaveChangesAsync();
-					await walletRepo.UpdateAsync(wallet);
-					await _unitOfWork.SaveChangesAsync();
 				}
-				await _unitOfWork.CommitTransactionAsync();
+				await transactionRepo.UpdateAsync(transaction);
+				await walletRepo.UpdateAsync(wallet);
+				await _unitOfWork.SaveAsync();
+				await _unitOfWork.CommitTransactionAsync(); 
+				
 				return _mapper.Map<TransactionResponseDTO>(transaction);
 
 			}
@@ -176,15 +182,9 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				var queryBuilder = CreateQueryBuilder(dto.Keyword);
-				var queryOptions = queryBuilder;
 
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Transaction>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
-				var transactions = transactionRepo.Get(queryOptions.Build());
+				var transactions = transactionRepo.Get(queryBuilder.Build());
 
 				return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 			}
