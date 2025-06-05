@@ -186,7 +186,6 @@ namespace ClickFlow.BLL.Services.Implements
 
 				await cpRepo.CreateAsync(coursePublisher);
 
-				await _unitOfWork.SaveChangesAsync();
 				var success = await _unitOfWork.SaveAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
