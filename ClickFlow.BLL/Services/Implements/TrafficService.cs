@@ -137,7 +137,6 @@ namespace ClickFlow.BLL.Services.Implements
 						EventType = ConversionEventType.Conversion,
 						Revenue = campaign.Commission,
 						OrderId = null,
-						Status = ConversionStatus.Approved,
 						Timestamp = DateTime.UtcNow
 					};
 

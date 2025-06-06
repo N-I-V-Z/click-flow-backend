@@ -30,10 +30,6 @@ namespace ClickFlow.DAL.Configurations
 				   .HasConversion<string>()
 				   .IsRequired();
 
-			builder.Property(c => c.Status)
-				   .HasConversion<string>()
-				   .IsRequired();
-
 			builder.HasOne(c => c.Click)
 				   .WithMany(t => t.Conversions)
 				   .HasForeignKey(c => c.ClickId)

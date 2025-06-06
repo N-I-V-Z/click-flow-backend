@@ -10,7 +10,6 @@ namespace ClickFlow.DAL.Entities
 		public ConversionEventType EventType { get; set; }
 		public int? Revenue { get; set; }
 		public string OrderId { get; set; }
-		public ConversionStatus Status { get; set; }
 		public DateTime Timestamp { get; set; }
 	}
 }

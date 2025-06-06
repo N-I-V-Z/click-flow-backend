@@ -29,6 +29,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ConfigExtensions\" />
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="https://bioimage-io.github.io/spec-bioimage-io/bioimageio_schema_latest.json" /></VisualStudio></ProjectExtensions>
 
 </Project>
