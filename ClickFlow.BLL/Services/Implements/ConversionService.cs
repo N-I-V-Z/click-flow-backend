@@ -47,7 +47,6 @@ namespace ClickFlow.BLL.Services.Implements
 				// 2) Khởi tạo Conversion
 				var conversion = _mapper.Map<Conversion>(dto);
 				conversion.Timestamp = DateTime.UtcNow;
-				conversion.Status = ConversionStatus.Pending;
 
 				await conversionRepo.CreateAsync(conversion);
 				await _unitOfWork.SaveAsync();
@@ -109,11 +108,6 @@ namespace ClickFlow.BLL.Services.Implements
 				var repo = _unitOfWork.GetRepo<Conversion>();
 				var queryBuilder = CreateQueryBuilder(dto.Keyword);
 
-				if (dto.Status != null)
-				{
-					queryBuilder.WithPredicate(x => x.Status == dto.Status);
-				}
-
 				if (dto.EventType != null)
 				{
 					queryBuilder.WithPredicate(x => x.EventType == dto.EventType);
@@ -173,30 +167,6 @@ namespace ClickFlow.BLL.Services.Implements
 				Console.WriteLine(ex.ToString());
 				throw;
 			}
-		}
-
-		public async Task<ConversionResponseDTO> UpdateStatusAsync(int id, ConversionUpdateStatusDTO dto)
-		{
-			try
-			{
-				var repo = _unitOfWork.GetRepo<Conversion>();
-				var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.Id == id);
-				var conversion = await repo.GetSingleAsync(queryBuilder.Build());
-
-				if (conversion == null)
-					throw new Exception("Conversion not found");
-
-				conversion.Status = dto.Status;
-				await repo.UpdateAsync(conversion);
-				await _unitOfWork.SaveAsync();
-				return _mapper.Map<ConversionResponseDTO>(conversion);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
-
 		}
 	}
 }
