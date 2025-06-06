@@ -56,7 +56,7 @@ namespace ClickFlow.API.Controllers
 				Console.ResetColor();
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
 			}
-			
+
 		}
 
 		[Authorize(Roles = "Publisher")]

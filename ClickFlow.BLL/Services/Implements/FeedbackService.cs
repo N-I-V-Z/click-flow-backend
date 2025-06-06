@@ -9,211 +9,211 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-    public class FeedbackService : IFeedbackService
-    {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-       
-        public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+	public class FeedbackService : IFeedbackService
+	{
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly IMapper _mapper;
 
-        public async Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto, int feedbackerId)
-        {
-            try
-            {
-                await _unitOfWork.BeginTransactionAsync();
-                var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
-                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+		public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper)
+		{
+			_unitOfWork = unitOfWork;
+			_mapper = mapper;
+		}
 
-                var existingFeedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
-            .WithPredicate(x => x.CampaignId == dto.CampaignId && x.FeedbackerId == feedbackerId)
-            .Build());
+		public async Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto, int feedbackerId)
+		{
+			try
+			{
+				await _unitOfWork.BeginTransactionAsync();
+				var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
-                if (existingFeedback != null)
-                {
-                    return new BaseResponse
-                    {
-                        IsSuccess = false,
-                        Message = "Bạn đã đánh giá chiến dịch này rồi. Mỗi người chỉ được đánh giá một lần."
-                    };
-                }
-                var feedback = _mapper.Map<Feedback>(dto);
-                feedback.Timestamp = DateTime.Now;
-                feedback.FeedbackerId = feedbackerId;
+				var existingFeedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
+			.WithPredicate(x => x.CampaignId == dto.CampaignId && x.FeedbackerId == feedbackerId)
+			.Build());
 
-                await feedbackRepo.CreateAsync(feedback);
-                await _unitOfWork.SaveChangesAsync();
+				if (existingFeedback != null)
+				{
+					return new BaseResponse
+					{
+						IsSuccess = false,
+						Message = "Bạn đã đánh giá chiến dịch này rồi. Mỗi người chỉ được đánh giá một lần."
+					};
+				}
+				var feedback = _mapper.Map<Feedback>(dto);
+				feedback.Timestamp = DateTime.Now;
+				feedback.FeedbackerId = feedbackerId;
 
-              
-                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
-                    .WithPredicate(x => x.Id == feedback.CampaignId)
-                    .WithInclude(x => x.Feedbacks)
-                    .Build());
+				await feedbackRepo.CreateAsync(feedback);
+				await _unitOfWork.SaveChangesAsync();
 
-                if (campaign != null)
-                {
-                    campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
-                    await campaignRepo.UpdateAsync(campaign);
-                    await _unitOfWork.SaveChangesAsync();
-                }
 
-                await _unitOfWork.CommitTransactionAsync();
-                return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được tạo thành công." };
-            }
-            catch (Exception)
-            {
-                await _unitOfWork.RollBackAsync();
-                throw;
-            }
-        }
+				var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+					.WithPredicate(x => x.Id == feedback.CampaignId)
+					.WithInclude(x => x.Feedbacks)
+					.Build());
 
-        public async Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto, int feedbackerId)
-        {
-            try
-            {
-                await _unitOfWork.BeginTransactionAsync();
-                var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
-                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+				if (campaign != null)
+				{
+					campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
+					await campaignRepo.UpdateAsync(campaign);
+					await _unitOfWork.SaveChangesAsync();
+				}
 
-                var feedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
-                    .WithPredicate(x => x.Id == dto.Id)
-                    .WithTracking(false)
-                    .Build());
+				await _unitOfWork.CommitTransactionAsync();
+				return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được tạo thành công." };
+			}
+			catch (Exception)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
 
-                if (feedback == null)
-                {
-                    return new BaseResponse { IsSuccess = false, Message = "Phản hồi không tồn tại." };
-                }
+		public async Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto, int feedbackerId)
+		{
+			try
+			{
+				await _unitOfWork.BeginTransactionAsync();
+				var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
-                _mapper.Map(dto, feedback);
-                await feedbackRepo.UpdateAsync(feedback);
-                await _unitOfWork.SaveChangesAsync();
+				var feedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
+					.WithPredicate(x => x.Id == dto.Id)
+					.WithTracking(false)
+					.Build());
 
-                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
-                    .WithPredicate(x => x.Id == feedback.CampaignId)
-                    .WithInclude(x => x.Feedbacks)
-                    .Build());
+				if (feedback == null)
+				{
+					return new BaseResponse { IsSuccess = false, Message = "Phản hồi không tồn tại." };
+				}
 
-                if (campaign != null)
-                {
-                    campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
-                    await campaignRepo.UpdateAsync(campaign);
-                    await _unitOfWork.SaveChangesAsync();
-                }
+				_mapper.Map(dto, feedback);
+				await feedbackRepo.UpdateAsync(feedback);
+				await _unitOfWork.SaveChangesAsync();
 
-                await _unitOfWork.CommitTransactionAsync();
-                return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được cập nhật thành công." };
-            }
-            catch (Exception)
-            {
-                await _unitOfWork.RollBackAsync();
-                throw;
-            }
-        }
+				var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+					.WithPredicate(x => x.Id == feedback.CampaignId)
+					.WithInclude(x => x.Feedbacks)
+					.Build());
 
-        public async Task<BaseResponse> DeleteFeedback(int id)
-        {
-            try
-            {
-                await _unitOfWork.BeginTransactionAsync();
-                var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
-                var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+				if (campaign != null)
+				{
+					campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
+					await campaignRepo.UpdateAsync(campaign);
+					await _unitOfWork.SaveChangesAsync();
+				}
 
-                var feedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
-                    .WithPredicate(x => x.Id == id)
-                    .WithTracking(false)
-                    .Build());
+				await _unitOfWork.CommitTransactionAsync();
+				return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được cập nhật thành công." };
+			}
+			catch (Exception)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
 
-                if (feedback == null)
-                {
-                    return new BaseResponse { IsSuccess = false, Message = "Phản hồi không tồn tại." };
-                }
+		public async Task<BaseResponse> DeleteFeedback(int id)
+		{
+			try
+			{
+				await _unitOfWork.BeginTransactionAsync();
+				var feedbackRepo = _unitOfWork.GetRepo<Feedback>();
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
-                var campaignId = feedback.CampaignId;
-                await feedbackRepo.DeleteAsync(feedback);
-                await _unitOfWork.SaveChangesAsync();
+				var feedback = await feedbackRepo.GetSingleAsync(new QueryBuilder<Feedback>()
+					.WithPredicate(x => x.Id == id)
+					.WithTracking(false)
+					.Build());
 
-                // Tính toán lại AverageStarRate
-                var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
-                    .WithPredicate(x => x.Id == campaignId)
-                    .WithInclude(x => x.Feedbacks)
-                    .Build());
+				if (feedback == null)
+				{
+					return new BaseResponse { IsSuccess = false, Message = "Phản hồi không tồn tại." };
+				}
 
-                if (campaign != null)
-                {
-                    campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
-                    await campaignRepo.UpdateAsync(campaign);
-                    await _unitOfWork.SaveChangesAsync();
-                }
+				var campaignId = feedback.CampaignId;
+				await feedbackRepo.DeleteAsync(feedback);
+				await _unitOfWork.SaveChangesAsync();
 
-                await _unitOfWork.CommitTransactionAsync();
-                return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được xóa thành công." };
-            }
-            catch (Exception)
-            {
-                await _unitOfWork.RollBackAsync();
-                throw;
-            }
-        }
+				// Tính toán lại AverageStarRate
+				var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
+					.WithPredicate(x => x.Id == campaignId)
+					.WithInclude(x => x.Feedbacks)
+					.Build());
 
-        public async Task<PaginatedList<FeedbackResponseDTO>> GetAllFeedbacks(int pageIndex, int pageSize)
-        {
-            var repo = _unitOfWork.GetRepo<Feedback>();
-            var feedbacks = repo.Get(new QueryBuilder<Feedback>()
-                .WithInclude(x => x.Campaign, x => x.Feedbacker)
-                .Build());
+				if (campaign != null)
+				{
+					campaign.AverageStarRate = campaign.Feedbacks?.Average(f => f.StarRate) ?? 0;
+					await campaignRepo.UpdateAsync(campaign);
+					await _unitOfWork.SaveChangesAsync();
+				}
 
-            var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);
-            var result = _mapper.Map<List<FeedbackResponseDTO>>(pagedFeedbacks);
-            return new PaginatedList<FeedbackResponseDTO>(result, pagedFeedbacks.TotalItems, pageIndex, pageSize);
-        }
+				await _unitOfWork.CommitTransactionAsync();
+				return new BaseResponse { IsSuccess = true, Message = "Phản hồi đã được xóa thành công." };
+			}
+			catch (Exception)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
 
-        public async Task<PaginatedList<FeedbackResponseDTO>> GetFeedbacksByCampaignId(int campaignId, int pageIndex, int pageSize)
-        {
-            var repo = _unitOfWork.GetRepo<Feedback>();
-            var feedbacks = repo.Get(new QueryBuilder<Feedback>()
-                .WithPredicate(x => x.CampaignId == campaignId)
-                .WithInclude(x => x.Feedbacker)               
-                .WithInclude(f => f.Feedbacker.ApplicationUser)
-                .WithInclude(f => f.Feedbacker.ApplicationUser.UserDetail)
-                .Build());
+		public async Task<PaginatedList<FeedbackResponseDTO>> GetAllFeedbacks(int pageIndex, int pageSize)
+		{
+			var repo = _unitOfWork.GetRepo<Feedback>();
+			var feedbacks = repo.Get(new QueryBuilder<Feedback>()
+				.WithInclude(x => x.Campaign, x => x.Feedbacker)
+				.Build());
 
-            var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);
-            var result = _mapper.Map<List<FeedbackResponseDTO>>(pagedFeedbacks);
-            return new PaginatedList<FeedbackResponseDTO>(result, pagedFeedbacks.TotalItems, pageIndex, pageSize);
-        }
+			var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);
+			var result = _mapper.Map<List<FeedbackResponseDTO>>(pagedFeedbacks);
+			return new PaginatedList<FeedbackResponseDTO>(result, pagedFeedbacks.TotalItems, pageIndex, pageSize);
+		}
 
-        public async Task<PaginatedList<FeedbackResponseDTO>> GetFeedbacksByFeedbackerId(int feedbackerId, int pageIndex, int pageSize)
-        {
-            var repo = _unitOfWork.GetRepo<Feedback>();
-            var feedbacks = repo.Get(new QueryBuilder<Feedback>()
-                .WithPredicate(x => x.FeedbackerId == feedbackerId)
-                .WithInclude(x => x.Campaign, x => x.Feedbacker)
-                .Build());
+		public async Task<PaginatedList<FeedbackResponseDTO>> GetFeedbacksByCampaignId(int campaignId, int pageIndex, int pageSize)
+		{
+			var repo = _unitOfWork.GetRepo<Feedback>();
+			var feedbacks = repo.Get(new QueryBuilder<Feedback>()
+				.WithPredicate(x => x.CampaignId == campaignId)
+				.WithInclude(x => x.Feedbacker)
+				.WithInclude(f => f.Feedbacker.ApplicationUser)
+				.WithInclude(f => f.Feedbacker.ApplicationUser.UserDetail)
+				.Build());
 
-            var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);
-            var result = _mapper.Map<List<FeedbackResponseDTO>>(pagedFeedbacks);
-            return new PaginatedList<FeedbackResponseDTO>(result, pagedFeedbacks.TotalItems, pageIndex, pageSize);
-        }
+			var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);
+			var result = _mapper.Map<List<FeedbackResponseDTO>>(pagedFeedbacks);
+			return new PaginatedList<FeedbackResponseDTO>(result, pagedFeedbacks.TotalItems, pageIndex, pageSize);
+		}
 
-        public async Task<FeedbackResponseDTO> GetFeedbackById(int id)
-        {
-            var repo = _unitOfWork.GetRepo<Feedback>();
-            var feedback = await repo.GetSingleAsync(new QueryBuilder<Feedback>()
-                .WithPredicate(x => x.Id == id)
-                .WithInclude(x => x.Campaign, x => x.Feedbacker)
-                .Build());
+		public async Task<PaginatedList<FeedbackResponseDTO>> GetFeedbacksByFeedbackerId(int feedbackerId, int pageIndex, int pageSize)
+		{
+			var repo = _unitOfWork.GetRepo<Feedback>();
+			var feedbacks = repo.Get(new QueryBuilder<Feedback>()
+				.WithPredicate(x => x.FeedbackerId == feedbackerId)
+				.WithInclude(x => x.Campaign, x => x.Feedbacker)
+				.Build());
 
-            if (feedback == null)
-            {
-                return null;
-            }
+			var pagedFeedbacks = await PaginatedList<Feedback>.CreateAsync(feedbacks, pageIndex, pageSize);
+			var result = _mapper.Map<List<FeedbackResponseDTO>>(pagedFeedbacks);
+			return new PaginatedList<FeedbackResponseDTO>(result, pagedFeedbacks.TotalItems, pageIndex, pageSize);
+		}
 
-            return _mapper.Map<FeedbackResponseDTO>(feedback);
-        }
-    }
+		public async Task<FeedbackResponseDTO> GetFeedbackById(int id)
+		{
+			var repo = _unitOfWork.GetRepo<Feedback>();
+			var feedback = await repo.GetSingleAsync(new QueryBuilder<Feedback>()
+				.WithPredicate(x => x.Id == id)
+				.WithInclude(x => x.Campaign, x => x.Feedbacker)
+				.Build());
+
+			if (feedback == null)
+			{
+				return null;
+			}
+
+			return _mapper.Map<FeedbackResponseDTO>(feedback);
+		}
+	}
 }
 
