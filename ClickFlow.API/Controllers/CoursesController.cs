@@ -1,14 +1,9 @@
-﻿using Azure;
-using ClickFlow.BLL.DTOs;
+﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.CourseDTOs;
 using ClickFlow.BLL.DTOs.PagingDTOs;
-using ClickFlow.BLL.DTOs.TrafficDTOs;
-using ClickFlow.BLL.Services.Implements;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ClickFlow.API.Controllers
 {

@@ -1,6 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.DTOs.ConversationDTOs;
-using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
 
 namespace ClickFlow.BLL.DTOs.MessageDTOs

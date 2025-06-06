@@ -1,12 +1,8 @@
 ﻿using ClickFlow.BLL.DTOs;
-using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.ReportDTOs;
-using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -43,14 +39,14 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
-		public async Task<IActionResult> GetAllReports([FromQuery] PagingRequestDTO dto)
-        {
-            try
-            {
+		public async Task<IActionResult> GetAllReports([FromQuery] ReportGetAllDTO dto)
+		{
+			try
+			{
 				var data = await _reportService.GetAllAsync(dto);
-                var response = new PagingDTO<ReportResponseDTO>(data);
+				var response = new PagingDTO<ReportResponseDTO>(data);
 
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -62,28 +58,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("status")]
-        public async Task<IActionResult> GetReportsByStatus([FromQuery] ReportsGetByStatusDTO dto)
-        {
-            try
-            {
-                var data = await _reportService.GetByStatusAsync(dto);
-                var response = new PagingDTO<ReportResponseDTO>(data);
-
-                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
-                return GetSuccess(response);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.Message);
-                Console.ResetColor();
-                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-            }
-        }
-
-        [Authorize(Roles = "Advertiser")]
+		[Authorize(Roles = "Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO dto)
 		{
@@ -91,7 +66,7 @@ namespace ClickFlow.API.Controllers
 
 			try
 			{
-                var response = await _reportService.CreateReportAsync(UserId, dto);
+				var response = await _reportService.CreateReportAsync(UserId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
@@ -105,14 +80,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin, Advertiser")]
-		[HttpPut("status/{reportId}")]
-		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatus status)
+		[HttpPut("{reportId}/status")]
+		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatusDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _reportService.UpdateStatusReportAsync(reportId, status);
+				var response = await _reportService.UpdateStatusReportAsync(reportId, dto.Status);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
@@ -126,14 +101,14 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Admin")]
-		[HttpPut("response/{reportId}")]
-		public async Task<IActionResult> UpdateResponseReport(int reportId, [FromBody] string response)
+		[HttpPut("{reportId}/response")]
+		public async Task<IActionResult> UpdateResponseReport(int reportId, [FromBody] ReportUpdateResponseDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var result = await _reportService.UpdateResponseReportAsync(reportId, response);
+				var result = await _reportService.UpdateResponseReportAsync(reportId, dto.Response);
 				if (result == null) return SaveError();
 				return SaveSuccess(result);
 			}

@@ -15,7 +15,7 @@ namespace ClickFlow.BLL.Services.BackgroundServices
 		}
 
 		public Task StartAsync(CancellationToken cancellationToken)
-		{		
+		{
 			_timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromDays(1));
 			return Task.CompletedTask;
 		}
@@ -42,4 +42,3 @@ namespace ClickFlow.BLL.Services.BackgroundServices
 		}
 	}
 }
-	

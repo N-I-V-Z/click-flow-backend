@@ -7,6 +7,10 @@ namespace ClickFlow.DAL.Enums
 		[EnumMember(Value = "Nạp tiền")]
 		Deposit,
 		[EnumMember(Value = "Rút tiền")]
-		Withdraw
+		Withdraw,
+		[EnumMember(Value = "Thanh toán")]
+		Pay,
+		[EnumMember(Value = "Được nhận")]
+		Received
 	}
 }

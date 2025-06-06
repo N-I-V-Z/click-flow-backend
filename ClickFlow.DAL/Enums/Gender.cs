@@ -3,7 +3,7 @@
 namespace ClickFlow.DAL.Enums
 {
 	public enum Gender
-    {
+	{
 		[EnumMember(Value = "Nam")]
 		Male,
 		[EnumMember(Value = "Nữ")]

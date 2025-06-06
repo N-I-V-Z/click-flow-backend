@@ -6,12 +6,12 @@ namespace ClickFlow.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class PusherController : BaseAPIController
+	public class PushersController : BaseAPIController
 	{
 		private readonly IPusherService _pusherService;
 		private readonly IConversationService _conversationService;
 
-		public PusherController(IPusherService pusherService, IConversationService conversationService)
+		public PushersController(IPusherService pusherService, IConversationService conversationService)
 		{
 			_pusherService = pusherService;
 			_conversationService = conversationService;

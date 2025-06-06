@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClickFlow.DAL.Migrations
 {
     [DbContext(typeof(ClickFlowContext))]
-    [Migration("20250529041851_Init")]
+    [Migration("20250604071806_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -237,55 +237,6 @@ namespace ClickFlow.DAL.Migrations
                     b.ToTable("CampaignParticipations", "dbo");
                 });
 
-            modelBuilder.Entity("ClickFlow.DAL.Entities.ClosedTraffic", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Browser")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("CampaignParticipationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DeviceType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("IpAddress")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool?>("IsValid")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OrderId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ReferrerURL")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("Revenue")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CampaignParticipationId");
-
-                    b.ToTable("ClosedTraffics", "dbo");
-                });
-
             modelBuilder.Entity("ClickFlow.DAL.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -351,6 +302,45 @@ namespace ClickFlow.DAL.Migrations
                     b.HasIndex("User2Id");
 
                     b.ToTable("Conversations", "dbo");
+                });
+
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Conversion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClickId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("Revenue")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClickId");
+
+                    b.ToTable("Conversions", "dbo");
                 });
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Course", b =>
@@ -531,6 +521,42 @@ namespace ClickFlow.DAL.Migrations
                     b.ToTable("PaymentMethods", "dbo");
                 });
 
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Plan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("MaxCampaigns")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxClicksPerMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxConversionsPerMonth")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Plans", "dbo");
+                });
+
             modelBuilder.Entity("ClickFlow.DAL.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -692,8 +718,13 @@ namespace ClickFlow.DAL.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("CampaignParticipationId")
+                    b.Property<int>("CampaignParticipationId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ClickId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("DeviceType")
                         .IsRequired()
@@ -705,19 +736,15 @@ namespace ClickFlow.DAL.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool?>("IsValid")
+                    b.Property<bool>("IsClosed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("OrderId")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ReferrerURL")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("Revenue")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
@@ -725,6 +752,9 @@ namespace ClickFlow.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CampaignParticipationId");
+
+                    b.HasIndex("ClickId")
+                        .IsUnique();
 
                     b.ToTable("Traffics", "dbo");
                 });
@@ -793,6 +823,51 @@ namespace ClickFlow.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("UserDetails", "dbo");
+                });
+
+            modelBuilder.Entity("ClickFlow.DAL.Entities.UserPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CurrentCampaigns")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("CurrentClicks")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("CurrentConversions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PlanId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserPlans", "dbo");
                 });
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Video", b =>
@@ -1015,15 +1090,6 @@ namespace ClickFlow.DAL.Migrations
                     b.Navigation("Publisher");
                 });
 
-            modelBuilder.Entity("ClickFlow.DAL.Entities.ClosedTraffic", b =>
-                {
-                    b.HasOne("ClickFlow.DAL.Entities.CampaignParticipation", "CampaignParticipation")
-                        .WithMany("ClosedTraffics")
-                        .HasForeignKey("CampaignParticipationId");
-
-                    b.Navigation("CampaignParticipation");
-                });
-
             modelBuilder.Entity("ClickFlow.DAL.Entities.Comment", b =>
                 {
                     b.HasOne("ClickFlow.DAL.Entities.ApplicationUser", "Author")
@@ -1067,6 +1133,18 @@ namespace ClickFlow.DAL.Migrations
                     b.Navigation("User1");
 
                     b.Navigation("User2");
+                });
+
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Conversion", b =>
+                {
+                    b.HasOne("ClickFlow.DAL.Entities.Traffic", "Click")
+                        .WithMany("Conversions")
+                        .HasForeignKey("ClickId")
+                        .HasPrincipalKey("ClickId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Click");
                 });
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Course", b =>
@@ -1204,7 +1282,9 @@ namespace ClickFlow.DAL.Migrations
                 {
                     b.HasOne("ClickFlow.DAL.Entities.CampaignParticipation", "CampaignParticipation")
                         .WithMany("Traffics")
-                        .HasForeignKey("CampaignParticipationId");
+                        .HasForeignKey("CampaignParticipationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CampaignParticipation");
                 });
@@ -1225,6 +1305,25 @@ namespace ClickFlow.DAL.Migrations
                         .HasForeignKey("ClickFlow.DAL.Entities.UserDetail", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ClickFlow.DAL.Entities.UserPlan", b =>
+                {
+                    b.HasOne("ClickFlow.DAL.Entities.Plan", "Plan")
+                        .WithMany("UserPlans")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ClickFlow.DAL.Entities.Publisher", "User")
+                        .WithOne("UserPlan")
+                        .HasForeignKey("ClickFlow.DAL.Entities.UserPlan", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
 
                     b.Navigation("User");
                 });
@@ -1340,8 +1439,6 @@ namespace ClickFlow.DAL.Migrations
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.CampaignParticipation", b =>
                 {
-                    b.Navigation("ClosedTraffics");
-
                     b.Navigation("Traffics");
                 });
 
@@ -1362,6 +1459,11 @@ namespace ClickFlow.DAL.Migrations
                     b.Navigation("Videos");
                 });
 
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Plan", b =>
+                {
+                    b.Navigation("UserPlans");
+                });
+
             modelBuilder.Entity("ClickFlow.DAL.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
@@ -1376,6 +1478,13 @@ namespace ClickFlow.DAL.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("Reports");
+
+                    b.Navigation("UserPlan");
+                });
+
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Traffic", b =>
+                {
+                    b.Navigation("Conversions");
                 });
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Wallet", b =>

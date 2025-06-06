@@ -11,29 +11,15 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class CourseService : ICourseService
+	public class CourseService : BaseServices<Course, CourseResponseDTO>, ICourseService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public CourseService(IUnitOfWork unitOfWork, IMapper mapper)
+		public CourseService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
-		}
-
-		protected virtual QueryBuilder<Course> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Course>()
-								.WithTracking(false);
-
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Course>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
 		}
 
 		public async Task<bool> CheckPublisherInCourseAsync(int publisherId, int courseId)
@@ -74,7 +60,7 @@ namespace ClickFlow.BLL.Services.Implements
 		{
 			try
 			{
-				var trafficRepo = _unitOfWork.GetRepo<Course>();
+				var repo = _unitOfWork.GetRepo<Course>();
 
 				var queryBuilder = CreateQueryBuilder()
 					.WithInclude(x => x.CoursePublishers)
@@ -87,11 +73,9 @@ namespace ClickFlow.BLL.Services.Implements
 					var predicate = FilterHelper.BuildSearchExpression<Course>(dto.Keyword);
 					queryBuilder.WithPredicate(predicate);
 				}
-				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
+				var loadedRecords = repo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Course>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<CourseResponseDTO>>(pagedRecords);
-				return new PaginatedList<CourseResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -115,9 +99,7 @@ namespace ClickFlow.BLL.Services.Implements
 				}
 				var loadedRecords = courseRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Course>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<CourseResponseDTO>>(pagedRecords);
-				return new PaginatedList<CourseResponseDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -204,7 +186,6 @@ namespace ClickFlow.BLL.Services.Implements
 
 				await cpRepo.CreateAsync(coursePublisher);
 
-				await _unitOfWork.SaveChangesAsync();
 				var success = await _unitOfWork.SaveAsync();
 				await _unitOfWork.CommitTransactionAsync();
 

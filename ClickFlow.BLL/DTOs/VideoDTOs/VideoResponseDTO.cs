@@ -1,6 +1,4 @@
-﻿using ClickFlow.DAL.Entities;
-
-namespace ClickFlow.BLL.DTOs.VideoDTOs
+﻿namespace ClickFlow.BLL.DTOs.VideoDTOs
 {
 	public class VideoResponseDTO
 	{

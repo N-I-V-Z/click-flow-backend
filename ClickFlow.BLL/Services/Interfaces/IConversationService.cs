@@ -1,5 +1,4 @@
 ﻿using ClickFlow.BLL.DTOs.ConversationDTOs;
-using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.BLL.Services.Interfaces
 {
