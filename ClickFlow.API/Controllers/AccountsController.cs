@@ -318,20 +318,26 @@ namespace ClickFlow.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         [Route("renew-token")]
-        public async Task<IActionResult> RenewTokenAsync()
+        public async Task<IActionResult> RenewTokenAsync(AuthenResultDTO authenResult)
         {
             try
             {
-                var refreshToken = Request.Cookies["refreshToken"];
-                if (string.IsNullOrEmpty(refreshToken))
+                if (string.IsNullOrEmpty(authenResult.Token) || string.IsNullOrEmpty(authenResult.RefreshToken))
                 {
-                    return Error("RefreshToken không tồn tại trong cookie.");
+                    ModelState.AddModelError("Token", "Token không được để trống.");
+                    ModelState.AddModelError("RefreshToken", "RefreshToken không được để trống");
+                    return ModelInvalid();
                 }
 
-                var userId = UserId;
-                var user = await _identityService.GetByIdAsync(userId);
+                var checkToken = await _accountService.CheckToRenewTokenAsync(authenResult);
+                if (!checkToken.IsSuccess)
+                {
+                    return Error(checkToken.Message);
+                }
+                var user = await _identityService.GetByIdAsync(UserId);
                 if (user == null)
                 {
                     return GetNotFound("Không tìm thấy người dùng.");
@@ -352,6 +358,7 @@ namespace ClickFlow.API.Controllers
                 return Error("Đã có lỗi xảy ra trong quá trình tạo mã đăng nhập mới. Vui lòng thử lại sau ít phút nữa.");
             }
         }
+
 
         [HttpPost]
         [Route("forgot-password")]
