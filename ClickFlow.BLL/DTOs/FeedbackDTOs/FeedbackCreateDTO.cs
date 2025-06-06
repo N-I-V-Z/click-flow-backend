@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ClickFlow.BLL.DTOs.FeedbackDTOs
 {
@@ -19,7 +14,7 @@ namespace ClickFlow.BLL.DTOs.FeedbackDTOs
         [Required(ErrorMessage = "ID chiến dịch không được để trống.")]
         public int CampaignId { get; set; }
 
-       
+
     }
 
     public class FeedbackUpdateDTO

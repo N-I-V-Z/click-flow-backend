@@ -1,12 +1,4 @@
-﻿using ClickFlow.BLL.Helpers.Validations;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ClickFlow.BLL.DTOs.UserDetailDTOs
+﻿namespace ClickFlow.BLL.DTOs.UserDetailDTOs
 {
     public class UserDetailRequestDTO
     {

@@ -8,154 +8,147 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class TransactionsController : BaseAPIController
-	{
-		private readonly ITransactionService _transactionService;
-		private readonly IVnPayService _vnPayService;
+    [Route("api/[controller]")]
+    [ApiController]
+    public class TransactionsController : BaseAPIController
+    {
+        private readonly ITransactionService _transactionService;
+        private readonly IVnPayService _vnPayService;
 
-		public TransactionsController(ITransactionService transactionService, IVnPayService vnPayService)
-		{
-			_transactionService = transactionService;
-			_vnPayService = vnPayService;
-		}
+        public TransactionsController(ITransactionService transactionService, IVnPayService vnPayService)
+        {
+            _transactionService = transactionService;
+            _vnPayService = vnPayService;
+        }
 
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpGet("own")]
-		public async Task<IActionResult> GetOwnTransactions([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var data = await _transactionService.GetAllTransactionsByUserIdAsync(UserId, dto);
-				var response = new PagingDTO<TransactionResponseDTO>(data);
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnTransactions([FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var data = await _transactionService.GetAllTransactionsByUserIdAsync(UserId, dto);
+                var response = new PagingDTO<TransactionResponseDTO>(data);
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
 
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
+        [HttpGet("response-payment")]
+        public async Task<IActionResult> PaymentResponse()
+        {
+            try
+            {
+                var vnpayRes = _vnPayService.PaymentExcute(Request.Query);
 
-		[HttpGet("response-payment")]
-		public async Task<IActionResult> PaymentResponse()
-		{
-			try
-			{
-				var vnpayRes = _vnPayService.PaymentExcute(Request.Query);
+                var transactionRes = await _transactionService.UpdateStatusTransactionAsync(
+                    int.Parse(vnpayRes.OrderId),
+                    new TransactionUpdateStatusDTO { Status = vnpayRes.IsSuccess });
 
-				if (!int.TryParse(vnpayRes.OrderId, out var transactionId))
-				{
-					throw new Exception("OrderId từ VnPay không hợp lệ.");
-				}
+                if (!vnpayRes.IsSuccess)
+                {
+                    return SaveError(transactionRes);
+                }
+                return SaveSuccess(transactionRes);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-				var transactionRes = await _transactionService.UpdateStatusTransactionAsync(
-					transactionId,
-					new TransactionUpdateStatusDTO { Status = vnpayRes.IsSuccess });
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllTransactions([FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var data = await _transactionService.GetAllTransactionsAsync(dto);
+                var response = new PagingDTO<TransactionResponseDTO>(data);
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
 
-				if (!vnpayRes.IsSuccess)
-				{
-					// Thanh toán VnPay thất bại: trả thông tin lỗi
-					return SaveError("Thanh toán không thành công: " + vnpayRes.VnPayResponseCode);
-				}
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpPost]
+        public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-				return SaveSuccess(transactionRes);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+            try
+            {
+                var response = await _transactionService.CreateTransactionAsync(dto);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpGet]
-		public async Task<IActionResult> GetAllTransactions([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var data = await _transactionService.GetAllTransactionsAsync(dto);
-				var response = new PagingDTO<TransactionResponseDTO>(data);
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpPost("payment-url")]
+        public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
+        {
+            try
+            {
+                if (dto == null || dto.Amount <= 0)
+                {
+                    ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
+                    return ModelInvalid();
+                }
 
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
+                var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, dto);
+                return GetSuccess(paymentUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpPost]
-		public async Task<IActionResult> CreateTransaction([FromBody] TransactionCreateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
-			try
-			{
-				var response = await _transactionService.CreateTransactionAsync(dto);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpPost("payment-url")]
-		public IActionResult CreatePaymentUrl([FromBody] VnPayRequestDTO dto)
-		{
-			if (dto == null || dto.Amount <= 0)
-			{
-				ModelState.AddModelError("Amount", "Không được nhỏ hơn 0.");
-				return ModelInvalid();
-			}
-
-			try
-			{
-				var paymentUrl = _vnPayService.CreatePaymentUrl(UserId, HttpContext, dto);
-				return GetSuccess(paymentUrl);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize(Roles = "Admin")]
-		[HttpPut("{transactionId}/status")]
-		public async Task<IActionResult> UpdateStatusTransaction(int transactionId, [FromBody] TransactionUpdateStatusDTO dto)
-		{
-			try
-			{
-				var response = await _transactionService.UpdateStatusTransactionAsync(transactionId, dto);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
-	}
+        [Authorize(Roles = "Admin")]
+        [HttpPut("status/{transactionId}")]
+        public async Task<IActionResult> UpdateStatusTransaction(int transactionId, [FromBody] TransactionUpdateStatusDTO dto)
+        {
+            try
+            {
+                var response = await _transactionService.UpdateStatusTransactionAsync(transactionId, dto);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
+    }
 }

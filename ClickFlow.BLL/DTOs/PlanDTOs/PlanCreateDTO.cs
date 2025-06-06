@@ -2,19 +2,19 @@
 
 namespace ClickFlow.BLL.DTOs.PlanDTOs
 {
-	public class PlanCreateDTO
-	{
-		[Required(ErrorMessage = "Name không được để trống.")]
-		public string Name { get; set; }
-		[Required(ErrorMessage = "MaxCampaigns không được để trống.")]
-		public int MaxCampaigns { get; set; }
-		[Required(ErrorMessage = "MaxClicksPerMonth không được để trống.")]
-		public int MaxClicksPerMonth { get; set; }
-		[Required(ErrorMessage = "MaxConversionsPerMonth không được để trống.")]
-		public int MaxConversionsPerMonth { get; set; }
-		[Required(ErrorMessage = "Price không được để trống.")]
-		public decimal Price { get; set; }
-		public int? DurationDays { get; set; }
-		public string? Description { get; set; }
-	}
+    public class PlanCreateDTO
+    {
+        [Required(ErrorMessage = "Name không được để trống.")]
+        public string Name { get; set; }
+        [Required(ErrorMessage = "MaxCampaigns không được để trống.")]
+        public int MaxCampaigns { get; set; }
+        [Required(ErrorMessage = "MaxClicksPerMonth không được để trống.")]
+        public int MaxClicksPerMonth { get; set; }
+        [Required(ErrorMessage = "MaxConversionsPerMonth không được để trống.")]
+        public int MaxConversionsPerMonth { get; set; }
+        [Required(ErrorMessage = "Price không được để trống.")]
+        public decimal Price { get; set; }
+        public int? DurationDays { get; set; }
+        public string? Description { get; set; }
+    }
 }

@@ -1,7 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.UserDetailDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -32,7 +31,7 @@ namespace ClickFlow.API.Controllers
                         ModelState.AddModelError("Gender", "Giới tính chỉ nhận Male hoặc Female.");
                         return ModelInvalid();
                     }
-                }        
+                }
                 var response = await _userDetailService.CreateUpdateUserDetail(dto, UserId);
                 if (!response.IsSuccess) return SaveError(response.Message);
                 return SaveSuccess(response);
@@ -46,7 +45,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-      
+
         [HttpGet]
         [Route("get-user-detail")]
         public async Task<IActionResult> GetUserDetailByUserId(int userId)
@@ -66,7 +65,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-     
+
         [HttpGet]
         [Route("get-all-details/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetAllUserDetails([FromRoute] int pageIndex, [FromRoute] int pageSize)
@@ -96,7 +95,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-      
+
         [HttpGet]
         [Route("filter-all-details-by-name/{pageIndex}/{pageSize}")]
         public async Task<IActionResult> GetAllUserDetailsByName([FromRoute] int pageIndex, [FromRoute] int pageSize, [FromQuery] string? name)
@@ -126,13 +125,13 @@ namespace ClickFlow.API.Controllers
             }
         }
 
- 
+
         [HttpPost]
         [Route("delete-user-detail")]
         public async Task<IActionResult> DeleteUserDetail()
         {
             try
-            {      
+            {
                 var response = await _userDetailService.DeleteUserDetail(UserId);
                 if (!response.IsSuccess) return SaveError(response.Message);
                 return SaveSuccess(response);

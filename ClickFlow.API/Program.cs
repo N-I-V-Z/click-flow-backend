@@ -17,119 +17,119 @@ using System.Text.Json.Serialization;
 
 namespace ClickFlow.API
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			var builder = WebApplication.CreateBuilder(args);
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-			// Add services to the container.
-			builder.Services.AddControllers()
-				.AddJsonOptions(options =>
-			{
-				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-				options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-				options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-			});
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-			builder.Services.AddDbContext<ClickFlowContext>(option =>
-			{
-				option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
-			});
-			var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
-			builder.Services.AddSingleton(emailConfig);
+            // Add services to the container.
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddDbContext<ClickFlowContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
+            });
+            var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+            builder.Services.AddSingleton(emailConfig);
 
-			builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
-			builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<VnPayConfiguration>>().Value);
+            builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
+            builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<VnPayConfiguration>>().Value);
 
-			builder.Services.Configure<PusherConfiguration>(builder.Configuration.GetSection("PusherConfiguration"));
-			builder.Services.AddScoped<IPusherService, PusherService>();
+            builder.Services.Configure<PusherConfiguration>(builder.Configuration.GetSection("PusherConfiguration"));
+            builder.Services.AddScoped<IPusherService, PusherService>();
 
-			builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
-
-
-			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwagger();
-
-			builder.Services.AddCors(opts =>
-			{
-				opts.AddPolicy("corspolicy", build =>
-				{
-					build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-				});
-			});
-
-			builder.Services.AddRepoBase();
-
-			builder.Services.AddUnitOfWork();
-
-			builder.Services.AddMapper();
-
-			builder.Services.AddBLLServices();
-
-			builder.Services.AddHostedService<CampaignExpiredCheckerService>();
-			builder.Services.AddHostedService<TrafficToClosedTrafficService>();
-
-			builder.Services.AddAuthentication(options =>
-			{
-				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-			}).AddJwtBearer(options =>
-			{
-				options.SaveToken = true;
-				options.RequireHttpsMetadata = false;
-				options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-				{
-					ValidateIssuer = true,
-					ValidateAudience = true,
-					ValidAudience = builder.Configuration["JWT:ValidAudience"],
-					ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
-					ClockSkew = TimeSpan.Zero,
-					ValidateLifetime = true,
-				};
-			});
-
-			builder.Services.Configure<DataProtectionTokenProviderOptions>(opts => opts.TokenLifespan = TimeSpan.FromHours(1));
-
-			builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
 
 
-			var app = builder.Build();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwagger();
 
-			using (var scope = app.Services.CreateScope())
-			{
-				var services = scope.ServiceProvider;
-				try
-				{
-					services.SeedData().Wait();
-				}
-				catch (Exception ex)
-				{
-					var logger = services.GetRequiredService<ILogger<Program>>();
-					logger.LogError(ex, "An error occurred while seeding the database.");
-				}
-			}
+            builder.Services.AddCors(opts =>
+            {
+                opts.AddPolicy("corspolicy", build =>
+                {
+                    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
-			// Configure the HTTP request pipeline.
-			if (app.Environment.IsDevelopment())
-			{
-				app.UseSwagger();
-				app.UseSwaggerUI();
-			}
+            builder.Services.AddRepoBase();
 
-			app.UseCors("corspolicy");
+            builder.Services.AddUnitOfWork();
 
-			app.UseHttpsRedirection();
+            builder.Services.AddMapper();
 
-			app.UseAuthentication();
+            builder.Services.AddBLLServices();
 
-			app.UseAuthorization();
+            builder.Services.AddHostedService<CampaignExpiredCheckerService>();
+            builder.Services.AddHostedService<TrafficToClosedTrafficService>();
 
-			app.MapControllers();
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWT:ValidAudience"],
+                    ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateLifetime = true,
+                };
+            });
 
-			app.Run();
-		}
-	}
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(opts => opts.TokenLifespan = TimeSpan.FromHours(1));
+
+            builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
+
+
+            var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    services.SeedData().Wait();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while seeding the database.");
+                }
+            }
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseCors("corspolicy");
+
+            app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
+        }
+    }
 }

@@ -2,12 +2,12 @@
 
 namespace ClickFlow.DAL.Enums
 {
-	public enum MessageType
-	{
-		[EnumMember(Value = "Văn bản")]
-		Text,
-		[EnumMember(Value = "Hình ảnh")]
-		Image
-	}
+    public enum MessageType
+    {
+        [EnumMember(Value = "Văn bản")]
+        Text,
+        [EnumMember(Value = "Hình ảnh")]
+        Image
+    }
 
 }

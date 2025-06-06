@@ -6,11 +6,6 @@ using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -31,7 +26,7 @@ namespace ClickFlow.BLL.Services.Implements
             {
                 var repo = _unitOfWork.GetRepo<UserDetail>();
                 await _unitOfWork.BeginTransactionAsync();
-           
+
                 var any = await repo.AnyAsync(new QueryBuilder<UserDetail>()
                                                 .WithPredicate(x => x.ApplicationUserId == userId)
                                                 .Build());
@@ -72,7 +67,7 @@ namespace ClickFlow.BLL.Services.Implements
             if (any)
             {
                 var userDetail = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
-                                                            .WithPredicate(x => x.ApplicationUserId ==userId)
+                                                            .WithPredicate(x => x.ApplicationUserId == userId)
                                                             .Build());
                 if (userId != userDetail.ApplicationUserId) return new BaseResponse { IsSuccess = false, Message = "Người dùng không khớp." };
                 await repo.DeleteAsync(userDetail);
@@ -114,7 +109,7 @@ namespace ClickFlow.BLL.Services.Implements
         {
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var response = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
-                                                    .WithPredicate(x => x.ApplicationUserId ==userId)
+                                                    .WithPredicate(x => x.ApplicationUserId == userId)
                                                     .WithTracking(false)
                                                     .Build());
             if (response == null) return null;

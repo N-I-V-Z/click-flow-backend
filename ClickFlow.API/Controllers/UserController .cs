@@ -1,10 +1,7 @@
-﻿using Azure;
-using ClickFlow.BLL.DTOs;
+﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers

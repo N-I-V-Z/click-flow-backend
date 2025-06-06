@@ -1,11 +1,9 @@
 ﻿using ClickFlow.BLL.DTOs;
-using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
-using ClickFlow.DAL.Paging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -323,7 +321,7 @@ namespace ClickFlow.API.Controllers
         [Authorize]
         [HttpPut]
         [Route(("update-campaign"))]
-        public async Task<IActionResult> UpdateCampaign([FromBody]  CampaignUpdateDTO dto)
+        public async Task<IActionResult> UpdateCampaign([FromBody] CampaignUpdateDTO dto)
         {
             if (!ModelState.IsValid) return ModelInvalid();
             var response = await _campaignService.UpdateCampaign(dto);
@@ -430,11 +428,11 @@ namespace ClickFlow.API.Controllers
 
         [Authorize]
         [HttpPut("update-status/{publisherId}/{campaignParticipationId}/{newStatus}")]
-        public async Task<IActionResult> UpdateParticipationStatus( [FromRoute] int publisherId, [FromRoute] int campaignParticipationId, [FromRoute] CampaignParticipationStatus newStatus)
+        public async Task<IActionResult> UpdateParticipationStatus([FromRoute] int publisherId, [FromRoute] int campaignParticipationId, [FromRoute] CampaignParticipationStatus newStatus)
         {
             try
             {
-                
+
                 var response = await _campaignService.UpdateCampaignParticipationStatus(
                     publisherId,
                     UserId,

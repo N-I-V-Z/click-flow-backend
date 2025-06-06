@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ClickFlow.BLL.DTOs.AdvertiserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.Response;
@@ -11,7 +10,6 @@ using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Linq;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -245,7 +243,7 @@ namespace ClickFlow.BLL.Services.Implements
                 .WithInclude(x => x.Publisher.ApplicationUser)
                 .Build());
 
-       
+
             var pagedCampaigns = await PaginatedList<CampaignParticipation>.CreateAsync(campaignParticipations, pageIndex, pageSize);
 
             var queryOptions = new QueryBuilder<CampaignParticipation>()
@@ -260,7 +258,7 @@ namespace ClickFlow.BLL.Services.Implements
                 .Select(g => new { PublisherId = g.Key, TotalCampaigns = g.Count() })
                 .ToDictionary(x => x.PublisherId, x => x.TotalCampaigns);
 
-          
+
             var response = _mapper.Map<List<CampaignParticipationResponseDTO>>(pagedCampaigns);
 
             // Lấy danh sách các publisherId duy nhất từ response
@@ -283,7 +281,7 @@ namespace ClickFlow.BLL.Services.Implements
                 item.DailyTraffic = avgTrafficDict.GetValueOrDefault(item.PublisherId, 0);
             }
 
-           
+
             return new PaginatedList<CampaignParticipationResponseDTO>(response, pagedCampaigns.TotalItems, pageIndex, pageSize);
         }
 

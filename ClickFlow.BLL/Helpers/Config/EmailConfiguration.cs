@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ClickFlow.BLL.Helpers.Config
+﻿namespace ClickFlow.BLL.Helpers.Config
 {
     public class EmailConfiguration
     {

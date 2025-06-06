@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ClickFlow.BLL.DTOs.AccountDTOs
 {
-    public class  AccountChangePassDTO
+    public class AccountChangePassDTO
     {
         [Required(ErrorMessage = "Mật khẩu cũ không được để trống.")]
         public string OldPassword { get; set; } = null!;

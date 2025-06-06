@@ -1,6 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs.AccountDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
@@ -459,14 +458,14 @@ namespace ClickFlow.API.Controllers
         {
             try
             {
-               
+
                 if (string.IsNullOrEmpty(email.Email))
                 {
                     ModelState.AddModelError("Email", "Email không được để trống.");
                     return ModelInvalid();
                 }
 
-           
+
                 var response = await _accountService.SendOTPByEmailAsync(email.Email);
                 if (!response.IsSuccess)
                 {

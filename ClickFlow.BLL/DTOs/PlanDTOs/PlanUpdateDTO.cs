@@ -1,4 +1,4 @@
 ﻿namespace ClickFlow.BLL.DTOs.PlanDTOs
 {
-	public class PlanUpdateDTO : PlanCreateDTO { }
+    public class PlanUpdateDTO : PlanCreateDTO { }
 }

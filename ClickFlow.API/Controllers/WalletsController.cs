@@ -5,55 +5,55 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class WalletsController : BaseAPIController
-	{
-		private readonly IWalletService _walletService;
+    [Route("api/[controller]")]
+    [ApiController]
+    public class WalletsController : BaseAPIController
+    {
+        private readonly IWalletService _walletService;
 
-		public WalletsController(IWalletService walletService)
-		{
-			_walletService = walletService;
-		}
+        public WalletsController(IWalletService walletService)
+        {
+            _walletService = walletService;
+        }
 
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpGet("own")]
-		public async Task<IActionResult> GetOwnWallet()
-		{
-			try
-			{
-				var response = await _walletService.GetWalletByUserIdAsync(UserId);
-				if (response == null) return GetNotFound("Không có dữ liệu.");
-				return Ok(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
-			}
-		}
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnWallet()
+        {
+            try
+            {
+                var response = await _walletService.GetWalletByUserIdAsync(UserId);
+                if (response == null) return GetNotFound("Không có dữ liệu.");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+            }
+        }
 
-		[Authorize(Roles = "Publisher, Advertiser")]
-		[HttpPut("{walletId}")]
-		public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+        [Authorize(Roles = "Publisher, Advertiser")]
+        [HttpPut("{walletId}")]
+        public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
-				var response = await _walletService.UpdateWalletAsync(walletId, dto);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-	}
+            try
+            {
+                var response = await _walletService.UpdateWalletAsync(walletId, dto);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+    }
 }

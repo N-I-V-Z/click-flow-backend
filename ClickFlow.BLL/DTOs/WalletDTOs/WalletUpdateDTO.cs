@@ -2,9 +2,9 @@
 
 namespace ClickFlow.BLL.DTOs.WalletDTOs
 {
-	public class WalletUpdateDTO
-	{
-		[DefaultValue(0)]
-		public int Balance { get; set; }
-	}
+    public class WalletUpdateDTO
+    {
+        [DefaultValue(0)]
+        public int Balance { get; set; }
+    }
 }

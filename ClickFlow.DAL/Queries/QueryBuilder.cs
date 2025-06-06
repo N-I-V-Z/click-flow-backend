@@ -2,42 +2,42 @@
 
 namespace ClickFlow.DAL.Queries
 {
-	public class QueryBuilder<T> where T : class
-	{
-		private readonly QueryOptions<T> _options = new QueryOptions<T>();
+    public class QueryBuilder<T> where T : class
+    {
+        private readonly QueryOptions<T> _options = new QueryOptions<T>();
 
-		public QueryBuilder<T> WithPredicate(Expression<Func<T, bool>> predicate)
-		{
-			_options.Predicate = predicate;
-			return this;
-		}
+        public QueryBuilder<T> WithPredicate(Expression<Func<T, bool>> predicate)
+        {
+            _options.Predicate = predicate;
+            return this;
+        }
 
-		public QueryBuilder<T> WithTracking(bool tracked)
-		{
-			_options.Tracked = tracked;
-			return this;
-		}
+        public QueryBuilder<T> WithTracking(bool tracked)
+        {
+            _options.Tracked = tracked;
+            return this;
+        }
 
-		public QueryBuilder<T> WithOrderBy(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy)
-		{
-			_options.OrderBy = orderBy;
-			return this;
-		}
+        public QueryBuilder<T> WithOrderBy(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy)
+        {
+            _options.OrderBy = orderBy;
+            return this;
+        }
 
-		public QueryBuilder<T> WithInclude(params Expression<Func<T, object>>[] includeProperty)
-		{
-			_options.IncludeProperties.AddRange(includeProperty);
-			return this;
-		}
-		public QueryBuilder<T> WithThenInclude(params Expression<Func<object, object>>[] thenIncludeProperty)
-		{
-			_options.ThenIncludeProperties.AddRange(thenIncludeProperty);
-			return this;
-		}
+        public QueryBuilder<T> WithInclude(params Expression<Func<T, object>>[] includeProperty)
+        {
+            _options.IncludeProperties.AddRange(includeProperty);
+            return this;
+        }
+        public QueryBuilder<T> WithThenInclude(params Expression<Func<object, object>>[] thenIncludeProperty)
+        {
+            _options.ThenIncludeProperties.AddRange(thenIncludeProperty);
+            return this;
+        }
 
-		public QueryOptions<T> Build()
-		{
-			return _options;
-		}
-	}
+        public QueryOptions<T> Build()
+        {
+            return _options;
+        }
+    }
 }

@@ -1,5 +1,4 @@
-﻿using ClickFlow.BLL.Helpers.Validations;
-using ClickFlow.DAL.Enums;
+﻿using ClickFlow.DAL.Enums;
 using System.ComponentModel.DataAnnotations;
 
 

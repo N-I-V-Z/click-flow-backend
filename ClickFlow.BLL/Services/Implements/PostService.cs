@@ -6,11 +6,6 @@ using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -71,7 +66,8 @@ namespace ClickFlow.BLL.Services.Implements
                 await _unitOfWork.CommitTransactionAsync();
 
                 return new BaseResponse { IsSuccess = true, Message = "Bài viết đã được xóa mềm." };
-            } catch
+            }
+            catch
             {
                 await _unitOfWork.RollBackAsync();
                 throw;
@@ -83,7 +79,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Post>();
             var posts = repo.Get(new QueryBuilder<Post>()
                 .WithPredicate(p => !p.IsDeleted)
-                .WithInclude(p => p.Author.UserDetail)             
+                .WithInclude(p => p.Author.UserDetail)
                 .Build());
 
             var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);

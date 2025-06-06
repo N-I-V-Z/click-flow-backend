@@ -1,11 +1,9 @@
-﻿using ClickFlow.BLL.DTOs.AdvertiserDTOs;
-using ClickFlow.DAL.Entities;
-using ClickFlow.DAL.Paging;
+﻿using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.BLL.Services.Interfaces
 {
-	public interface IAdvertiserService
-	{
+    public interface IAdvertiserService
+    {
         Task<Advertiser> GetAdvertiserByUserIdAsync(int userId);
     }
 }

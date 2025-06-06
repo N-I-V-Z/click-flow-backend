@@ -2,8 +2,8 @@
 
 namespace ClickFlow.BLL.DTOs.PlanDTOs
 {
-	public class PlanGetAllDTO : PagingRequestDTO
-	{
-		public bool? IsActive { get; set; }
-	}
+    public class PlanGetAllDTO : PagingRequestDTO
+    {
+        public bool? IsActive { get; set; }
+    }
 }

@@ -1,11 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs.PostDTOs;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.DAL.Paging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.Services.Interfaces
 {

@@ -3,10 +3,10 @@ using ClickFlow.DAL.Enums;
 
 namespace ClickFlow.BLL.DTOs.ConversionDTOs
 {
-	public class ConversionGetAllDTO : PagingRequestDTO
-	{
-		public ConversionEventType? EventType { get; set; }
-		public ConversionStatus? Status { get; set; }
-		public string ClickId { get; set; }
-	}
+    public class ConversionGetAllDTO : PagingRequestDTO
+    {
+        public ConversionEventType? EventType { get; set; }
+        public ConversionStatus? Status { get; set; }
+        public string ClickId { get; set; }
+    }
 }

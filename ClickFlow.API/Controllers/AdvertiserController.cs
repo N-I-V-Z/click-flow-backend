@@ -1,5 +1,4 @@
-﻿using ClickFlow.BLL.Services.Implements;
-using ClickFlow.BLL.Services.Interfaces;
+﻿using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
@@ -13,7 +12,7 @@ namespace ClickFlow.API.Controllers
 
         public AdvertiserController(IAdvertiserService advertiserService, IConfiguration configuration)
         {
-            _advertiserService = advertiserService;    
+            _advertiserService = advertiserService;
             this._configuration = configuration;
         }
     }

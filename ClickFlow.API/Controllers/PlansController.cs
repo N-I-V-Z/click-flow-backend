@@ -6,123 +6,123 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class PlansController : BaseAPIController
-	{
-		private readonly IPlanService _planService;
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PlansController : BaseAPIController
+    {
+        private readonly IPlanService _planService;
 
-		public PlansController(IPlanService planService)
-		{
-			_planService = planService;
-		}
+        public PlansController(IPlanService planService)
+        {
+            _planService = planService;
+        }
 
-		[Authorize]
-		[HttpGet]
-		public async Task<IActionResult> GetAll([FromQuery]PlanGetAllDTO dto)
-		{
-			try
-			{
-				var data = await _planService.GetAllAsync(dto);
-				var response = new PagingDTO<PlanResponseDTO>(data);
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] PlanGetAllDTO dto)
+        {
+            try
+            {
+                var data = await _planService.GetAllAsync(dto);
+                var response = new PagingDTO<PlanResponseDTO>(data);
 
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize]
-		[HttpGet("{id}")]
-		public async Task<IActionResult> GetById(int id)
-		{
-			try
-			{
-				var plan = await _planService.GetByIdAsync(id);
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var plan = await _planService.GetByIdAsync(id);
 
-				if (plan == null) return GetNotFound("Không có dữ liệu.");
-				return GetSuccess(plan);
-			}
-			catch (KeyNotFoundException ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                if (plan == null) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(plan);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpPost]
-		public async Task<IActionResult> Create([FromBody] PlanCreateDTO dto)
-		{
-			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PlanCreateDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-			try
-			{
-				var result = await _planService.CreateAsync(dto);
+            try
+            {
+                var result = await _planService.CreateAsync(dto);
 
-				if (result == null) return SaveError();
-				return SaveSuccess(result);
-			}
-			catch (KeyNotFoundException ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                if (result == null) return SaveError();
+                return SaveSuccess(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpPut("{id}")]
-		public async Task<IActionResult> Update(int id, [FromBody] PlanUpdateDTO dto)
-		{
-			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] PlanUpdateDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-			try
-			{
-				var updated = await _planService.UpdateAsync(id, dto);
+            try
+            {
+                var updated = await _planService.UpdateAsync(id, dto);
 
-				if (updated == null) return SaveError();
-				return SaveSuccess(updated);
-			}
-			catch (KeyNotFoundException ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                if (updated == null) return SaveError();
+                return SaveSuccess(updated);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(int id)
-		{
-			try
-			{
-				var success = await _planService.DeleteAsync(id);
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var success = await _planService.DeleteAsync(id);
 
-				if (!success)
-					return NotFound(new { message = $"Plan with ID {id} not found." });
+                if (!success)
+                    return NotFound(new { message = $"Plan with ID {id} not found." });
 
-				return SaveSuccess(success);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-	}
+                return SaveSuccess(success);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+    }
 }

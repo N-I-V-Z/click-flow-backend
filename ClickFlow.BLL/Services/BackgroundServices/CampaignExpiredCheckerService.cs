@@ -4,42 +4,42 @@ using Microsoft.Extensions.Hosting;
 
 namespace ClickFlow.BLL.Services.BackgroundServices
 {
-	public class CampaignExpiredCheckerService : IHostedService, IDisposable
-	{
-		private readonly IServiceProvider _serviceProvider;
-		private Timer _timer;
+    public class CampaignExpiredCheckerService : IHostedService, IDisposable
+    {
+        private readonly IServiceProvider _serviceProvider;
+        private Timer _timer;
 
-		public CampaignExpiredCheckerService(IServiceProvider serviceProvider)
-		{
-			_serviceProvider = serviceProvider;
-		}
+        public CampaignExpiredCheckerService(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
 
-		public Task StartAsync(CancellationToken cancellationToken)
-		{
-			// Khởi tạo Timer với chu kỳ 5 phút
-			_timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
-			return Task.CompletedTask;
-		}
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            // Khởi tạo Timer với chu kỳ 5 phút
+            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+            return Task.CompletedTask;
+        }
 
-		private async void DoWork(object state)
-		{
-			using (var scope = _serviceProvider.CreateScope())
-			{
-				var campaignService = scope.ServiceProvider.GetRequiredService<ICampaignService>();
-				await campaignService.CheckAndStopExpiredCampaigns();
-			}
-		}
+        private async void DoWork(object state)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var campaignService = scope.ServiceProvider.GetRequiredService<ICampaignService>();
+                await campaignService.CheckAndStopExpiredCampaigns();
+            }
+        }
 
-		public Task StopAsync(CancellationToken cancellationToken)
-		{
-			// Dừng Timer khi service dừng
-			_timer?.Change(Timeout.Infinite, 0);
-			return Task.CompletedTask;
-		}
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            // Dừng Timer khi service dừng
+            _timer?.Change(Timeout.Infinite, 0);
+            return Task.CompletedTask;
+        }
 
-		public void Dispose()
-		{
-			_timer?.Dispose();
-		}
-	}
+        public void Dispose()
+        {
+            _timer?.Dispose();
+        }
+    }
 }

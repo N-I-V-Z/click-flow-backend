@@ -4,8 +4,8 @@ using ClickFlow.DAL.Paging;
 
 namespace ClickFlow.BLL.Services.Interfaces
 {
-	public interface IFeedbackService
-	{
+    public interface IFeedbackService
+    {
         Task<BaseResponse> CreateFeedback(FeedbackCreateDTO dto, int feedbackerId);
         Task<BaseResponse> UpdateFeedback(FeedbackUpdateDTO dto, int feedbackerId);
         Task<BaseResponse> DeleteFeedback(int id);

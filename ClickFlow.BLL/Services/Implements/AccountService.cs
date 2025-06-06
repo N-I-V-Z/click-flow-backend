@@ -11,15 +11,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace ClickFlow.BLL.Services.Implements
@@ -113,7 +109,7 @@ namespace ClickFlow.BLL.Services.Implements
 
                 return new AuthenResultDTO
                 {
-                    Token = accessToken,                
+                    Token = accessToken,
                 };
             }
             catch (Exception)
@@ -315,14 +311,14 @@ namespace ClickFlow.BLL.Services.Implements
                 {
                     throw new ArgumentException("Role không hợp lệ.");
                 }
-                
+
                 await _identityService.AddToRoleAsync(user, accRequest.Role.ToString());
                 switch (accRequest.Role)
                 {
                     case Role.Advertiser:
                         var advertiser = new Advertiser
                         {
-                          Id = user.Id,
+                            Id = user.Id,
                             CompanyName = accRequest.CompanyName,
                             IntroductionWebsite = accRequest.IntroductionWebsite,
                             StaffSize = accRequest.StaffSize ?? 0,
@@ -359,7 +355,7 @@ namespace ClickFlow.BLL.Services.Implements
                     EmailAddress = user.Email,
                     UserName = user.UserName,
                     PhoneNumBer = user.PhoneNumber,
-                  
+
                 };
             }
             catch (Exception)
@@ -441,7 +437,7 @@ namespace ClickFlow.BLL.Services.Implements
         {
             try
             {
-                
+
                 var user = new ApplicationUser
                 {
                     Email = email,
@@ -451,7 +447,7 @@ namespace ClickFlow.BLL.Services.Implements
 
                 var otp = await _identityService.GenerateTwoFactorTokenAsync(user, "Email");
 
-          
+
                 var emailContent = $@"
             <p>Xin chào,</p>
             <p>Mã OTP của bạn là: <strong>{otp}</strong></p>
@@ -459,7 +455,7 @@ namespace ClickFlow.BLL.Services.Implements
             <p>Trân trọng,</p>
             <p>Đội ngũ ClickFlow</p>";
 
-              
+
                 var emailDTO = new EmailDTO
                 (
                     new string[] { email },
@@ -467,10 +463,10 @@ namespace ClickFlow.BLL.Services.Implements
                     emailContent
                 );
 
-            
+
                 _emailService.SendEmail(emailDTO);
 
-             
+
                 return new BaseResponse
                 {
                     IsSuccess = true,
@@ -479,7 +475,7 @@ namespace ClickFlow.BLL.Services.Implements
             }
             catch (Exception ex)
             {
-              
+
                 return new BaseResponse
                 {
                     IsSuccess = false,
@@ -509,7 +505,7 @@ namespace ClickFlow.BLL.Services.Implements
             return dateTimeInterval;
         }
 
-       
+
 
         #endregion
 

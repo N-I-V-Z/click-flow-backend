@@ -7,180 +7,180 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClickFlow.API.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class CoursesController : BaseAPIController
-	{
-		private readonly ICourseService _courseService;
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CoursesController : BaseAPIController
+    {
+        private readonly ICourseService _courseService;
 
-		public CoursesController(ICourseService courseService)
-		{
-			_courseService = courseService;
-		}
+        public CoursesController(ICourseService courseService)
+        {
+            _courseService = courseService;
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpGet("admin")]
-		public async Task<IActionResult> GetAllCourses([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var data = await _courseService.GetAllCoursesAsync(dto);
-				var response = new PagingDTO<CourseResponseDTO>(data);
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetAllCourses([FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var data = await _courseService.GetAllCoursesAsync(dto);
+                var response = new PagingDTO<CourseResponseDTO>(data);
 
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Publisher")]
-		[HttpGet("{courseId}/check")]
-		public async Task<IActionResult> CheckJoinCourse(int courseId)
-		{
-			try
-			{
-				var response = await _courseService.CheckPublisherInCourseAsync(UserId, courseId);
+        [Authorize(Roles = "Publisher")]
+        [HttpGet("{courseId}/check")]
+        public async Task<IActionResult> CheckJoinCourse(int courseId)
+        {
+            try
+            {
+                var response = await _courseService.CheckPublisherInCourseAsync(UserId, courseId);
 
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Publisher")]
-		[HttpGet("publisher")]
-		public async Task<IActionResult> GetAllCoursesForPublisher([FromQuery] PagingRequestDTO dto)
-		{
-			try
-			{
-				var data = await _courseService.GetAllCourseForPublisherAsync(UserId, dto);
-				var response = new PagingDTO<CourseResponseDTO>(data);
+        [Authorize(Roles = "Publisher")]
+        [HttpGet("publisher")]
+        public async Task<IActionResult> GetAllCoursesForPublisher([FromQuery] PagingRequestDTO dto)
+        {
+            try
+            {
+                var data = await _courseService.GetAllCourseForPublisherAsync(UserId, dto);
+                var response = new PagingDTO<CourseResponseDTO>(data);
 
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                if (!data.Any()) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin, Publisher")]
-		[HttpGet("{courseId}")]
-		public async Task<IActionResult> GetById(int courseId)
-		{
-			try
-			{
-				var response = await _courseService.GetCourseByIdAsync(courseId);
+        [Authorize(Roles = "Admin, Publisher")]
+        [HttpGet("{courseId}")]
+        public async Task<IActionResult> GetById(int courseId)
+        {
+            try
+            {
+                var response = await _courseService.GetCourseByIdAsync(courseId);
 
-				if (response == null) return GetNotFound("Không có dữ liệu.");
-				return GetSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+                if (response == null) return GetNotFound("Không có dữ liệu.");
+                return GetSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpPost]
-		public async Task<IActionResult> CreateCourse([FromBody] CourseCreateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> CreateCourse([FromBody] CourseCreateDTO dto)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
-				var response = await _courseService.CreateCourseAsync(UserId, dto);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+            try
+            {
+                var response = await _courseService.CreateCourseAsync(UserId, dto);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Publisher")]
-		[HttpPost("{courseId}/join")]
-		public async Task<IActionResult> JoinCourse(int courseId)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+        [Authorize(Roles = "Publisher")]
+        [HttpPost("{courseId}/join")]
+        public async Task<IActionResult> JoinCourse(int courseId)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
-				var response = await _courseService.JoinTheCourseAsync(courseId, UserId);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+            try
+            {
+                var response = await _courseService.JoinTheCourseAsync(courseId, UserId);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Publisher")]
-		[HttpPost("{courseId}/rate")]
-		public async Task<IActionResult> RateCourse(int courseId, [FromBody] CourseRateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+        [Authorize(Roles = "Publisher")]
+        [HttpPost("{courseId}/rate")]
+        public async Task<IActionResult> RateCourse(int courseId, [FromBody] CourseRateDTO dto)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
-				var response = await _courseService.RateTheCourseAsync(courseId, UserId, dto);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
+            try
+            {
+                var response = await _courseService.RateTheCourseAsync(courseId, UserId, dto);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
-		[Authorize(Roles = "Admin")]
-		[HttpPut("{courseId}")]
-		public async Task<IActionResult> UpdateCourse(int courseId, [FromBody] CourseUpdateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{courseId}")]
+        public async Task<IActionResult> UpdateCourse(int courseId, [FromBody] CourseUpdateDTO dto)
+        {
+            if (!ModelState.IsValid) return ModelInvalid();
 
-			try
-			{
-				var response = await _courseService.UpdateCourseAsync(courseId, dto);
-				if (response == null) return SaveError();
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-	}
+            try
+            {
+                var response = await _courseService.UpdateCourseAsync(courseId, dto);
+                if (response == null) return SaveError();
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
+    }
 }

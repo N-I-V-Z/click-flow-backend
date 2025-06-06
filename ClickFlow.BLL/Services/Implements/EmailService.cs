@@ -4,11 +4,6 @@ using ClickFlow.BLL.Helpers.Config;
 using ClickFlow.BLL.Services.Interfaces;
 using MailKit.Net.Smtp;
 using MimeKit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.Services.Implements
 {

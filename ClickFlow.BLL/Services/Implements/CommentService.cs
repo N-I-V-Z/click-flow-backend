@@ -6,11 +6,6 @@ using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -123,7 +118,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Comment>();
             var query = repo.Get(new QueryBuilder<Comment>()
                 .WithPredicate(c => c.PostId == postId && !c.IsDeleted)
-                .WithInclude(c => c.Author)             
+                .WithInclude(c => c.Author)
                 .Build());
 
             var paged = await PaginatedList<Comment>.CreateAsync(query, pageIndex, pageSize);

@@ -1,11 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs.PublisherDTOs;
 using ClickFlow.BLL.DTOs.UserDetailDTOs;
-using ClickFlow.DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClickFlow.BLL.DTOs.FeedbackDTOs
 {

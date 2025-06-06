@@ -13,7 +13,7 @@ namespace ClickFlow.BLL.Services.Implements
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-       
+
         public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -47,7 +47,7 @@ namespace ClickFlow.BLL.Services.Implements
                 await feedbackRepo.CreateAsync(feedback);
                 await _unitOfWork.SaveChangesAsync();
 
-              
+
                 var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
                     .WithPredicate(x => x.Id == feedback.CampaignId)
                     .WithInclude(x => x.Feedbacks)
@@ -176,7 +176,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<Feedback>();
             var feedbacks = repo.Get(new QueryBuilder<Feedback>()
                 .WithPredicate(x => x.CampaignId == campaignId)
-                .WithInclude(x => x.Feedbacker)               
+                .WithInclude(x => x.Feedbacker)
                 .WithInclude(f => f.Feedbacker.ApplicationUser)
                 .WithInclude(f => f.Feedbacker.ApplicationUser.UserDetail)
                 .Build());
