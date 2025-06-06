@@ -168,7 +168,8 @@ namespace ClickFlow.BLL.Services.Implements
 
 				return _mapper.Map<PublisherResponseDTO>(conversion?.Click?.CampaignParticipation?.Publisher);
 			}
-			catch (Exception ex) {
+			catch (Exception ex)
+			{
 				Console.WriteLine(ex.ToString());
 				throw;
 			}

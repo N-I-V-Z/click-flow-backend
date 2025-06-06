@@ -6,62 +6,62 @@ using Microsoft.AspNetCore.Mvc;
 namespace ClickFlow.API.Controllers
 {
 
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CommentsController : BaseAPIController
-    {
-        private readonly ICommentService _commentService;
+	[Route("api/[controller]")]
+	[ApiController]
+	public class CommentsController : BaseAPIController
+	{
+		private readonly ICommentService _commentService;
 
-        public CommentsController(ICommentService commentService)
-        {
-            _commentService = commentService;
-        }
-
-
-        [Authorize]
-        [HttpPost("create-comment")]
-        public async Task<IActionResult> Create([FromBody] CommentCreateDTO dto)
-        {
-            if (!ModelState.IsValid) return ModelInvalid();
-            var response = await _commentService.CreateComment(dto, UserId);
-            return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
-        }
+		public CommentsController(ICommentService commentService)
+		{
+			_commentService = commentService;
+		}
 
 
-        [Authorize]
-        [HttpPut("update-comment")]
-        public async Task<IActionResult> Update([FromBody] CommentUpdateDTO dto)
-        {
-            if (!ModelState.IsValid) return ModelInvalid();
-            var response = await _commentService.UpdateComment(dto, UserId);
-            return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
-        }
+		[Authorize]
+		[HttpPost("create-comment")]
+		public async Task<IActionResult> Create([FromBody] CommentCreateDTO dto)
+		{
+			if (!ModelState.IsValid) return ModelInvalid();
+			var response = await _commentService.CreateComment(dto, UserId);
+			return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
+		}
 
 
-        [Authorize]
-        [HttpDelete("delete-comment/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var response = await _commentService.DeleteComment(id);
-            return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
-        }
+		[Authorize]
+		[HttpPut("update-comment")]
+		public async Task<IActionResult> Update([FromBody] CommentUpdateDTO dto)
+		{
+			if (!ModelState.IsValid) return ModelInvalid();
+			var response = await _commentService.UpdateComment(dto, UserId);
+			return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
+		}
 
 
-        [Authorize]
-        [HttpGet("get-comment-by-id{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var comment = await _commentService.GetCommentById(id);
-            return comment == null ? GetError("Không tìm thấy bình luận.") : GetSuccess(comment);
-        }
+		[Authorize]
+		[HttpDelete("delete-comment/{id}")]
+		public async Task<IActionResult> Delete(int id)
+		{
+			var response = await _commentService.DeleteComment(id);
+			return response.IsSuccess ? SaveSuccess(response) : SaveError(response);
+		}
 
 
-        [Authorize]
-        [HttpGet("get-comment-by-post-id/{postId}/{pageIndex}/{pageSize}")]
-        public async Task<IActionResult> GetByPostId(int postId, int pageIndex, int pageSize)
-        {
-            var comments = await _commentService.GetCommentsByPostId(postId, pageIndex, pageSize);
-            return GetSuccess(comments);
-        }
-    }
+		[Authorize]
+		[HttpGet("get-comment-by-id{id}")]
+		public async Task<IActionResult> GetById(int id)
+		{
+			var comment = await _commentService.GetCommentById(id);
+			return comment == null ? GetError("Không tìm thấy bình luận.") : GetSuccess(comment);
+		}
+
+
+		[Authorize]
+		[HttpGet("get-comment-by-post-id/{postId}/{pageIndex}/{pageSize}")]
+		public async Task<IActionResult> GetByPostId(int postId, int pageIndex, int pageSize)
+		{
+			var comments = await _commentService.GetCommentsByPostId(postId, pageIndex, pageSize);
+			return GetSuccess(comments);
+		}
+	}
 }
