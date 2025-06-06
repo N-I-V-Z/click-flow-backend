@@ -19,7 +19,7 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize]
 		[HttpGet]
-		public async Task<IActionResult> GetAll([FromQuery]PlanGetAllDTO dto)
+		public async Task<IActionResult> GetAll([FromQuery] PlanGetAllDTO dto)
 		{
 			try
 			{
