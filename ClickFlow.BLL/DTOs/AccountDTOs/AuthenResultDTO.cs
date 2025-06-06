@@ -1,7 +1,8 @@
-﻿namespace ClickFlow.BLL.DTOs.AccountDTOs
+namespace ClickFlow.BLL.DTOs.AccountDTOs
 {
-	public class AuthenResultDTO
-	{
-		public string Token { get; set; } = null!;
-	}
+    public class AuthenResultDTO
+    {
+        public string Token { get; set; } = null!;
+        public string RefreshToken { get; set; } = null!;
+    }
 }
