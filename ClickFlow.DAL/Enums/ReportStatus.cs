@@ -8,6 +8,8 @@ namespace ClickFlow.DAL.Enums
 		Pending,
 		[EnumMember(Value = "Đang xử lý")]
 		Processing,
+		[EnumMember(Value = "Đã hủy")]
+		Canceled,
 		[EnumMember(Value = "Đã phê duyệt")]
 		Approved,
 		[EnumMember(Value = "Đã bị từ chối")]

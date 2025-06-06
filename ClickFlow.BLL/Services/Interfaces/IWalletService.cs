@@ -4,8 +4,8 @@ namespace ClickFlow.BLL.Services.Interfaces
 {
 	public interface IWalletService
 	{
-		Task<WalletViewDTO> CreateWalletAsync(WalletCreateDTO dto);
-		Task<WalletViewDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto);
-		Task<WalletViewDTO> GetWalletByUserIdAsync(int id);
+		Task<WalletResponseDTO> CreateWalletAsync(int userId, WalletCreateDTO dto);
+		Task<WalletResponseDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto);
+		Task<WalletResponseDTO> GetWalletByUserIdAsync(int id);
 	}
 }

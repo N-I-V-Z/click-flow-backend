@@ -2,7 +2,6 @@
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ClickFlow.API.Controllers
 {
@@ -17,63 +16,14 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-		[Authorize]
-		[HttpPost]
-		public async Task<IActionResult> CreateWallet([FromBody] WalletCreateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
-			try
-			{
-				var response = await _walletService.CreateWalletAsync(dto);
-				if (response == null) return SaveError(response);
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize]
-		[HttpPut]
-		public async Task<IActionResult> UpdateWallet([FromQuery] int id, [FromBody] WalletUpdateDTO dto)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
-			try
-			{
-				var response = await _walletService.UpdateWalletAsync(id, dto);
-				if (response == null) return SaveError(response);
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize]
-		[HttpGet]
-		[Route("get-owner-wallet")]
-		public async Task<IActionResult> GetWalletByToken()
+		[Authorize(Roles = "Publisher, Advertiser")]
+		[HttpGet("own")]
+		public async Task<IActionResult> GetOwnWallet()
 		{
 			try
 			{
-				var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-				if (string.IsNullOrEmpty(userId))
-				{
-					return Unauthorized("User Id không hợp lệ hoặc chưa đăng nhập.");
-				}
-
-				var response = await _walletService.GetWalletByUserIdAsync(int.Parse(userId));
-				if (response == null) return NotFound("Không tìm thấy ví cho người dùng này.");
+				var response = await _walletService.GetWalletByUserIdAsync(UserId);
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return Ok(response);
 			}
 			catch (Exception ex)
@@ -85,5 +35,25 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
+		[Authorize(Roles = "Publisher, Advertiser")]
+		[HttpPut("{walletId}")]
+		public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
+		{
+			if (!ModelState.IsValid) return ModelInvalid();
+
+			try
+			{
+				var response = await _walletService.UpdateWalletAsync(walletId, dto);
+				if (response == null) return SaveError();
+				return SaveSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
 	}
 }

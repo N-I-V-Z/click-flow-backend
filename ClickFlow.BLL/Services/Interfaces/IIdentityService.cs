@@ -30,7 +30,7 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<ApplicationUser> GetUserAsync(ClaimsPrincipal principal);
         Task<IdentityResult> SetTwoFactorEnabledAsync(ApplicationUser user, bool enable2Fa);
         Task<SignInResult> CheckPasswordSignInAsync(ApplicationUser user, string password, bool lockOutOnFailure);
-        Task<ApplicationUser> GetByIdAsync(string id);
+        Task<ApplicationUser> GetByIdAsync(int id);
         Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user);
         Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string newPass);
     }

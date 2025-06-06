@@ -1,7 +1,6 @@
-﻿using ClickFlow.BLL.DTOs.PagingDTOs;
+﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.ReportDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +17,15 @@ namespace ClickFlow.API.Controllers
 			_reportService = reportService;
 		}
 
-		[Authorize]
-		[HttpGet("id")]
-		public async Task<IActionResult> GetReportById([FromQuery] int id)
+		[Authorize(Roles = "Admin, Advertiser")]
+		[HttpGet("{reportId}")]
+		public async Task<IActionResult> GetReportById(int reportId)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
-				var response = await _reportService.GetByIdAsync(id);
-				if (response == null) return NotFound();
+				var response = await _reportService.GetByIdAsync(reportId);
+
+				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -39,16 +37,16 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		//[Authorize]
+		[Authorize(Roles = "Admin")]
 		[HttpGet]
-		public async Task<IActionResult> GetReports([FromQuery] PagingRequestDTO dto)
+		public async Task<IActionResult> GetAllReports([FromQuery] ReportGetAllDTO dto)
 		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
 			try
 			{
-				var response = await _reportService.GetAllAsync(dto);
-				if (!response.Any()) return NotFound();
+				var data = await _reportService.GetAllAsync(dto);
+				var response = new PagingDTO<ReportResponseDTO>(data);
+
+				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -60,7 +58,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Advertiser")]
 		[HttpPost]
 		public async Task<IActionResult> CreateReport([FromBody] ReportCreateDTO dto)
 		{
@@ -68,8 +66,8 @@ namespace ClickFlow.API.Controllers
 
 			try
 			{
-				var response = await _reportService.CreateReportAsync(dto);
-				if (response == null) return SaveError(response);
+				var response = await _reportService.CreateReportAsync(UserId, dto);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -81,16 +79,16 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
-		[HttpDelete]
-		public async Task<IActionResult> DeleteReport([FromQuery] int id)
+		[Authorize(Roles = "Admin, Advertiser")]
+		[HttpPut("{reportId}/status")]
+		public async Task<IActionResult> UpdateStatusReport(int reportId, [FromBody] ReportStatusDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _reportService.DeleteAsync(id);
-				if (!response) return SaveError(response);
+				var response = await _reportService.UpdateStatusReportAsync(reportId, dto.Status);
+				if (response == null) return SaveError();
 				return SaveSuccess(response);
 			}
 			catch (Exception ex)
@@ -102,38 +100,17 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
-		[HttpPut("status")]
-		public async Task<IActionResult> UpdateStatusReport([FromQuery] int id, [FromBody] ReportStatus status)
+		[Authorize(Roles = "Admin")]
+		[HttpPut("{reportId}/response")]
+		public async Task<IActionResult> UpdateResponseReport(int reportId, [FromBody] ReportUpdateResponseDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
 			try
 			{
-				var response = await _reportService.UpdateStatusReportAsync(id, status);
-				if (response == null) return SaveError(response);
-				return SaveSuccess(response);
-			}
-			catch (Exception ex)
-			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
-			}
-		}
-
-		[Authorize]
-		[HttpPut("response")]
-		public async Task<IActionResult> UpdateResponseReport([FromQuery] int id, [FromBody] string response)
-		{
-			if (!ModelState.IsValid) return ModelInvalid();
-
-			try
-			{
-				var result = await _reportService.UpdateResponseReportAsync(id, response);
-				if (result == null) return SaveError(result);
-				return SaveSuccess(response);
+				var result = await _reportService.UpdateResponseReportAsync(reportId, dto.Response);
+				if (result == null) return SaveError();
+				return SaveSuccess(result);
 			}
 			catch (Exception ex)
 			{

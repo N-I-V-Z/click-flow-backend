@@ -2,7 +2,7 @@
 
 namespace ClickFlow.DAL.Queries
 {
-    public class QueryBuilder<T> where T : class
+	public class QueryBuilder<T> where T : class
 	{
 		private readonly QueryOptions<T> _options = new QueryOptions<T>();
 
@@ -27,6 +27,11 @@ namespace ClickFlow.DAL.Queries
 		public QueryBuilder<T> WithInclude(params Expression<Func<T, object>>[] includeProperty)
 		{
 			_options.IncludeProperties.AddRange(includeProperty);
+			return this;
+		}
+		public QueryBuilder<T> WithThenInclude(params Expression<Func<object, object>>[] thenIncludeProperty)
+		{
+			_options.ThenIncludeProperties.AddRange(thenIncludeProperty);
 			return this;
 		}
 

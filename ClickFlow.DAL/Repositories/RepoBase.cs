@@ -1,10 +1,11 @@
 ﻿using ClickFlow.DAL.EF;
 using ClickFlow.DAL.Queries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ClickFlow.DAL.Repositories
 {
-    public class RepoBase<T> : IRepoBase<T> where T : class
+	public class RepoBase<T> : IRepoBase<T> where T : class
 	{
 		private readonly ClickFlowContext _context;
 		protected readonly DbSet<T> _dbSet;
@@ -25,7 +26,7 @@ namespace ClickFlow.DAL.Repositories
 		{
 			await _dbSet.AddRangeAsync(entities);
 		}
-		
+
 		public Task DeleteAsync(T entity)
 		{
 			if (_context.Entry<T>(entity).State == EntityState.Detached)
@@ -57,6 +58,14 @@ namespace ClickFlow.DAL.Repositories
 				foreach (var includeProperty in options.IncludeProperties)
 				{
 					query = query.Include(includeProperty);
+				}
+			}
+
+			if (options.ThenIncludeProperties?.Any() ?? false)
+			{
+				foreach (var thenIncludeProperty in options.ThenIncludeProperties)
+				{
+					query = ((IIncludableQueryable<T, object>)query).ThenInclude(thenIncludeProperty);
 				}
 			}
 
@@ -97,7 +106,7 @@ namespace ClickFlow.DAL.Repositories
 
 		public async Task<bool> AnyAsync(QueryOptions<T> options)
 		{
-			if(options.Predicate != null)
+			if (options.Predicate != null)
 			{
 				var result = await _dbSet.AnyAsync(options.Predicate);
 				return result;

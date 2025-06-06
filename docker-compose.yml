@@ -1,0 +1,14 @@
+
+services:
+
+  # Backend .NET
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: click_flow_backend_container
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ClickFlowDB;User=sa;Password=Db@sba301;TrustServerCertificate=True;
+    ports:
+      - "8099:7087" # Mở cổng API
+    restart: always # Tự khởi động lại khi lỗi

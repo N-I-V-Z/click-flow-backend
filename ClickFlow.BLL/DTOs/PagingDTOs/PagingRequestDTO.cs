@@ -1,9 +1,13 @@
-﻿namespace ClickFlow.BLL.DTOs.PagingDTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ClickFlow.BLL.DTOs.PagingDTOs
 {
 	public class PagingRequestDTO
 	{
-		public int PageIndex { get; set; }
-		public int PageSize { get; set; }
+		[Required(ErrorMessage = "PageIndex không được để trống.")]
+		public int PageIndex { get; set; } = 1;
+		[Required(ErrorMessage = "PageSize không được để trống.")]
+		public int PageSize { get; set; } = 10;
 		public string? Keyword { get; set; }
 	}
 }

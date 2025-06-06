@@ -7,11 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\UserDTOs\**" />
+    <EmbeddedResource Remove="DTOs\UserDTOs\**" />
+    <None Remove="DTOs\UserDTOs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="CloudinaryDotNet" Version="1.27.4" />
     <PackageReference Include="MailKit" Version="4.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.0" />
     <PackageReference Include="MimeKit" Version="4.10.0" />
+    <PackageReference Include="PusherServer" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

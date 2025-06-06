@@ -1,5 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs.AccountDTOs;
 using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
@@ -317,26 +318,20 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         [Route("renew-token")]
-        public async Task<IActionResult> RenewTokenAsync(AuthenResultDTO authenResult)
+        public async Task<IActionResult> RenewTokenAsync()
         {
             try
             {
-                if (string.IsNullOrEmpty(authenResult.Token) || string.IsNullOrEmpty(authenResult.RefreshToken))
+                var refreshToken = Request.Cookies["refreshToken"];
+                if (string.IsNullOrEmpty(refreshToken))
                 {
-                    ModelState.AddModelError("Token", "Token không được để trống.");
-                    ModelState.AddModelError("RefreshToken", "RefreshToken không được để trống");
-                    return ModelInvalid();
+                    return Error("RefreshToken không tồn tại trong cookie.");
                 }
 
-                var checkToken = await _accountService.CheckToRenewTokenAsync(authenResult);
-                if (!checkToken.IsSuccess)
-                {
-                    return Error(checkToken.Message);
-                }
-                var user = await _identityService.GetByIdAsync(UserId);
+                var userId = UserId;
+                var user = await _identityService.GetByIdAsync(userId);
                 if (user == null)
                 {
                     return GetNotFound("Không tìm thấy người dùng.");

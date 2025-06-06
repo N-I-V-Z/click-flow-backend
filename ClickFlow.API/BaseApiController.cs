@@ -15,7 +15,7 @@ namespace ClickFlow.API
 			});
 		}
 
-        protected ActionResult GetNotFound(string message)
+		protected ActionResult GetNotFound(string message)
 		{
 			return new NotFoundObjectResult(new ResponseApiDTO
 			{
@@ -89,12 +89,20 @@ namespace ClickFlow.API
 
 		protected string UserEmail => User.FindFirst("Email")?.Value;
 
-		protected string UserId
+		protected int UserId
 		{
 			get
 			{
-				var id = User.FindFirst("Id")?.Value;
-				return id;
+				try
+				{
+					var id = int.Parse(User.FindFirst("Id")?.Value);
+					return id;
+				}
+				catch (Exception)
+				{
+					throw;
+				}
+
 			}
 		}
 	}

@@ -1,18 +1,19 @@
 
 using ClickFlow.API.ConfigExtensions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using ClickFlow.BLL.Helpers.Config;
+using ClickFlow.BLL.Services.BackgroundServices;
+using ClickFlow.BLL.Services.Implements;
+using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.EF;
+using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using ClickFlow.DAL.EF;
 using System.Text.Json.Serialization;
-using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.BLL.Services.Implements;
-using ClickFlow.BLL.Helpers.Config;
-using Microsoft.Extensions.Options;
-using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.API
 {
@@ -27,23 +28,27 @@ namespace ClickFlow.API
 				.AddJsonOptions(options =>
 			{
 				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+				options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+				options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 			});
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddDbContext<ClickFlowContext>(option =>
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
 			});
-            var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
-            builder.Services.AddSingleton(emailConfig);
+			var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+			builder.Services.AddSingleton(emailConfig);
 
-            builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
+			builder.Services.Configure<VnPayConfiguration>(builder.Configuration.GetSection("VnPayConfiguration"));
 			builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<VnPayConfiguration>>().Value);
 
+			builder.Services.Configure<PusherConfiguration>(builder.Configuration.GetSection("PusherConfiguration"));
+			builder.Services.AddScoped<IPusherService, PusherService>();
+
+			builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
 
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
-
-            builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
 
 			builder.Services.AddCors(opts =>
@@ -60,8 +65,10 @@ namespace ClickFlow.API
 
 			builder.Services.AddMapper();
 
-          
-            builder.Services.AddBLLServices();
+			builder.Services.AddBLLServices();
+
+			builder.Services.AddHostedService<CampaignExpiredCheckerService>();
+			builder.Services.AddHostedService<TrafficToClosedTrafficService>();
 
 			builder.Services.AddAuthentication(options =>
 			{
@@ -89,7 +96,7 @@ namespace ClickFlow.API
 			builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 
-            var app = builder.Build();
+			var app = builder.Build();
 
 			using (var scope = app.Services.CreateScope())
 			{

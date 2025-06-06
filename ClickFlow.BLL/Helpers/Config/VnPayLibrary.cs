@@ -1,9 +1,9 @@
-﻿using System.Globalization;
-using System.Net.Sockets;
+﻿using Microsoft.AspNetCore.Http;
+using System.Globalization;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Http;
 
 namespace ClickFlow.BLL.Helpers.Config
 {

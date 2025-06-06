@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.PagingDTOs;
+using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
@@ -11,114 +12,42 @@ using ClickFlow.DAL.UnitOfWork;
 
 namespace ClickFlow.BLL.Services.Implements
 {
-	public class TrafficService : ITrafficService
+	public class TrafficService : BaseServices<Traffic, TrafficResponseDTO>, ITrafficService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 
-		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper)
+		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 		}
 
-		protected virtual QueryBuilder<Traffic> CreateQueryBuilder(string? search = null)
-		{
-			var queryBuilder = new QueryBuilder<Traffic>()
-								.WithTracking(false);
-
-			if (!string.IsNullOrEmpty(search))
-			{
-				var predicate = FilterHelper.BuildSearchExpression<Traffic>(search);
-				queryBuilder.WithPredicate(predicate);
-			}
-
-			return queryBuilder;
-		}
-
-		public async Task<PaginatedList<TrafficViewDTO>> GetPagedData(IQueryable<Transaction> query, int pageIndex, int pageSize)
-		{
-			var paginatedEntities = await PaginatedList<Transaction>.CreateAsync(query, pageIndex, pageSize);
-			var resultDto = _mapper.Map<List<TrafficViewDTO>>(paginatedEntities);
-
-			return new PaginatedList<TrafficViewDTO>(resultDto, paginatedEntities.TotalItems, pageIndex, pageSize);
-		}
-
-		public async Task<TrafficViewDTO> CreateAsync(TrafficCreateDTO dto)
+		public async Task<BaseResponse> ValidateTraffic(TrafficCreateDTO dto)
 		{
 			try
 			{
-
-				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
-				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
-
-				// traffic được tạo
-				var newTraffic = _mapper.Map<Traffic>(dto);
-
-				// campaign của traffic được tạo
-				var campaign = await campaignRepo.GetSingleAsync(new QueryBuilder<Campaign>()
-					.WithPredicate(x => x.Id == dto.CampaignId)
-					.WithTracking(false)
-					.Build()
-					);
-
-				// các traffic của campaign đó, để tính tổng tiền
-				var trafficCampaign = await trafficRepo.GetAllAsync(new QueryBuilder<Traffic>()
-					.WithPredicate(x => x.Id == dto.CampaignId && x.IsValid == true)
-					.WithTracking(false)
-					.Build()
-					);
-				var totalCommission = trafficCampaign.Sum(x => x.Revenue);
-				
-				// check xem có traffic nào cùng ip, cùng campaign, cùng publisher mà hợp lệ chưa
-				var checkTrafficCPC = await trafficRepo.GetAllAsync(new QueryBuilder<Traffic>()
-					.WithPredicate(x => x.IsValid == true &&
-						x.IpAddress == dto.IpAddress &&
+				var campaignParticipationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var cp = await campaignParticipationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
+					.WithPredicate(x =>
 						x.CampaignId == dto.CampaignId &&
-						x.PublisherId == dto.PublisherId)
-					.WithTracking(false)
-					.Build());
+						x.PublisherId == dto.PublisherId &&
+						x.Status == CampaignParticipationStatus.Participated
+					).Build());
 
-				// ngày hiện tại
-				var currentDay = new DateOnly();
-
-				
-
-				if (campaign.EndDate < currentDay || campaign.StartDate > currentDay)
+				if (cp == null)
 				{
-					newTraffic.IsValid = false;
-				}
-				else if (campaign.TypePay == TypePay.CPC && checkTrafficCPC.Any())
-				{
-					newTraffic.IsValid = false;
-				}
-				else if (campaign.TypePay == TypePay.CPC && totalCommission + campaign.Commission < campaign.Budget)
-				{
-					newTraffic.IsValid = false;
-				}
-				else
-				{
-					newTraffic.IsValid = true;
-				}
-
-				if (newTraffic.IsValid == true)
-				{
-					if (campaign.TypePay == TypePay.CPC)
+					return new BaseResponse
 					{
-						newTraffic.Revenue = campaign.Commission;
-					}
+						IsSuccess = false,
+						Message = "Publihser chưa tham gia chiến dịch này"
+					};
 				}
 
-
-				await trafficRepo.CreateAsync(newTraffic);
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
+				return new BaseResponse
 				{
-					return null;
-				}
-
-
-				return _mapper.Map<TrafficViewDTO>(newTraffic);
+					IsSuccess = true
+				};
 			}
 			catch (Exception ex)
 			{
@@ -127,13 +56,130 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllAsync(PagingRequestDTO dto)
+		public async Task<bool> IsValidTraffic(TrafficCreateDTO dto, string IpAddress)
+		{
+			try
+			{
+				var campaignParticipationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var cp = await campaignParticipationRepo.GetSingleAsync(new QueryBuilder<CampaignParticipation>()
+					.WithPredicate(x =>
+						x.CampaignId == dto.CampaignId &&
+						x.PublisherId == dto.PublisherId &&
+						x.Status == CampaignParticipationStatus.Participated
+					).Build());
+
+				var today = DateTime.UtcNow.Date;
+
+				var queryBuilder = CreateQueryBuilder();
+				var checkIpQueryOptions = queryBuilder.WithPredicate(x =>
+					x.CampaignParticipationId == cp.Id &&
+					x.IpAddress.Equals(IpAddress) &&
+					x.IsValid == true &&
+					x.Timestamp.Date == today.Date
+				);
+
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+				bool checkIpAddress = await trafficRepo.GetSingleAsync(checkIpQueryOptions.Build()) == null;
+
+				if (!checkIpAddress)
+				{
+					return false;
+				}
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+		public async Task<TrafficClickResponseDTO> CreateAsync(TrafficCreateDTO dto, string remoteIp)
+		{
+			try
+			{
+				await _unitOfWork.BeginTransactionAsync();
+
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var conversionRepo = _unitOfWork.GetRepo<Conversion>();
+
+				// Lấy thông tin chiến dịch và người tham gia
+				var campaign = await campaignRepo.GetSingleAsync(
+					new QueryBuilder<Campaign>().WithPredicate(x => x.Id == dto.CampaignId).Build());
+
+				var participation = await cpRepo.GetSingleAsync(
+					new QueryBuilder<CampaignParticipation>()
+						.WithPredicate(x => x.CampaignId == dto.CampaignId && x.PublisherId == dto.PublisherId)
+						.Build());
+
+				var wallet = await walletRepo.GetSingleAsync(
+					new QueryBuilder<Wallet>().WithPredicate(x => x.UserId == dto.PublisherId).Build());
+
+				// Ghi nhận lượt click
+				var newTraffic = _mapper.Map<Traffic>(dto);
+				newTraffic.ClickId = Guid.NewGuid().ToString();
+				newTraffic.Timestamp = dto.Timestamp ?? DateTime.UtcNow;
+				newTraffic.CampaignParticipationId = participation.Id;
+				newTraffic.IpAddress = remoteIp;
+				newTraffic.IsValid = await IsValidTraffic(dto, remoteIp);
+
+				await trafficRepo.CreateAsync(newTraffic);
+
+				// Nếu là CPC → tạo conversion ngay lập tức
+				if (campaign.TypePay == TypePay.CPC && newTraffic.IsValid)
+				{
+					var conversion = new Conversion
+					{
+						ClickId = newTraffic.ClickId,
+						EventType = ConversionEventType.Conversion,
+						Revenue = campaign.Commission,
+						OrderId = null,
+						Status = ConversionStatus.Approved,
+						Timestamp = DateTime.UtcNow
+					};
+
+					await conversionRepo.CreateAsync(conversion);
+
+					// Cộng hoa hồng cho publisher
+					wallet.Balance += campaign.Commission ?? 0;
+					await walletRepo.UpdateAsync(wallet);
+				}
+
+				// Nếu là CPS hoặc CPA → chỉ ghi nhận traffic, đợi postback từ advertiser
+				// Postback sẽ dựa vào ClickId đã được sinh ở trên để tạo Conversion sau
+
+				var saved = await _unitOfWork.SaveAsync();
+				await _unitOfWork.CommitTransactionAsync();
+
+				return saved ? new TrafficClickResponseDTO
+				{
+					ClickId = newTraffic.ClickId,
+					URL = campaign.OriginURL
+				} : null;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
+
+
+
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllAsync(PagingRequestDTO dto)
 		{
 			try
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-				var queryBuilder = CreateQueryBuilder();
+				var queryBuilder = CreateQueryBuilder().WithInclude(
+					//x => x.CampaignParticipation, 
+					x => x.CampaignParticipation.Campaign,
+					x => x.CampaignParticipation.Publisher.ApplicationUser);
 				if (!string.IsNullOrEmpty(dto.Keyword))
 				{
 					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
@@ -141,9 +187,7 @@ namespace ClickFlow.BLL.Services.Implements
 				}
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -152,17 +196,22 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<TrafficViewDTO> GetByIdAsync(int id)
+		public async Task<TrafficResponseDTO> GetByIdAsync(int id)
 		{
 			try
 			{
 				var queryBuilder = CreateQueryBuilder();
-				var queryOptions = queryBuilder.WithPredicate(x => x.Id == id);
+				var queryOptions = queryBuilder
+					.WithPredicate(x => x.Id == id)
+					.WithInclude(
+						//x => x.CampaignParticipation,
+						x => x.CampaignParticipation.Campaign,
+						x => x.CampaignParticipation.Publisher.ApplicationUser);
 
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 				var response = await trafficRepo.GetSingleAsync(queryOptions.Build());
 				if (response == null) return null;
-				return _mapper.Map<TrafficViewDTO>(response);
+				return _mapper.Map<TrafficResponseDTO>(response);
 			}
 			catch (Exception ex)
 			{
@@ -171,14 +220,20 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto)
 		{
 			try
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
 				var queryBuilder = CreateQueryBuilder();
-				var queryOptions = queryBuilder.WithPredicate(x => x.PublisherId == id);
+				var queryOptions = queryBuilder
+					.WithInclude(
+						//x => x.CampaignParticipation, 
+						x => x.CampaignParticipation.Campaign,
+						x => x.CampaignParticipation.Publisher.ApplicationUser)
+					.WithPredicate(x => x.CampaignParticipation.Publisher.ApplicationUser.Id == id);
+
 				if (!string.IsNullOrEmpty(dto.Keyword))
 				{
 					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
@@ -187,9 +242,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 			}
 			catch (Exception ex)
 			{
@@ -198,14 +251,19 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficViewDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto)
 		{
 			try
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
 				var queryBuilder = CreateQueryBuilder();
-				var queryOptions = queryBuilder.WithInclude(x => x.Campaign).WithPredicate(x => x.Campaign.AdvertiserId == id);
+				var queryOptions = queryBuilder.WithInclude(
+						//x => x.CampaignParticipation,
+						x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser,
+						x => x.CampaignParticipation.Publisher.ApplicationUser)
+					.WithPredicate(x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser.Id == id);
+
 				if (!string.IsNullOrEmpty(dto.Keyword))
 				{
 					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
@@ -214,9 +272,157 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
-				var pagedRecords = await PaginatedList<Traffic>.CreateAsync(loadedRecords, dto.PageIndex, dto.PageSize);
-				var resultDTO = _mapper.Map<List<TrafficViewDTO>>(pagedRecords);
-				return new PaginatedList<TrafficViewDTO>(resultDTO, pagedRecords.TotalItems, dto.PageIndex, dto.PageSize);
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto)
+		{
+			try
+			{
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+				var queryBuilder = CreateQueryBuilder();
+				var queryOptions = queryBuilder.WithInclude(
+						//x => x.CampaignParticipation,
+						x => x.CampaignParticipation.Campaign,
+						x => x.CampaignParticipation.Publisher.ApplicationUser)
+					.WithPredicate(x => x.CampaignParticipation.CampaignId == id);
+				if (!string.IsNullOrEmpty(dto.Keyword))
+				{
+					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
+					queryBuilder.WithPredicate(predicate);
+				}
+
+				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
+
+				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+
+		public async Task TransferTrafficToClosedTraffic()
+		{
+			try
+			{
+				await _unitOfWork.BeginTransactionAsync();
+
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+				var queryBuilder = CreateQueryBuilder();
+				var queryOptions = queryBuilder
+					.WithPredicate(x =>
+						(x.CampaignParticipation.Campaign.EndDate <= DateOnly.FromDateTime(DateTime.UtcNow)) ||
+						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Canceled) ||
+						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Completed))
+					.Build();
+
+				var trafficsToClose = await trafficRepo.GetAllAsync(queryOptions);
+				foreach (var traffic in trafficsToClose)
+				{
+					traffic.IsClosed = true;
+				}
+
+				await _unitOfWork.SaveAsync();
+				await _unitOfWork.CommitTransactionAsync();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				await _unitOfWork.RollBackAsync();
+				throw;
+			}
+		}
+
+		public async Task<int> AverageTrafficInCampaign(int publisherId)
+		{
+			try
+			{
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+
+				var campaignList = await cpRepo.GetAllAsync(new QueryBuilder<CampaignParticipation>()
+					.WithPredicate(x => x.PublisherId == publisherId)
+					.Build());
+
+				if (!campaignList.Any()) return 0;
+
+				var campaignIds = campaignList.Select(x => x.CampaignId).ToList();
+
+				var campaigns = await campaignRepo.GetAllAsync(new QueryBuilder<Campaign>()
+					.WithPredicate(x => campaignIds.Contains(x.Id) &&
+									   (x.Status == CampaignStatus.Completed || x.Status == CampaignStatus.Canceled))
+					.Build());
+
+				if (!campaigns.Any()) return 0;
+
+				var validCpIds = campaignList
+					.Where(x => campaigns.Any(c => c.Id == x.CampaignId))
+					.Select(x => x.Id)
+					.ToList();
+
+				if (!validCpIds.Any()) return 0;
+
+				var trafficList = await trafficRepo.GetAllAsync(new QueryBuilder<Traffic>()
+					.WithPredicate(x => x.IsClosed && validCpIds.Contains((int)x.CampaignParticipationId))
+					.Build());
+
+				if (!trafficList.Any()) return 0;
+
+				var avg = trafficList
+					.GroupBy(x => x.CampaignParticipationId)
+					.Select(g => g.Count())
+					.Average();
+
+				return (int)avg;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+		public async Task<int> CountAllTrafficByCampaign(int campaignId)
+		{
+			try
+			{
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+				var campaign = await campaignRepo.GetSingleAsync(
+					new QueryBuilder<Campaign>()
+						.WithPredicate(x => x.Id == campaignId)
+						.Build());
+
+				if (campaign == null) throw new Exception($"Campaign with ID {campaignId} not found.");
+
+				var cps = await cpRepo.GetAllAsync(
+					new QueryBuilder<CampaignParticipation>()
+						.WithPredicate(x => x.CampaignId == campaignId)
+						.Build());
+
+				var cpIds = cps.Select(x => x.Id).ToList();
+				if (!cpIds.Any()) return 0;
+
+				var isClosed = campaign.Status == CampaignStatus.Completed || campaign.Status == CampaignStatus.Canceled;
+
+				var traffics = await trafficRepo.GetAllAsync(
+					new QueryBuilder<Traffic>()
+						.WithPredicate(x => x.IsClosed == isClosed && cpIds.Contains((int)x.CampaignParticipationId))
+						.Build());
+
+				return traffics.Count();
 			}
 			catch (Exception ex)
 			{
