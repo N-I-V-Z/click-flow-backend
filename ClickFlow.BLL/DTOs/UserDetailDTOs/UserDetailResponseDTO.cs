@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClickFlow.DAL.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace ClickFlow.BLL.DTOs.UserDetailDTOs
         public string Address { get; set; }
         public int ApplicationUserId { get; set; }
         public string FullName { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

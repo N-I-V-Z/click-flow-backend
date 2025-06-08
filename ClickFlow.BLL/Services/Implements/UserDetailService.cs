@@ -89,6 +89,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
                                         .WithPredicate(x => true)
+                                        .WithInclude(x => x.User)
                                         .Build());
             var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
             var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
@@ -100,6 +101,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
                                         .WithPredicate(x => true)
+                                        .WithInclude(x => x.User)
                                         .Build());
             if (!string.IsNullOrEmpty(name))
             {
@@ -115,6 +117,7 @@ namespace ClickFlow.BLL.Services.Implements
             var repo = _unitOfWork.GetRepo<UserDetail>();
             var response = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
                                                     .WithPredicate(x => x.ApplicationUserId ==userId)
+                                                    .WithInclude(x => x.User)
                                                     .WithTracking(false)
                                                     .Build());
             if (response == null) return null;
