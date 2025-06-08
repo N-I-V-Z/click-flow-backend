@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ClickFlow.BLL.DTOs.PusherDTOs
+﻿namespace ClickFlow.BLL.DTOs.PusherDTOs
 {
 	public class PusherAuthRequestDTO
 	{

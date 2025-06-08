@@ -1,6 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs.PlanDTOs;
 using ClickFlow.BLL.DTOs.PublisherDTOs;
-using ClickFlow.DAL.Entities;
 
 namespace ClickFlow.BLL.DTOs.UserPlanDTOs
 {

@@ -1,6 +1,5 @@
-﻿using ClickFlow.BLL.DTOs.AccountDTOs;
+using ClickFlow.BLL.DTOs.AccountDTOs;
 using ClickFlow.BLL.Services.Interfaces;
-using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Web;
