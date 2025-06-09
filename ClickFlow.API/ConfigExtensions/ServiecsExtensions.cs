@@ -730,21 +730,21 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 1, // ABC ERP
-							CreateAt = DateTime.UtcNow.AddDays(-25),
+							CreateAt = DateTime.Now,
 							PublisherId = 2,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 5, // Green Foods
-							CreateAt = DateTime.UtcNow.AddDays(-20),
+							CreateAt = DateTime.Now,
 							PublisherId = 2,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 7, // Fashion House Spring Summer
-							CreateAt = DateTime.UtcNow.AddDays(-15),
+							CreateAt = DateTime.Now,
 							PublisherId = 2,
 							Status = CampaignParticipationStatus.Participated,
 						},
@@ -753,21 +753,21 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 1, // ABC ERP
-							CreateAt = DateTime.UtcNow.AddDays(-22),
+							CreateAt = DateTime.Now,
 							PublisherId = 3,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 3, // XYZ Banking App
-							CreateAt = DateTime.UtcNow.AddDays(-18),
+							CreateAt = DateTime.Now,
 							PublisherId = 3,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 6, // Green Family Combo
-							CreateAt = DateTime.UtcNow.AddDays(-8),
+							CreateAt = DateTime.Now,
 							PublisherId = 3,
 							Status = CampaignParticipationStatus.Participated,
 						},
@@ -776,14 +776,14 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 2, // ABC Code Academy
-							CreateAt = DateTime.UtcNow.AddDays(-12),
+							CreateAt = DateTime.Now,
 							PublisherId = 4,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 7, // Fashion House Spring Summer
-							CreateAt = DateTime.UtcNow.AddDays(-35),
+							CreateAt = DateTime.Now,
 							PublisherId = 4,
 							Status = CampaignParticipationStatus.Participated,
 						},
@@ -792,14 +792,14 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 2, // ABC Code Academy
-							CreateAt = DateTime.UtcNow.AddDays(-10),
+							CreateAt = DateTime.Now,
 							PublisherId = 5,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 9, // Tour Hạ Long - Sapa
-							CreateAt = DateTime.UtcNow.AddDays(-6),
+							CreateAt = DateTime.Now,
 							PublisherId = 5,
 							Status = CampaignParticipationStatus.Participated,
 						},
@@ -808,14 +808,14 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 3, // XYZ Banking App
-							CreateAt = DateTime.UtcNow.AddDays(-16),
+							CreateAt = DateTime.Now,
 							PublisherId = 6,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 10, // Tour Miền Tây
-							CreateAt = DateTime.UtcNow.AddDays(-4),
+							CreateAt = DateTime.Now,
 							PublisherId = 6,
 							Status = CampaignParticipationStatus.Participated,
 						},
@@ -824,21 +824,21 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 8, // Fashion Accessories
-							CreateAt = DateTime.UtcNow.AddDays(-2),
+							CreateAt = DateTime.Now,
 							PublisherId = 2,
 							Status = CampaignParticipationStatus.Pending,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 4, // XYZ Maintenance Service (Pending campaign)
-							CreateAt = DateTime.UtcNow.AddDays(-1),
+							CreateAt = DateTime.Now,
 							PublisherId = 3,
 							Status = CampaignParticipationStatus.Pending,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 11, // Đặt vé máy bay (Pending campaign)
-							CreateAt = DateTime.UtcNow.AddDays(-1),
+							CreateAt = DateTime.Now,
 							PublisherId = 4,
 							Status = CampaignParticipationStatus.Rejected,
 						}
