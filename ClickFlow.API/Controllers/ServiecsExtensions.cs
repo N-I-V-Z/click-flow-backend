@@ -267,6 +267,23 @@ namespace ClickFlow.API.ConfigExtensions
 				}
 				#endregion
 
+				#region Seeding Transactions
+				if (!context.Transactions.Any())
+				{
+					var wallets = context.Wallets.ToList();
+					foreach (var wallet in wallets)
+					{
+						await context.Transactions.AddRangeAsync(
+							new Transaction { Balance = wallet.Balance + 10_000, Amount = 10_000, TransactionType = TransactionType.Deposit, PaymentDate = DateTime.UtcNow, WalletId = wallet.Id },
+							new Transaction { Balance = wallet.Balance, Amount = 10_000, TransactionType = TransactionType.Withdraw, PaymentDate = DateTime.UtcNow.AddMinutes(5), WalletId = wallet.Id },
+							new Transaction { Balance = wallet.Balance - 10_000, Amount = 10_000, TransactionType = TransactionType.Withdraw, PaymentDate = DateTime.UtcNow.AddMinutes(10), WalletId = wallet.Id },
+							new Transaction { Balance = wallet.Balance, Amount = 10_000, TransactionType = TransactionType.Deposit, PaymentDate = DateTime.UtcNow.AddMinutes(10), WalletId = wallet.Id }
+							);
+					}
+					await context.SaveChangesAsync();
+				}
+				#endregion
+
 				#region Seeding Campaigns
 				if (!context.Campaigns.Any())
 				{
@@ -737,15 +754,15 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 5, // Green Foods
-							CreateAt = DateTime.Now,
-							PublisherId = 2,
+							CreateAt = DateTime.UtcNow.AddDays(-20),
+							PublisherId = 3,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 7, // Fashion House Spring Summer
-							CreateAt = DateTime.Now,
-							PublisherId = 2,
+							CreateAt = DateTime.UtcNow.AddDays(-15),
+							PublisherId = 4,
 							Status = CampaignParticipationStatus.Participated,
 						},
 
@@ -753,15 +770,15 @@ namespace ClickFlow.API.ConfigExtensions
 						new CampaignParticipation
 						{
 							CampaignId = 1, // ABC ERP
-							CreateAt = DateTime.Now,
-							PublisherId = 3,
+							CreateAt = DateTime.UtcNow.AddDays(-22),
+							PublisherId = 5,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
 						{
 							CampaignId = 3, // XYZ Banking App
-							CreateAt = DateTime.Now,
-							PublisherId = 3,
+							CreateAt = DateTime.UtcNow.AddDays(-18),
+							PublisherId = 6,
 							Status = CampaignParticipationStatus.Participated,
 						},
 						new CampaignParticipation
@@ -1006,6 +1023,35 @@ namespace ClickFlow.API.ConfigExtensions
 							Timestamp = DateTime.UtcNow.AddDays(-5)
 						}
 					);
+					await context.SaveChangesAsync();
+				}
+				#endregion
+
+				#region Seeding Conversion
+				if (!context.Conversions.Any())
+				{
+					var traffics = await context.Traffics.ToListAsync();
+					foreach (var traffic in traffics)
+					{
+						await context.Conversions.AddRangeAsync(
+							new Conversion
+							{
+								ClickId = traffic.ClickId,
+								EventType = ConversionEventType.Sale,
+								OrderId = Guid.NewGuid().ToString(),
+								Revenue = 100_000,
+								Timestamp = DateTime.UtcNow
+							},
+							new Conversion
+							{
+								ClickId = traffic.ClickId,
+								EventType = ConversionEventType.Install,
+								OrderId = Guid.NewGuid().ToString(),
+								Revenue = 100_000,
+								Timestamp = DateTime.UtcNow
+							}
+							);
+					}
 					await context.SaveChangesAsync();
 				}
 				#endregion
@@ -1477,6 +1523,60 @@ namespace ClickFlow.API.ConfigExtensions
 						await context.Messages.AddRangeAsync(messages);
 						await context.SaveChangesAsync();
 					}
+				}
+				#endregion
+
+				#region Seeding UserPlans
+				if (!context.UserPlans.Any())
+				{
+					await context.UserPlans.AddRangeAsync(
+						new UserPlan
+						{
+							PlanId = 1,
+							CurrentClicks = 0,
+							CurrentCampaigns = 0,
+							CurrentConversions = 0,
+							ExpirationDate = null,
+							UserId = 2,
+						},
+						new UserPlan
+						{
+							PlanId = 1,
+							CurrentClicks = 0,
+							CurrentCampaigns = 0,
+							CurrentConversions = 0,
+							ExpirationDate = null,
+							UserId = 3,
+						},
+						new UserPlan
+						{
+							PlanId = 1,
+							CurrentClicks = 0,
+							CurrentCampaigns = 0,
+							CurrentConversions = 0,
+							ExpirationDate = null,
+							UserId = 4,
+						},
+						new UserPlan
+						{
+							PlanId = 1,
+							CurrentClicks = 0,
+							CurrentCampaigns = 0,
+							CurrentConversions = 0,
+							ExpirationDate = null,
+							UserId = 5,
+						},
+						new UserPlan
+						{
+							PlanId = 1,
+							CurrentClicks = 0,
+							CurrentCampaigns = 0,
+							CurrentConversions = 0,
+							ExpirationDate = null,
+							UserId = 6,
+						}
+						);
+					await context.SaveChangesAsync();
 				}
 				#endregion
 			}

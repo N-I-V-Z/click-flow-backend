@@ -84,26 +84,5 @@ namespace ClickFlow.API.Controllers
 				return GetError();
 			}
 		}
-
-		[Authorize]
-		[HttpPut("{id}/status")]
-		public async Task<IActionResult> UpdateStatus(int id, [FromBody] ConversionUpdateStatusDTO dto)
-		{
-			if (!ModelState.IsValid)
-				return ModelInvalid();
-
-			try
-			{
-				var result = await _conversionService.UpdateStatusAsync(id, dto);
-				return SaveSuccess(result);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-				return SaveError();
-			}
-		}
-
-
 	}
 }

@@ -20,16 +20,13 @@ namespace ClickFlow.DAL.Configurations
 			builder.HasIndex(c => c.ClickId);
 
 			builder.Property(c => c.OrderId)
-				   .HasMaxLength(100);
+				   .HasMaxLength(100)
+				   .IsRequired(false);
 
 			builder.Property(c => c.Timestamp)
 				   .IsRequired();
 
 			builder.Property(c => c.EventType)
-				   .HasConversion<string>()
-				   .IsRequired();
-
-			builder.Property(c => c.Status)
 				   .HasConversion<string>()
 				   .IsRequired();
 

@@ -18,12 +18,11 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Publisher")]
 		[HttpGet("current")]
-		public async Task<IActionResult> GetCurrentPlan([FromQuery] int publisherId)
+		public async Task<IActionResult> GetCurrentPlan()
 		{
-
 			try
 			{
-				var response = await _userPlanService.GetCurrentPlanAsync(publisherId);
+				var response = await _userPlanService.GetCurrentPlanAsync(UserId);
 				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}

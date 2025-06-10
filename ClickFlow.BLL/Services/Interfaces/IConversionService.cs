@@ -9,7 +9,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<PaginatedList<ConversionResponseDTO>> GetAllAsync(ConversionGetAllDTO dto);
 		Task<ConversionResponseDTO> GetByIdAsync(int id);
 		Task<ConversionResponseDTO> CreateAsync(ConversionCreateDTO dto);
-		Task<ConversionResponseDTO> UpdateStatusAsync(int id, ConversionUpdateStatusDTO dto);
 		Task<PublisherResponseDTO> GetPublisherIdByClickId(string clickId);
 	}
 }

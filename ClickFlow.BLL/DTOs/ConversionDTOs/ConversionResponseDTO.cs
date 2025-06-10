@@ -11,7 +11,6 @@ namespace ClickFlow.BLL.DTOs.ConversionDTOs
 		public ConversionEventType EventType { get; set; }
 		public int? Revenue { get; set; }
 		public string OrderId { get; set; }
-		public ConversionStatus Status { get; set; }
 		public DateTime Timestamp { get; set; }
 	}
 }
