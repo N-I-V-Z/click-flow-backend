@@ -56,7 +56,7 @@ namespace ClickFlow.BLL.Services.Implements
 				{
 					return new BaseResponse { IsSuccess = false, Message = "Ngày bắt đầu không được lớn hơn ngày kêt thúc" };
 				}
-				if (startDate >= currentTime)
+				if (startDate < currentTime)
 				{
 					return new BaseResponse { IsSuccess = false, Message = "Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại." };
 				}

@@ -317,7 +317,6 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         [Route("renew-token")]
         public async Task<IActionResult> RenewTokenAsync(AuthenResultDTO authenResult)
