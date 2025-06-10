@@ -201,6 +201,20 @@ namespace ClickFlow.BLL.Services.Implements
 			return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
 		}
 
+		public async Task<CampaignResponseDTO> GetCampaignByTd(int Id)
+		{
+			var repo = _unitOfWork.GetRepo<Campaign>();
+			var campaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
+				.WithPredicate(x => x.Id == Id && !x.IsDeleted)
+				.WithInclude(x => x.Advertiser)
+				.Build());
+			if (campaign == null)
+			{
+				return null;
+			}
+			return _mapper.Map<CampaignResponseDTO>(campaign);
+		}
+
 		public async Task<PaginatedList<CampaignResponseDTO>> GetCampaignsExceptFromPending(int pageIndex, int pageSize)
 		{
 			var repo = _unitOfWork.GetRepo<Campaign>();
@@ -414,8 +428,9 @@ namespace ClickFlow.BLL.Services.Implements
 
 
 			return new PaginatedList<CampaignResponseForPublisherDTO>(mappedCampaigns, pagedCampaigns.TotalItems, pageIndex, pageSize);
-		}
-		public async Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize)
+		}    
+
+        public async Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize)
 		{
 			var repo = _unitOfWork.GetRepo<Campaign>();
 
@@ -681,6 +696,62 @@ namespace ClickFlow.BLL.Services.Implements
 				.Build());
 
 			return await campaigns.CountAsync();
+		}
+
+		public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublishersInCampaign(int campaignId, int pageIndex, int pageSize)
+		{
+			var repo = _unitOfWork.GetRepo<CampaignParticipation>();
+			
+			var participations = repo.Get(new QueryBuilder<CampaignParticipation>()
+				.WithPredicate(x => x.CampaignId == campaignId)
+				.WithInclude(x => x.Publisher)
+				.WithInclude(x => x.Publisher.ApplicationUser)				
+				.Build());
+				
+			var pagedParticipations = await PaginatedList<CampaignParticipation>.CreateAsync(participations, pageIndex, pageSize);
+			
+			// Map từng item thay vì cả collection
+			var result = new List<CampaignParticipationResponseDTO>();
+			foreach (var item in pagedParticipations)
+			{
+				var dto = _mapper.Map<CampaignParticipationResponseDTO>(item);
+				result.Add(dto);
+			}
+			
+			// Get all campaign participations for calculating TotalCampaigns
+			var queryOptions = new QueryBuilder<CampaignParticipation>()
+				.WithInclude(x => x.Publisher)
+				.Build();
+				
+			var allCampaignParticipations = repo.Get(queryOptions).ToList();
+			
+			// Calculate TotalCampaigns for each publisher
+			var publisherCampaignCount = allCampaignParticipations
+				.GroupBy(x => x.PublisherId)
+				.Select(g => new { PublisherId = g.Key, TotalCampaigns = g.Count() })
+				.ToDictionary(x => x.PublisherId, x => x.TotalCampaigns);
+				
+			// Get unique publisher IDs
+			var publisherIds = result.Select(x => x.PublisherId).Distinct().ToList();
+			
+			// Calculate DailyTraffic for all publishers
+			var avgTrafficDict = new Dictionary<int, int>();
+			foreach (var publisherId in publisherIds)
+			{
+				avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaign(publisherId);
+			}
+			
+			// Assign TotalCampaigns and DailyTraffic to each DTO
+			foreach (var item in result)
+			{
+				item.TotalCampaigns = publisherCampaignCount.ContainsKey(item.PublisherId)
+					? publisherCampaignCount[item.PublisherId]
+					: 0;
+					
+				item.DailyTraffic = avgTrafficDict.GetValueOrDefault(item.PublisherId, 0);
+			}
+			
+			return new PaginatedList<CampaignParticipationResponseDTO>(result, pagedParticipations.TotalItems, pageIndex, pageSize);
 		}
 	}
 }

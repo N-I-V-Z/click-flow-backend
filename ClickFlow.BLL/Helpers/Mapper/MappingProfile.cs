@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
+using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.DAL.Entities;
+using ClickFlow.DAL.Paging;
 using System.Globalization;
 using System.Reflection;
 
@@ -39,6 +41,24 @@ namespace ClickFlow.BLL.Helpers.Mapper
 			   .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src =>
 				   DateOnly.FromDateTime(DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture))));
 			CreateMap<ApplicationUser, ApplicationUserResponseDTO>();
+			
+			// Thêm mapping cho PaginatedList<CampaignParticipation> sang List<CampaignParticipationResponseDTO>
+			CreateMap<PaginatedList<CampaignParticipation>, List<CampaignParticipationResponseDTO>>()
+				.ConvertUsing((src, dest, context) => 
+				{
+					var list = new List<CampaignParticipationResponseDTO>();
+					foreach (var item in src)
+					{
+						list.Add(context.Mapper.Map<CampaignParticipationResponseDTO>(item));
+					}
+					return list;
+				});
+				
+			// Thêm mapping cho CampaignParticipation sang CampaignParticipationResponseDTO
+			CreateMap<CampaignParticipation, CampaignParticipationResponseDTO>()
+				.ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.CreateAt)))
+				.ForMember(dest => dest.TotalCampaigns, opt => opt.Ignore())
+				.ForMember(dest => dest.DailyTraffic, opt => opt.Ignore());
 
 		}
 	}

@@ -12,15 +12,17 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<BaseResponse> UpdateCampaign(CampaignUpdateDTO dto);
 		Task<BaseResponse> UpdateCampaignStatus(CampaignUpdateStatusDTO dto);
 		Task<BaseResponse> DeleteCampaign(int id, int userId);
-
-		Task<PaginatedList<CampaignResponseDTO>> GetAllCampaigns(int pageIndex, int pageSize);
+		Task<CampaignResponseDTO> GetCampaignByTd(int Id);
+        Task<PaginatedList<CampaignResponseDTO>> GetAllCampaigns(int pageIndex, int pageSize);
 		Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByStatus(CampaignStatus? status, int pageIndex, int pageSize);
 		Task<PaginatedList<CampaignResponseDTO>> GetCampaignsExceptFromPending(int pageIndex, int pageSize);
 		Task<PaginatedList<CampaignResponseDTO>> GetCampaignsByAdvertiserId(int advertiserId, CampaignStatus? status, int pageIndex, int pageSize);
 		Task<PaginatedList<CampaignResponseForPublisherDTO>> GetAllCampaignForPublisher(int publisherId, int pageIndex, int pageSize);
 		Task<PaginatedList<CampaignResponseDTO>> GetCampaignsJoinedByPublisher(int publisherId, int pageIndex, int pageSize);
 		Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublisherPaticipationByStatusForAdvertiser(int advertiserId, CampaignParticipationStatus? campaignParticipationStatus, int pageIndex, int pageSize);
-		Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize);
+		Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublishersInCampaign(int campaignId, int pageIndex, int pageSize);
+
+        Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize);
 
 		Task<CampaignResponseForPublisherDTO> GetCampaignByIdForPublisher(int id, int publisherId);
 		Task<BaseResponse> RegisterForCampaign(CampaignParticipationCreateDTO dto, int userId);
