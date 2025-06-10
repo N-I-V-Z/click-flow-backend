@@ -705,8 +705,7 @@ namespace ClickFlow.BLL.Services.Implements
 			var participations = repo.Get(new QueryBuilder<CampaignParticipation>()
 				.WithPredicate(x => x.CampaignId == campaignId)
 				.WithInclude(x => x.Publisher)
-				.WithInclude(x => x.Publisher.ApplicationUser)
-				.WithInclude(x => x.Campaign)
+				.WithInclude(x => x.Publisher.ApplicationUser)				
 				.Build());
 				
 			var pagedParticipations = await PaginatedList<CampaignParticipation>.CreateAsync(participations, pageIndex, pageSize);
