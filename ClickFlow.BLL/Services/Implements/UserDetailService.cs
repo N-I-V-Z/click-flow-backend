@@ -79,41 +79,44 @@ namespace ClickFlow.BLL.Services.Implements
 			return new BaseResponse { IsSuccess = false, Message = "Không tồn tại người dùng." };
 		}
 
-		public async Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetails(int pageIndex, int pageSize)
-		{
-			var repo = _unitOfWork.GetRepo<UserDetail>();
-			var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
-										.WithPredicate(x => true)
-										.Build());
-			var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
-			var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
-			return new PaginatedList<UserDetailResponseDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
-		}
+        public async Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetails(int pageIndex, int pageSize)
+        {
+            var repo = _unitOfWork.GetRepo<UserDetail>();
+            var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
+                                        .WithPredicate(x => true)
+                                        .WithInclude(x => x.User)
+                                        .Build());
+            var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
+            var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
+            return new PaginatedList<UserDetailResponseDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
+        }
 
-		public async Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name)
-		{
-			var repo = _unitOfWork.GetRepo<UserDetail>();
-			var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
-										.WithPredicate(x => true)
-										.Build());
-			if (!string.IsNullOrEmpty(name))
-			{
-				loadedRecords = loadedRecords.Where(x => x.User.FullName.Contains(name));
-			}
-			var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
-			var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
-			return new PaginatedList<UserDetailResponseDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
-		}
+        public async Task<PaginatedList<UserDetailResponseDTO>> GetAllUserDetailsByName(int pageIndex, int pageSize, string? name)
+        {
+            var repo = _unitOfWork.GetRepo<UserDetail>();
+            var loadedRecords = repo.Get(new QueryBuilder<UserDetail>()
+                                        .WithPredicate(x => true)
+                                        .WithInclude(x => x.User)
+                                        .Build());
+            if (!string.IsNullOrEmpty(name))
+            {
+                loadedRecords = loadedRecords.Where(x => x.User.FullName.Contains(name));
+            }
+            var pagedRecords = await PaginatedList<UserDetail>.CreateAsync(loadedRecords, pageIndex, pageSize);
+            var resultDTO = _mapper.Map<List<UserDetailResponseDTO>>(pagedRecords);
+            return new PaginatedList<UserDetailResponseDTO>(resultDTO, pagedRecords.TotalItems, pageIndex, pageSize);
+        }
 
-		public async Task<UserDetailResponseDTO> GetUserDetailByUserId(int userId)
-		{
-			var repo = _unitOfWork.GetRepo<UserDetail>();
-			var response = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
-													.WithPredicate(x => x.ApplicationUserId == userId)
-													.WithTracking(false)
-													.Build());
-			if (response == null) return null;
-			return _mapper.Map<UserDetailResponseDTO>(response);
-		}
-	}
+        public async Task<UserDetailResponseDTO> GetUserDetailByUserId(int userId)
+        {
+            var repo = _unitOfWork.GetRepo<UserDetail>();
+            var response = await repo.GetSingleAsync(new QueryBuilder<UserDetail>()
+                                                    .WithPredicate(x => x.ApplicationUserId ==userId)
+                                                    .WithInclude(x => x.User)
+                                                    .WithTracking(false)
+                                                    .Build());
+            if (response == null) return null;
+            return _mapper.Map<UserDetailResponseDTO>(response);
+        }
+    }
 }

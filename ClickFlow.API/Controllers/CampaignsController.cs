@@ -360,12 +360,12 @@ namespace ClickFlow.API.Controllers
 		public async Task<IActionResult> RegisterForCampaign([FromBody] CampaignParticipationCreateDTO dto)
 		{
 			var response = await _campaignService.RegisterForCampaign(dto, UserId);
-			if (response.IsSuccess)
-			{
-				return Ok(response);
-			}
-			return BadRequest(response);
-		}
+            if (response.IsSuccess)
+            {
+                return SaveSuccess(response);
+            }
+            return SaveError(response);
+        }
 
 		[Authorize]
 		[HttpGet("campaigns/count-by-statuses")]
@@ -439,24 +439,19 @@ namespace ClickFlow.API.Controllers
 					campaignParticipationId,
 					newStatus);
 
-				if (!response.IsSuccess)
-				{
-					return BadRequest(response);
-				}
-
-				return Ok(response);
-			}
+                if (response.IsSuccess)
+                {
+                    return SaveSuccess(response);
+                }
+                return SaveError(response);
+            }
 			catch (Exception ex)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(ex.Message);
 				Console.ResetColor();
-				return StatusCode(500, new BaseResponse
-				{
-					IsSuccess = false,
-					Message = "Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau."
-				});
-			}
+                return SaveError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.");
+            }
 		}
 	}
 }
