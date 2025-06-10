@@ -317,7 +317,7 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         [Route("renew-token")]
         public async Task<IActionResult> RenewTokenAsync(AuthenResultDTO authenResult)
@@ -336,16 +336,12 @@ namespace ClickFlow.API.Controllers
                 {
                     return Error(checkToken.Message);
                 }
-                var user = await _identityService.GetByIdAsync(UserId);
-                if (user == null)
-                {
-                    return GetNotFound("Không tìm thấy người dùng.");
-                }
-                var newToken = await _accountService.GenerateTokenAsync(user);
+                var newToken = await _accountService.GenerateTokenFromRefreshTokenAsync(authenResult);
                 if (newToken == null)
                 {
                     return Error("Tạo mã đăng nhập mới không thành công. Vui lòng thử lại sau ít phút.");
                 }
+
 
                 return SaveSuccess(newToken);
             }

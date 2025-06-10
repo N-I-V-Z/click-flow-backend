@@ -9,7 +9,7 @@ namespace ClickFlow.BLL.DTOs.CampaignParticipationDTOs
 		public int Id { get; set; }
 		public CampaignParticipationStatus Status { get; set; }
 		public string ShortLink { get; set; }
-		public DateTime CreateAt { get; set; }
+		public DateOnly CreateAt { get; set; }
 		public int PublisherId { get; set; }
 		public PublisherResponseDTO Publisher { get; set; }
 		public int CampaignId { get; set; }

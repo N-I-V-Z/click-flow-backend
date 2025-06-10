@@ -208,6 +208,41 @@ namespace ClickFlow.BLL.Services.Implements
                 throw;
             }
         }
+        public async Task<AuthenResultDTO> GenerateTokenFromRefreshTokenAsync(AuthenResultDTO authenResult)
+        {
+            try
+            {
+                var refreshTokenRepo = _unitOfWork.GetRepo<RefreshToken>();
+                var storedToken = await refreshTokenRepo.GetSingleAsync(new QueryBuilder<RefreshToken>()
+                    .WithPredicate(x => x.Token == authenResult.RefreshToken && !x.IsUsed && !x.IsRevoked)
+                    .WithTracking(true)
+                    .Build());
+
+                if (storedToken == null)
+                {
+                    return null;
+                }
+
+                // Đánh dấu là đã sử dụng
+                storedToken.IsUsed = true;
+                await _unitOfWork.SaveChangesAsync();
+
+                // Lấy user từ UserId
+                var user = await _identityService.GetByIdAsync(storedToken.UserId);
+                if (user == null)
+                {
+                    return null;
+                }
+
+                // Sinh token mới như cũ
+                return await GenerateTokenAsync(user);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollBackAsync();
+                return null;
+            }
+        }
 
 
 
