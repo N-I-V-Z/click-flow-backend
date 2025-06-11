@@ -13,6 +13,7 @@ namespace ClickFlow.DAL.Entities
 		public Advertiser? Advertiser { get; set; }
 		public Publisher? Publisher { get; set; }
 		public Wallet? Wallet { get; set; }
+		public bool IsBlocked { get; set; }
 
 		public ICollection<Post> Posts { get; set; }
 		public ICollection<Comment> Comments { get; set; }

@@ -19,7 +19,9 @@ namespace ClickFlow.DAL.Configurations
 				   .IsRequired();
 			builder.Property(u => u.IsDeleted)
 				   .IsRequired();
-			builder.HasOne(u => u.UserDetail)
+            builder.Property(u => u.IsBlocked)
+                   .IsRequired();
+            builder.HasOne(u => u.UserDetail)
 				   .WithOne(ud => ud.User)
 				   .HasForeignKey<UserDetail>(ud => ud.ApplicationUserId);
 		}

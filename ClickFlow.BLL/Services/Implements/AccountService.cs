@@ -549,6 +549,33 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
+		public async Task<BaseResponse> UpdateUserBlockStatusAsync(int userId, bool isBlocked)
+		{
+			try
+			{
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+				var user = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>()
+					.WithPredicate(x => x.Id == userId)
+					.WithTracking(true)
+					.Build());
+
+				if (user == null)
+				{
+					return new BaseResponse { IsSuccess = false, Message = "User not found." };
+				}
+
+				user.IsBlocked = isBlocked;
+				await userRepo.UpdateAsync(user);
+				await _unitOfWork.SaveChangesAsync();
+
+				var message = isBlocked ? "User blocked successfully." : "User unblocked successfully.";
+				return new BaseResponse { IsSuccess = true, Message = message };
+			}
+			catch (Exception ex)
+			{
+				return new BaseResponse { IsSuccess = false, Message = $"Error updating user status: {ex.Message}" };
+			}
+		}
 
 		#region Private
 		private string GenerateRefreshToken()
