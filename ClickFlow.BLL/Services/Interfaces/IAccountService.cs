@@ -18,5 +18,6 @@ namespace ClickFlow.BLL.Services.Interfaces
         Task<BaseResponse> ResetPasswordAsync(AccountResetpassDTO dto);
         Task<BaseResponse> SendOTPByEmailAsync(string email);
         Task<BaseResponse> UpdateUserBlockStatusAsync(int userId, bool isBlocked);
+        Task<AuthenResultDTO> SignInWithGoogleAsync(GoogleAuthDTO dto);
     }
 }

@@ -17,6 +17,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using System.Net.Http.Json;
+using System.Net.Http;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -575,6 +577,76 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				return new BaseResponse { IsSuccess = false, Message = $"Error updating user status: {ex.Message}" };
 			}
+		}
+
+		public async Task<AuthenResultDTO> SignInWithGoogleAsync(GoogleAuthDTO dto)
+		{
+			try
+			{
+				var clientId = _configuration["Authentication:Google:ClientId"];
+				var httpClient = new HttpClient();
+				var tokenInfoUrl = $"https://oauth2.googleapis.com/tokeninfo?id_token={dto.IdToken}";
+				var response = await httpClient.GetAsync(tokenInfoUrl);
+				if (!response.IsSuccessStatusCode)
+				{
+					return null;
+				}
+
+				var tokenInfo = await response.Content.ReadFromJsonAsync<GoogleTokenInfo>();
+				if (tokenInfo == null || tokenInfo.Aud != clientId)
+				{
+					return null;
+				}
+
+				// Get or create user
+				var user = await _identityService.GetByEmailAsync(tokenInfo.Email);
+				if (user != null && user.IsBlocked)
+				{
+					return null;
+				}
+
+				if (user == null)
+				{
+					user = new ApplicationUser
+					{
+						Email = tokenInfo.Email,
+						UserName = tokenInfo.Email,
+						FullName = tokenInfo.Name,
+						EmailConfirmed = true,
+						Role = DAL.Enums.Role.Publisher
+					};
+
+					var createResult = await _identityService.CreateAsync(user, Guid.NewGuid().ToString() + "Aa1!");
+					if (!createResult.Succeeded)
+					{
+						return null;
+					}
+					await _identityService.AddToRoleAsync(user, user.Role.ToString());
+				}
+
+				return await GenerateTokenAsync(user);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				return null;
+			}
+		}
+
+		private class GoogleTokenInfo
+		{
+			public string Iss { get; set; }
+			public string Azp { get; set; }
+			public string Aud { get; set; }
+			public string Sub { get; set; }
+			public string Email { get; set; }
+			public string Email_Verified { get; set; }
+			public string Name { get; set; }
+			public string Picture { get; set; }
+			public string Given_Name { get; set; }
+			public string Family_Name { get; set; }
+			public string Iat { get; set; }
+			public string Exp { get; set; }
 		}
 
 		#region Private
