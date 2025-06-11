@@ -7,20 +7,23 @@ using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
+using Net.payOS;
 namespace ClickFlow.BLL.Services.Implements
 {
 	public class TransacsionService : BaseServices<Transaction, TransactionResponseDTO>, ITransactionService
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
+		//private readonly PayOS _payOS;
 
-		public TransacsionService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+		public TransacsionService(IUnitOfWork unitOfWork, IMapper mapper/*, PayOS payOS */) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
+			//_payOS = payOS;
 		}
 
-		public async Task<TransactionResponseDTO> CreateTransactionAsync(TransactionCreateDTO dto)
+		public async Task<TransactionResponseDTO> CreateTransactionAsync(int userId, TransactionCreateDTO dto)
 		{
 			try
 			{
@@ -32,7 +35,7 @@ namespace ClickFlow.BLL.Services.Implements
 				// 1) Lấy Wallet bằng dto.WalletId
 				var wallet = await walletRepo.GetSingleAsync(
 					new QueryBuilder<Wallet>()
-						.WithPredicate(x => x.Id == dto.WalletId)
+						.WithPredicate(x => x.UserId == userId)
 						.WithTracking(false)
 						.Build());
 
@@ -114,7 +117,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<TransactionResponseDTO> UpdateStatusTransactionAsync(int id, TransactionUpdateStatusDTO dto)
+		public async Task<TransactionResponseDTO> UpdateStatusTransactionAsync(long id, TransactionUpdateStatusDTO dto)
 		{
 			try
 			{

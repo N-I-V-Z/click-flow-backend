@@ -631,7 +631,7 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<int>(type: "int", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -793,7 +793,6 @@ namespace ClickFlow.DAL.Migrations
                     EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Revenue = table.Column<int>(type: "int", nullable: true),
                     OrderId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
