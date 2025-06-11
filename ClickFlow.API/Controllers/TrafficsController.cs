@@ -1,6 +1,7 @@
 ﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
+using ClickFlow.BLL.Helpers.Config;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -140,9 +141,7 @@ namespace ClickFlow.API.Controllers
 					return SaveError(checkTraffic.Message);
 
 				// 3) Tính IP
-				var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-				if (string.IsNullOrEmpty(ip))
-					ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+				var ip = Utils.GetIpAddress(HttpContext);
 
 				// 4) Tăng click count, nếu hết quota quay về lỗi
 				//    PublisherId lấy từ dto.PublisherId (giả định DTO có trường này)
