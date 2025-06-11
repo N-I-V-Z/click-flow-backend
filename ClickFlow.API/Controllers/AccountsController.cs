@@ -519,5 +519,34 @@ namespace ClickFlow.API.Controllers
                 return Error("Đã xảy ra lỗi khi cập nhật trạng thái người dùng. Vui lòng thử lại sau.");
             }
         }
+
+        [HttpPost]
+        [Route("authen-google")]
+        public async Task<IActionResult> SignInWithGoogleAsync([FromBody] GoogleAuthDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(dto.IdToken))
+                {
+                    ModelState.AddModelError("IdToken", "IdToken không được để trống.");
+                    return ModelInvalid();
+                }
+
+                var token = await _accountService.SignInWithGoogleAsync(dto);
+                if (token == null)
+                {
+                    return GetUnAuthorized("Đăng nhập bằng Google không thành công.");
+                }
+
+                return Success(token, "Đăng nhập thành công.");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi trong quá trình đăng nhập bằng Google. Vui lòng thử lại sau.");
+            }
+        }
     }
 }
