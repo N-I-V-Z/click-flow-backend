@@ -105,6 +105,10 @@ namespace ClickFlow.API.Controllers
                 if (authenDTO.UserNameOrEmail.Equals(adminEmail))
                 {
                     var admin = await _identityService.GetByEmailAsync(adminEmail);
+                    if (admin != null && admin.IsBlocked)
+                    {
+                        return GetUnAuthorized("Tài khoản của bạn đã bị chặn. Vui lòng liên hệ quản trị viên.");
+                    }
                     var adminPass = await _identityService.CheckPasswordAsync(admin, authenDTO.Password);
                     if (!adminPass)
                     {
@@ -125,6 +129,11 @@ namespace ClickFlow.API.Controllers
                 {
                     ModelState.AddModelError("UserNameOrEmail", "Tên đăng nhập hoặc Email không đúng.");
                     return ModelInvalid();
+                }
+
+                if (user.IsBlocked)
+                {
+                    return GetUnAuthorized("Tài khoản của bạn đã bị chặn. Vui lòng liên hệ quản trị viên.");
                 }
 
                 var password = await _identityService.CheckPasswordAsync(user, authenDTO.Password);
@@ -485,6 +494,29 @@ namespace ClickFlow.API.Controllers
                 Console.WriteLine(ex.Message);
                 Console.ResetColor();
                 return Error("Đã xảy ra lỗi khi gửi mã OTP. Vui lòng thử lại sau.");
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("update-user-status/{userId}/{isBlocked}")]
+        public async Task<IActionResult> UpdateUserStatusAsync([FromRoute] int userId, [FromRoute] bool isBlocked)
+        {
+            try
+            {
+                var response = await _accountService.UpdateUserBlockStatusAsync(userId, isBlocked);
+                if (!response.IsSuccess)
+                {
+                    return Error(response.Message);
+                }
+                return SaveSuccess(response);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã xảy ra lỗi khi cập nhật trạng thái người dùng. Vui lòng thử lại sau.");
             }
         }
     }
