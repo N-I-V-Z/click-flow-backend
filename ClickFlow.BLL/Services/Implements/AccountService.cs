@@ -624,7 +624,31 @@ namespace ClickFlow.BLL.Services.Implements
 					await _identityService.AddToRoleAsync(user, user.Role.ToString());
 				}
 
-				return await GenerateTokenAsync(user);
+				// Store avatar
+				var userDetailRepo = _unitOfWork.GetRepo<UserDetail>();
+				var userDetail = await userDetailRepo.GetSingleAsync(new QueryBuilder<UserDetail>()
+				    .WithPredicate(x => x.ApplicationUserId == user.Id)
+				    .WithTracking(true)
+				    .Build());
+
+                if (userDetail == null)
+                {
+                    userDetail = new UserDetail
+                    {
+                        ApplicationUserId = user.Id,
+                        AvatarURL = tokenInfo.Picture
+                    };
+                    await userDetailRepo.CreateAsync(userDetail);
+                }
+                else
+                {
+                    userDetail.AvatarURL = tokenInfo.Picture;
+                    await userDetailRepo.UpdateAsync(userDetail);
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+
+                return await GenerateTokenAsync(user);
 			}
 			catch (Exception ex)
 			{
