@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClickFlow.DAL.Migrations
 {
     [DbContext(typeof(ClickFlowContext))]
-    [Migration("20250606091225_Init")]
+    [Migration("20250611044336_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -327,10 +327,6 @@ namespace ClickFlow.DAL.Migrations
 
                     b.Property<int?>("Revenue")
                         .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
@@ -766,11 +762,11 @@ namespace ClickFlow.DAL.Migrations
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Transaction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<int>("Amount")
                         .HasColumnType("int");

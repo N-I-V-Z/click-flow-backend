@@ -27,7 +27,6 @@ namespace ClickFlow.API.Controllers
 				var data = await _courseService.GetAllCoursesAsync(dto);
 				var response = new PagingDTO<CourseResponseDTO>(data);
 
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -67,7 +66,6 @@ namespace ClickFlow.API.Controllers
 				var data = await _courseService.GetAllCourseForPublisherAsync(UserId, dto);
 				var response = new PagingDTO<CourseResponseDTO>(data);
 
-				if (!data.Any()) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -87,7 +85,6 @@ namespace ClickFlow.API.Controllers
 			{
 				var response = await _courseService.GetCourseByIdAsync(courseId);
 
-				if (response == null) return GetNotFound("Không có dữ liệu.");
 				return GetSuccess(response);
 			}
 			catch (Exception ex)

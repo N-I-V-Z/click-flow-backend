@@ -62,17 +62,12 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var repo = _unitOfWork.GetRepo<Course>();
 
-				var queryBuilder = CreateQueryBuilder()
+				var queryBuilder = CreateQueryBuilder(dto.Keyword)
 					.WithInclude(x => x.CoursePublishers)
 					.WithPredicate(x =>
 						x.CoursePublishers.FirstOrDefault(c => c.PublisherId == publisherId) == null
 					);
 
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Course>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
 				var loadedRecords = repo.Get(queryBuilder.Build());
 
 				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
@@ -90,13 +85,8 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var courseRepo = _unitOfWork.GetRepo<Course>();
 
-				var queryBuilder = CreateQueryBuilder();
+				var queryBuilder = CreateQueryBuilder(dto.Keyword);
 
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Course>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
 				var loadedRecords = courseRepo.Get(queryBuilder.Build());
 
 				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
