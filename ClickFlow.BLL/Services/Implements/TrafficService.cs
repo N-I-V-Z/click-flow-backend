@@ -175,15 +175,13 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-				var queryBuilder = CreateQueryBuilder().WithInclude(
+				var queryBuilder = CreateQueryBuilder(dto.Keyword).WithInclude(
 					//x => x.CampaignParticipation, 
 					x => x.CampaignParticipation.Campaign,
 					x => x.CampaignParticipation.Publisher.ApplicationUser);
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
+
+				queryBuilder.WithOrderBy(x => x.OrderByDescending(x => x.Timestamp));
+
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
 				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
@@ -219,13 +217,13 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByPublisherIdAsync(int id, PagingRequestDTO dto)
+		public async Task<PaginatedList<TrafficResponseDTO>> GetAllByPublisherIdAsync(int id, TrafficForPublisherDTO dto)
 		{
 			try
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-				var queryBuilder = CreateQueryBuilder();
+				var queryBuilder = CreateQueryBuilder(dto.Keyword);
 				var queryOptions = queryBuilder
 					.WithInclude(
 						//x => x.CampaignParticipation, 
@@ -233,11 +231,12 @@ namespace ClickFlow.BLL.Services.Implements
 						x => x.CampaignParticipation.Publisher.ApplicationUser)
 					.WithPredicate(x => x.CampaignParticipation.Publisher.ApplicationUser.Id == id);
 
-				if (!string.IsNullOrEmpty(dto.Keyword))
+				if (dto.CampaignId != null)
 				{
-					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
+					queryBuilder.WithPredicate(x => x.CampaignParticipation.CampaignId == dto.CampaignId);
 				}
+
+				queryBuilder.WithOrderBy(x => x.OrderByDescending(x => x.Timestamp));
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
@@ -256,18 +255,14 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-				var queryBuilder = CreateQueryBuilder();
+				var queryBuilder = CreateQueryBuilder(dto.Keyword);
 				var queryOptions = queryBuilder.WithInclude(
 						//x => x.CampaignParticipation,
 						x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser,
 						x => x.CampaignParticipation.Publisher.ApplicationUser)
 					.WithPredicate(x => x.CampaignParticipation.Campaign.Advertiser.ApplicationUser.Id == id);
 
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
+				queryBuilder.WithOrderBy(x => x.OrderByDescending(x => x.Timestamp));
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
@@ -286,17 +281,12 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-				var queryBuilder = CreateQueryBuilder();
+				var queryBuilder = CreateQueryBuilder(dto.Keyword);
 				var queryOptions = queryBuilder.WithInclude(
 						//x => x.CampaignParticipation,
 						x => x.CampaignParticipation.Campaign,
 						x => x.CampaignParticipation.Publisher.ApplicationUser)
 					.WithPredicate(x => x.CampaignParticipation.CampaignId == id);
-				if (!string.IsNullOrEmpty(dto.Keyword))
-				{
-					var predicate = FilterHelper.BuildSearchExpression<Traffic>(dto.Keyword);
-					queryBuilder.WithPredicate(predicate);
-				}
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 

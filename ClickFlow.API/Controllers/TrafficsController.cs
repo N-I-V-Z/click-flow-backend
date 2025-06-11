@@ -64,7 +64,7 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Publisher")]
 		[HttpGet("publisher")]
-		public async Task<IActionResult> GetTrafficsByPublisher([FromQuery] PagingRequestDTO dto)
+		public async Task<IActionResult> GetTrafficsByPublisher([FromQuery] TrafficForPublisherDTO dto)
 		{
 			try
 			{
