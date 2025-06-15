@@ -27,7 +27,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task ConfirmWebhook(string webhookUrl)
+		public async Task ConfirmWebhookAsync(string webhookUrl)
 		{
 			try
 			{
@@ -38,11 +38,6 @@ namespace ClickFlow.BLL.Services.Implements
 				Console.WriteLine(ex.ToString());
 				throw;
 			}
-		}
-
-		public Task ConfirmWebhookAsync(string webhookUrl)
-		{
-			throw new NotImplementedException();
 		}
 
 		public async Task<CreatePaymentResult> CreatePaymentLinkAsync(PaymentData data)
