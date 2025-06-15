@@ -1,11 +1,14 @@
-﻿using ClickFlow.BLL.DTOs;
+﻿using Azure;
+using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.PayOSDTOs;
 using ClickFlow.BLL.DTOs.TransactionDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Net.payOS;
 using Net.payOS.Types;
+using System.Text.Json;
 
 namespace ClickFlow.API.Controllers
 {
@@ -17,17 +20,20 @@ namespace ClickFlow.API.Controllers
 		//private readonly IVnPayService _vnPayService;
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly IPayOSService _payOSService;
+		private readonly IConfiguration _configuration;
 
 		public TransactionsController(
 			ITransactionService transactionService
 			/*, IVnPayService vnPayService */,
 			 IHttpContextAccessor httpContextAccessor,
-			 IPayOSService payOSService)
+			 IPayOSService payOSService,
+			 IConfiguration configuration)
 		{
 			//_vnPayService = vnPayService;
 			_transactionService = transactionService;
 			_httpContextAccessor = httpContextAccessor;
 			_payOSService = payOSService;
+			_configuration = configuration;
 		}
 
 		[Authorize(Roles = "Publisher, Advertiser")]
@@ -167,10 +173,30 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
+
+		[Authorize(Roles = "Publisher, Advertiser")]
+		[HttpPost]
+		public async Task<IActionResult> CreateTransactionRequest([FromBody] TransactionCreateDTO dto)
+		{
+			try
+			{
+				var response = await _transactionService.CreateTransactionAsync(UserId, dto);
+				if (response == null) return SaveError();
+				return SaveSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+			}
+		}
+
 		// PayOS
 		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost("payos/create-payment-link")]
-		public async Task<IActionResult> CreatePayOSPaymentLink(TransactionCreateDTO dto)
+		public async Task<IActionResult> CreatePayOSPaymentLink([FromBody] TransactionCreateDTO dto)
 		{
 			if (!ModelState.IsValid) return ModelInvalid();
 
@@ -185,16 +211,15 @@ namespace ClickFlow.API.Controllers
 				List<ItemData> items = new List<ItemData> { item };
 
 				// Get the current request's base URL
-				var request = _httpContextAccessor.HttpContext.Request;
-				var baseUrl = $"{request.Scheme}://{request.Host}";
+				var feURL = _configuration["FronendURL"];
 
 				PaymentData paymentData = new PaymentData(
 					orderCode: orderCode,
 					amount: transaction.Amount,
 					description: description,
 					items: items,
-					cancelUrl: $"{baseUrl}/cancel",
-					returnUrl: $"{baseUrl}/success"
+					cancelUrl: $"{feURL}/payment-cancel",
+					returnUrl: $"{feURL}/payment-success"
 				);
 
 				CreatePaymentResult createPayment = await _payOSService.CreatePaymentLinkAsync(paymentData);
@@ -211,7 +236,7 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet("payos/get-payment-link-infomation/{orderId}")]
-		public async Task<IActionResult> GetPaymentLinkInformation(int orderId)
+		public async Task<IActionResult> GetPaymentLinkInformation(long orderId)
 		{
 			try
 			{
@@ -228,26 +253,36 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[HttpPost("payos/webhook")]
-		public async Task<IActionResult> HandleWebhook(ConfirmWebhookDTO dto)
+		public async Task<IActionResult> HandleWebhook([FromBody] WebhookType payload)
 		{
 			try
 			{
-				await _payOSService.ConfirmWebhookAsync(dto.webhook_url);
+				var webhookData = _payOSService.VerifyPaymentWebhookData(payload);
+				if (webhookData == null)
+				{
+					return Ok(new PayOSWebhookResponse(-1, "fail", null));
+				}
 
-				return SaveSuccess(true);
+				var checkUpdateTransaction = await _transactionService.UpdateStatusTransactionAsync(webhookData.orderCode, new TransactionUpdateStatusDTO { Status = payload.success });
+
+				if (checkUpdateTransaction == null)
+				{
+					return Ok(new PayOSWebhookResponse(-1, "fail", null));
+				}
+
+				return Ok(new PayOSWebhookResponse(0, "Ok", null));
 			}
 			catch (Exception ex)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
+				Console.WriteLine($"[Webhook Error] {ex.Message}");
 				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Ok(new PayOSWebhookResponse(-1, "fail", null));
 			}
 		}
 
-
 		[HttpPut("payos/cancel-payment-link/{orderId}")]
-		public async Task<IActionResult> CancelPaymentLink(int orderId)
+		public async Task<IActionResult> CancelPaymentLink(long orderId)
 		{
 			try
 			{

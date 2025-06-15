@@ -46,6 +46,7 @@ namespace ClickFlow.BLL.Services.Implements
 				newTransaction.PaymentDate = DateTime.UtcNow;
 				newTransaction.Status = false; // pending
 				newTransaction.Balance = wallet.Balance; // lưu số dư hiện tại
+				newTransaction.WalletId = wallet.Id;
 
 				// 3) Tùy loại TransactionType
 				if (dto.TransactionType == TransactionType.Withdraw)
