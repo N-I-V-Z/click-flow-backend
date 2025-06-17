@@ -286,7 +286,8 @@ namespace ClickFlow.BLL.Services.Implements
 						//x => x.CampaignParticipation,
 						x => x.CampaignParticipation.Campaign,
 						x => x.CampaignParticipation.Publisher.ApplicationUser)
-					.WithPredicate(x => x.CampaignParticipation.CampaignId == id);
+					.WithPredicate(x => x.CampaignParticipation.CampaignId == id)
+					.WithOrderBy(x => x.OrderByDescending(x => x.Timestamp));
 
 				var loadedRecords = trafficRepo.Get(queryBuilder.Build());
 
