@@ -16,6 +16,7 @@ namespace ClickFlow.BLL.Services.Implements
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
+		private readonly double COMMISSION = 0.05;
 
 		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
@@ -128,7 +129,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				await trafficRepo.CreateAsync(newTraffic);
 
-				var commision = campaign.Commission != null ? campaign.Commission.Value : campaign.Budget * campaign.Percents / 100;
+				var commision = (campaign.Commission != null ? campaign.Commission.Value : campaign.Budget * campaign.Percents / 100) * (1 - COMMISSION);
 
 				// Nếu là CPC → tạo conversion ngay lập tức
 				if (campaign.TypePay == TypePay.CPC && newTraffic.IsValid)
