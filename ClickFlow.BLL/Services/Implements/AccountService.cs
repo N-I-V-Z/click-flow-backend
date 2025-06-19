@@ -30,15 +30,17 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWalletService _walletService;
 
         public AccountService(IIdentityService identityService, IUnitOfWork unitOfWork,
-                               IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+                               IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IWalletService walletService)
         {
             _unitOfWork = unitOfWork;
             _identityService = identityService;
             _emailService = emailService;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _walletService = walletService;
         }
         public async Task<AuthenResultDTO> GenerateTokenAsync(ApplicationUser user)
         {
@@ -412,6 +414,9 @@ namespace ClickFlow.BLL.Services.Implements
 
 				}
 
+				// Tạo ví cho user mới
+				await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
+
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
@@ -605,6 +610,7 @@ namespace ClickFlow.BLL.Services.Implements
 					return null;
 				}
 
+				bool isNewUser = false;
 				if (user == null)
 				{
 					user = new ApplicationUser
@@ -622,6 +628,7 @@ namespace ClickFlow.BLL.Services.Implements
 						return null;
 					}
 					await _identityService.AddToRoleAsync(user, user.Role.ToString());
+					isNewUser = true;
 				}
 
 				// Store avatar
@@ -644,6 +651,13 @@ namespace ClickFlow.BLL.Services.Implements
                 {
                     userDetail.AvatarURL = tokenInfo.Picture;
                     await userDetailRepo.UpdateAsync(userDetail);
+                }
+
+                // Tạo ví nếu chưa có
+                var wallet = await _walletService.GetWalletByUserIdAsync(user.Id);
+                if (wallet == null)
+                {
+                    await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
                 }
 
                 await _unitOfWork.SaveChangesAsync();
