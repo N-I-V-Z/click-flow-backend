@@ -420,5 +420,43 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
+
+		public async Task<int> CountTrafficForPublisher(int campaignId, int publisherId)
+		{
+			try
+			{
+				var campaignRepo = _unitOfWork.GetRepo<Campaign>();
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+				var campaign = await campaignRepo.GetSingleAsync(
+					new QueryBuilder<Campaign>()
+						.WithPredicate(x => x.Id == campaignId)
+						.Build());
+
+				if (campaign == null) throw new Exception($"Campaign with ID {campaignId} not found.");
+
+				var cps = await cpRepo.GetSingleAsync(
+					new QueryBuilder<CampaignParticipation>()
+						.WithPredicate(x => x.CampaignId == campaignId && x.PublisherId == publisherId)
+						.Build());
+
+				if (cps == null) return 0;
+
+				var isClosed = campaign.Status == CampaignStatus.Completed || campaign.Status == CampaignStatus.Canceled;
+
+				var traffics = await trafficRepo.GetAllAsync(
+					CreateQueryBuilder()
+						.WithPredicate(x => x.IsClosed == isClosed && cps.Id == x.CampaignParticipationId && x.IsValid)
+						.Build());
+
+				return traffics.Count();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
 	}
 }
