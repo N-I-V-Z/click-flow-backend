@@ -165,13 +165,31 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize]
+		[Authorize(Roles = "Admin, Advertiser")]
 		[HttpGet("{campaignId}/count")]
 		public async Task<IActionResult> GetCountTrafficByCampaignId(int campaignId)
 		{
 			try
 			{
 				var response = await _trafficService.CountAllTrafficByCampaign(campaignId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publisher/{campaignId}/count")]
+		public async Task<IActionResult> GetCountTrafficForPublisher(int campaignId)
+		{
+			try
+			{
+				var response = await _trafficService.CountTrafficForPublisher(campaignId, UserId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
