@@ -516,6 +516,31 @@ namespace ClickFlow.BLL.Services.Implements
 			return response;
 		}
 
+		private async Task<double> GetTotalRevenueOfValidConversions(int campaignId)
+		{
+			var participationRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+			var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+			var conversionRepo = _unitOfWork.GetRepo<Conversion>();
+
+			var participations = await participationRepo.Get(new QueryBuilder<CampaignParticipation>()
+				.WithPredicate(x => x.CampaignId == campaignId)
+				.Build()).ToListAsync();
+
+			var participationIds = participations.Select(p => p.Id).ToList();
+
+			var traffics = await trafficRepo.Get(new QueryBuilder<Traffic>()
+				.WithPredicate(x => x.IsValid && x.CampaignParticipationId != null && participationIds.Contains(x.CampaignParticipationId.Value))
+				.Build()).ToListAsync();
+
+			var clickIds = traffics.Select(t => t.ClickId).ToList();
+
+			var conversions = await conversionRepo.Get(new QueryBuilder<Conversion>()
+				.WithPredicate(x => clickIds.Contains(x.ClickId) && x.Revenue != null)
+				.Build()).ToListAsync();
+
+			return conversions.Sum(c => c.Revenue ?? 0);
+		}
+
 		public async Task<BaseResponse> ValidateCampaignForTraffic(int campaignId)
 		{
 			var repo = _unitOfWork.GetRepo<Campaign>();
@@ -542,6 +567,14 @@ namespace ClickFlow.BLL.Services.Implements
 			if (campaign.Advertiser != null && campaign.Advertiser.ApplicationUser.IsDeleted)
 			{
 				return new BaseResponse { IsSuccess = false, Message = "Nhà quảng cáo của chiến dịch này đã bị khóa." };
+			}
+			var availableBudget = campaign.Budget * 0.9;
+
+			var totalRevenue = await GetTotalRevenueOfValidConversions(campaignId);
+
+			if (totalRevenue >= availableBudget)
+			{
+				return new BaseResponse { IsSuccess = false, Message = $"Tổng doanh thu từ các conversion đã vượt quá ngân sách khả dụng ({availableBudget:N0})." };
 			}
 
 			return new BaseResponse { IsSuccess = true, Message = "Chiến dịch hợp lệ để chạy traffic." };
