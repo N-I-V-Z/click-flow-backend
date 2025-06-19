@@ -20,6 +20,8 @@ namespace ClickFlow.BLL.Services.Implements
 		private readonly IAdvertiserService _advertiserService;
 		private readonly ITrafficService _trafficService;
 
+		private readonly double COMMISION = 0.9;
+
 
 
 		public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService, ITrafficService trafficService)
@@ -568,13 +570,16 @@ namespace ClickFlow.BLL.Services.Implements
 			{
 				return new BaseResponse { IsSuccess = false, Message = "Nhà quảng cáo của chiến dịch này đã bị khóa." };
 			}
-			var availableBudget = campaign.Budget * 0.9;
+			var availableBudget = campaign.Budget * COMMISION;
 
 			var totalRevenue = await GetTotalRevenueOfValidConversions(campaignId);
 
-			if (totalRevenue >= availableBudget)
+			// Lấy giá trị hoa hồng cho 1 lượt click
+			var nextClickRevenue = campaign.Commission ?? (campaign.Percents/100*campaign.Budget) ?? 0;
+
+			if (totalRevenue + nextClickRevenue >= availableBudget)
 			{
-				return new BaseResponse { IsSuccess = false, Message = $"Tổng doanh thu từ các conversion đã vượt quá ngân sách khả dụng ({availableBudget:N0})." };
+				return new BaseResponse { IsSuccess = false, Message = $"Tổng doanh thu hiện tại cộng thêm 1 lượt click nữa sẽ vượt quá ngân sách khả dụng ({availableBudget:N0})." };
 			}
 
 			return new BaseResponse { IsSuccess = true, Message = "Chiến dịch hợp lệ để chạy traffic." };
