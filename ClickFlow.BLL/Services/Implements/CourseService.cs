@@ -5,6 +5,7 @@ using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
+using ClickFlow.DAL.Enums;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
@@ -166,6 +167,19 @@ namespace ClickFlow.BLL.Services.Implements
 				// Trừ tiền
 				wallet.Balance -= course.Price;
 				await walletRepo.UpdateAsync(wallet);
+
+				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+				var newTransaction = new Transaction
+				{
+					Amount = course.Price,
+					Balance = wallet.Balance - course.Price,
+					PaymentDate = DateTime.UtcNow,
+					Status = true,
+					TransactionType = TransactionType.Pay,
+					WalletId = wallet.Id
+				};
+				await transactionRepo.CreateAsync(newTransaction);
+				await _unitOfWork.SaveAsync();
 
 				// Tham gia khóa học
 				var coursePublisher = new CoursePublisher
