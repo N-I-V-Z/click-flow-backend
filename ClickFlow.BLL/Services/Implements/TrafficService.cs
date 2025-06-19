@@ -128,6 +128,8 @@ namespace ClickFlow.BLL.Services.Implements
 
 				await trafficRepo.CreateAsync(newTraffic);
 
+				var commision = campaign.Commission != null ? campaign.Commission.Value : campaign.Budget * campaign.Percents / 100;
+
 				// Nếu là CPC → tạo conversion ngay lập tức
 				if (campaign.TypePay == TypePay.CPC && newTraffic.IsValid)
 				{
@@ -135,7 +137,7 @@ namespace ClickFlow.BLL.Services.Implements
 					{
 						ClickId = newTraffic.ClickId,
 						EventType = ConversionEventType.Conversion,
-						Revenue = campaign.Commission,
+						Revenue = commision,
 						OrderId = null,
 						Timestamp = DateTime.UtcNow
 					};
@@ -143,7 +145,7 @@ namespace ClickFlow.BLL.Services.Implements
 					await conversionRepo.CreateAsync(conversion);
 
 					// Cộng hoa hồng cho publisher
-					wallet.Balance += campaign.Commission ?? 0;
+					wallet.Balance += commision ?? 0;
 					await walletRepo.UpdateAsync(wallet);
 				}
 
