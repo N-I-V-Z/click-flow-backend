@@ -138,7 +138,7 @@ namespace ClickFlow.BLL.Services.Implements
 					{
 						ClickId = newTraffic.ClickId,
 						EventType = ConversionEventType.Conversion,
-						Revenue = commision,
+						Revenue = (int)commision,
 						OrderId = null,
 						Timestamp = DateTime.UtcNow
 					};
@@ -146,7 +146,7 @@ namespace ClickFlow.BLL.Services.Implements
 					await conversionRepo.CreateAsync(conversion);
 
 					// Cộng hoa hồng cho publisher
-					wallet.Balance += commision ?? 0;
+					wallet.Balance += (int)commision;
 					await walletRepo.UpdateAsync(wallet);
 				}
 
