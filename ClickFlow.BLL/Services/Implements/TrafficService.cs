@@ -461,5 +461,34 @@ namespace ClickFlow.BLL.Services.Implements
 				throw;
 			}
 		}
+
+		public async Task<int> CountTrafficOfAllActiveCampaignForPublisher(int publisherId)
+		{
+			try
+			{
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+				var cps = await cpRepo.GetSingleAsync(
+					new QueryBuilder<CampaignParticipation>()
+						.WithPredicate(x => x.PublisherId == publisherId)
+						.Build());
+
+				if (cps == null) return 0;
+
+
+				var traffics = await trafficRepo.GetAllAsync(
+					CreateQueryBuilder()
+						.WithPredicate(x => x.IsClosed == false && cps.Id == x.CampaignParticipationId && x.IsValid)
+						.Build());
+
+				return traffics.Count();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
 	}
 }
