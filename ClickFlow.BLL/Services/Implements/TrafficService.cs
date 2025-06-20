@@ -17,7 +17,6 @@ namespace ClickFlow.BLL.Services.Implements
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 		private readonly double COMMISSION = 0.05;
-
 		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
@@ -148,6 +147,25 @@ namespace ClickFlow.BLL.Services.Implements
 					// Cộng hoa hồng cho publisher
 					wallet.Balance += (int)commision;
 					await walletRepo.UpdateAsync(wallet);
+					await _unitOfWork.SaveChangesAsync();
+
+					var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+					var admin = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>().WithPredicate(x => x.Role == Role.Admin).Build());
+					var adminWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(x => x.UserId == admin.Id).Build());
+
+					var adminCommision = (int)((campaign.Commission != null ? campaign.Commission.Value : campaign.Budget * campaign.Percents / 100) * COMMISSION);
+					adminWallet.Balance += adminCommision;
+
+					var adminTranssaction = new Transaction
+					{
+						Amount = adminCommision,
+						Balance = adminWallet.Balance,
+						PaymentDate = DateTime.UtcNow,
+						Status = true,
+						TransactionType = TransactionType.Received,
+						WalletId = adminWallet.Id
+					};
+					await _unitOfWork.SaveChangesAsync();
 				}
 
 				// Nếu là CPS hoặc CPA → chỉ ghi nhận traffic, đợi postback từ advertiser
