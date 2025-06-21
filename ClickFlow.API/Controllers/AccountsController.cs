@@ -326,7 +326,6 @@ namespace ClickFlow.API.Controllers
             }
         }
 
-        //[Authorize]
         [HttpPost]
         [Route("renew-token")]
         public async Task<IActionResult> RenewTokenAsync(AuthenResultDTO authenResult)
@@ -385,22 +384,22 @@ namespace ClickFlow.API.Controllers
 
         }
 
-        //[HttpGet]
-        //[Route("reset-password-view")]
-        //public async Task<IActionResult> GetResetPassRequest([FromRoute] string token, [FromRoute] string email)
-        //{
-        //    try
-        //    {
-        //        return GetSuccess(new { Token = token, Email = email });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.ForegroundColor = ConsoleColor.Red;
-        //        Console.WriteLine(ex.Message);
-        //        Console.ResetColor();
-        //        return Error("Đã có lỗi xảy ra trong quá trình nhận yêu cầu đổi mật khẩu. Vui lòng thử lại sau ít phút nữa.");
-        //    }
-        //}
+        [HttpGet]
+        [Route("reset-password-view")]
+        public async Task<IActionResult> GetResetPassRequest([FromQuery] string token, [FromQuery] string email)
+        {
+            try
+            {
+                return GetSuccess(new { Token = token, Email = email });
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+                return Error("Đã có lỗi xảy ra trong quá trình nhận yêu cầu đổi mật khẩu. Vui lòng thử lại sau ít phút nữa.");
+            }
+        }
 
         [HttpPost]
         [Route("reset-password")]

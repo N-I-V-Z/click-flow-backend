@@ -455,8 +455,8 @@ namespace ClickFlow.BLL.Services.Implements
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine($"encode token: {encodedToken}");
 			Console.ResetColor();
-			var forgotUrl = $"https://localhost:7166/api/Accounts/reset-password-view?token={encodedToken}&email={user.Email}";
-			//var forgotUrl = $"http://localhost:5173/Password-reset?token={encodedToken}&email={user.Email}";
+			var forgotUrl = $"https://localhost:7087/api/Accounts/reset-password-view?token={encodedToken}&email={user.Email}";
+			//var forgotUrl = $"http://localhost:7087/Password-reset?token={encodedToken}&email={user.Email}";
 			var message = new EmailDTO
 					(
 						new string[] { user.Email! },
