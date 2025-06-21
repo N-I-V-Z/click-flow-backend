@@ -143,66 +143,70 @@ namespace ClickFlow.API
 
 			app.UseAuthorization();
 
-			app.MapGet("/", () => Results.Content(
-				"""
-				<!DOCTYPE html>
-				<html lang="en">
-				<head>
-					<meta charset="UTF-8">
-					<meta name="viewport" content="width=device-width, initial-scale=1.0">
-					<title>ClickFlow Server</title>
-					<style>
-						* {
-							box-sizing: border-box;
-						}
-						body {
-							margin: 0;
-							padding: 0;
-							font-family: 'Segoe UI', sans-serif;
-							background: linear-gradient(135deg, #1e3a8a, #2563eb);
-							color: #f8fafc;
-							height: 100vh;
-							display: flex;
-							align-items: center;
-							justify-content: center;
-							flex-direction: column;
-							text-align: center;
-						}
-						h1 {
-							font-size: 3rem;
-							margin-bottom: 0.5rem;
-						}
-						p {
-							font-size: 1.2rem;
-							color: #cbd5e1;
-						}
-						.card {
-							background: rgba(255, 255, 255, 0.05);
-							padding: 2rem 3rem;
-							border-radius: 1rem;
-							box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-							backdrop-filter: blur(10px);
-						}
-						.badge {
-							margin-top: 1rem;
-							font-size: 0.85rem;
-							color: #60a5fa;
-							background: rgba(255,255,255,0.08);
-							padding: 0.25rem 0.75rem;
-							border-radius: 9999px;
-							text-transform: uppercase;
-							letter-spacing: 1px;
-						}
-					</style>
-				</head>
-				<body>
-					<div class="card">
-						<h1>ClickFlow Server</h1>
-					</div>
-				</body>
-				</html>
-				""", "text/html"
-			));
+			if (app.Environment.IsDevelopment()) app.MapGet("/", () => Results.Redirect("/swagger"));
+			else if (app.Environment.IsProduction())
+			{
+				app.MapGet("/", () => Results.Content(
+					"""
+							<!DOCTYPE html>
+							<html lang="en">
+							<head>
+								<meta charset="UTF-8">
+								<meta name="viewport" content="width=device-width, initial-scale=1.0">
+								<title>ClickFlow Server</title>
+								<style>
+									* {
+										box-sizing: border-box;
+									}
+									body {
+										margin: 0;
+										padding: 0;
+										font-family: 'Segoe UI', sans-serif;
+										background: linear-gradient(135deg, #1e3a8a, #2563eb);
+										color: #f8fafc;
+										height: 100vh;
+										display: flex;
+										align-items: center;
+										justify-content: center;
+										flex-direction: column;
+										text-align: center;
+									}
+									h1 {
+										font-size: 3rem;
+										margin-bottom: 0.5rem;
+									}
+									p {
+										font-size: 1.2rem;
+										color: #cbd5e1;
+									}
+									.card {
+										background: rgba(255, 255, 255, 0.05);
+										padding: 2rem 3rem;
+										border-radius: 1rem;
+										box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+										backdrop-filter: blur(10px);
+									}
+									.badge {
+										margin-top: 1rem;
+										font-size: 0.85rem;
+										color: #60a5fa;
+										background: rgba(255,255,255,0.08);
+										padding: 0.25rem 0.75rem;
+										border-radius: 9999px;
+										text-transform: uppercase;
+										letter-spacing: 1px;
+									}
+								</style>
+							</head>
+							<body>
+								<div class="card">
+									<h1>ClickFlow Server</h1>
+								</div>
+							</body>
+							</html>
+							""", "text/html"
+				));
+			}
 
 			app.MapControllers();
 
