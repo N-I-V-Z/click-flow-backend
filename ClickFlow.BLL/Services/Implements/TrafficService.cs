@@ -17,7 +17,6 @@ namespace ClickFlow.BLL.Services.Implements
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
 		private readonly double COMMISSION = 0.05;
-
 		public TrafficService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
@@ -148,6 +147,25 @@ namespace ClickFlow.BLL.Services.Implements
 					// Cộng hoa hồng cho publisher
 					wallet.Balance += (int)commision;
 					await walletRepo.UpdateAsync(wallet);
+					await _unitOfWork.SaveChangesAsync();
+
+					var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+					var admin = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>().WithPredicate(x => x.Role == Role.Admin).Build());
+					var adminWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(x => x.UserId == admin.Id).Build());
+
+					var adminCommision = (int)((campaign.Commission != null ? campaign.Commission.Value : campaign.Budget * campaign.Percents / 100) * COMMISSION);
+					adminWallet.Balance += adminCommision;
+
+					var adminTranssaction = new Transaction
+					{
+						Amount = adminCommision,
+						Balance = adminWallet.Balance,
+						PaymentDate = DateTime.UtcNow,
+						Status = true,
+						TransactionType = TransactionType.Received,
+						WalletId = adminWallet.Id
+					};
+					await _unitOfWork.SaveChangesAsync();
 				}
 
 				// Nếu là CPS hoặc CPA → chỉ ghi nhận traffic, đợi postback từ advertiser
@@ -451,6 +469,35 @@ namespace ClickFlow.BLL.Services.Implements
 				var traffics = await trafficRepo.GetAllAsync(
 					CreateQueryBuilder()
 						.WithPredicate(x => x.IsClosed == isClosed && cps.Id == x.CampaignParticipationId && x.IsValid)
+						.Build());
+
+				return traffics.Count();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				throw;
+			}
+		}
+
+		public async Task<int> CountTrafficOfAllActiveCampaignForPublisher(int publisherId)
+		{
+			try
+			{
+				var cpRepo = _unitOfWork.GetRepo<CampaignParticipation>();
+				var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+				var cps = await cpRepo.GetSingleAsync(
+					new QueryBuilder<CampaignParticipation>()
+						.WithPredicate(x => x.PublisherId == publisherId)
+						.Build());
+
+				if (cps == null) return 0;
+
+
+				var traffics = await trafficRepo.GetAllAsync(
+					CreateQueryBuilder()
+						.WithPredicate(x => x.IsClosed == false && cps.Id == x.CampaignParticipationId && x.IsValid)
 						.Build());
 
 				return traffics.Count();

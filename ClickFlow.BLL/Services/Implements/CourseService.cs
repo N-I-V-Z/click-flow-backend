@@ -16,7 +16,6 @@ namespace ClickFlow.BLL.Services.Implements
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
-
 		public CourseService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
 		{
 			_unitOfWork = unitOfWork;
@@ -179,7 +178,24 @@ namespace ClickFlow.BLL.Services.Implements
 					WalletId = wallet.Id
 				};
 				await transactionRepo.CreateAsync(newTransaction);
-				await _unitOfWork.SaveAsync();
+				await _unitOfWork.SaveChangesAsync();
+
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+				var admin = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>().WithPredicate(x => x.Role == Role.Admin).Build());
+				var adminWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(x => x.UserId == admin.Id).Build());
+				adminWallet.Balance += course.Price;
+
+				var adminTransaction = new Transaction
+				{
+					Amount = course.Price,
+					Balance = wallet.Balance,
+					PaymentDate = DateTime.UtcNow,
+					Status = true,
+					TransactionType = TransactionType.Received,
+					WalletId = adminWallet.Id
+				};
+
+				await _unitOfWork.SaveChangesAsync();
 
 				// Tham gia khóa học
 				var coursePublisher = new CoursePublisher
