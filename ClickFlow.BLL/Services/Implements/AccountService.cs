@@ -455,15 +455,26 @@ namespace ClickFlow.BLL.Services.Implements
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine($"encode token: {encodedToken}");
 			Console.ResetColor();
-			var forgotUrl = $"https://localhost:7087/api/Accounts/reset-password-view?token={encodedToken}&email={user.Email}";
-			//var forgotUrl = $"http://localhost:7087/Password-reset?token={encodedToken}&email={user.Email}";
-			var message = new EmailDTO
-					(
-						new string[] { user.Email! },
-						"Forgot Password Link!",
-						forgotUrl!
-					);
-			_emailService.SendEmail(message);
+			var forgotUrl = $"{_configuration["FronendURL"]}/renew-password?token={encodedToken}&email={user.Email}";
+            var emailContent = $@"
+				<div style='font-family: Arial, sans-serif; max-width: 500px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px; padding: 24px; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);'>
+				  <h2 style='color: #6a0dad; text-align: center; margin-bottom: 20px;'>Yêu cầu đổi mật khẩu</h2>
+				  <p style='color: #333;'>Xin chào <b>{user.FullName ?? user.Email}</b>,</p>
+				  <p style='color: #333;'>Bạn vừa yêu cầu đổi mật khẩu cho tài khoản ClickFlow của mình.</p>
+				  <p style='color: #333;'>Vui lòng nhấn vào nút bên dưới để đặt lại mật khẩu mới:</p>
+				  <div style='text-align: center; margin: 24px 0;'>
+					<a href='{forgotUrl}' style='display: inline-block; padding: 14px 28px; background: #6a0dad; color: #fff; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 16px; transition: background-color 0.3s ease;'>Đổi mật khẩu</a>
+				  </div>
+				  <p style='color: #888; font-size: 14px; text-align: center;'>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+				  <hr style='border: none; border-top: 1px solid #e0e0e0; margin: 28px 0;'/>
+				  <p style='font-size: 12px; color: #aaa; text-align: center;'>&copy; Đội ngũ ClickFlow</p>
+				</div>";
+            var message = new EmailDTO(
+				new string[] { user.Email! },
+				"Yêu cầu đổi mật khẩu",
+				emailContent
+			);
+            _emailService.SendEmail(message);
 			return new BaseResponse { IsSuccess = true, Message = "Url đổi mật khẩu đã được gửi đến email của bạn. Hãy truy cập url để đổi mật khẩu nhé." };
 		}
 
