@@ -139,7 +139,7 @@ namespace ClickFlow.API
 
 			app.UseCors("CorsPolicy");
 
-			app.UseHttpsRedirection();
+			//app.UseHttpsRedirection();
 
 			app.UseAuthentication();
 
