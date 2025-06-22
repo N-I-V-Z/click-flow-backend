@@ -17,7 +17,6 @@ services:
 
       # CORS
       Cors__AllowedOrigins__0: "https://clickflow88.vercel.app"
-      Cors__AllowedOrigins__1: "http://localhost:3000"
 
       # JWT
       JWT__ValidAudience: "http://localhost:8099"
