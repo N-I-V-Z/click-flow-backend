@@ -334,10 +334,9 @@ namespace ClickFlow.BLL.Services.Implements
 					.WithPredicate(x =>
 						(x.CampaignParticipation.Campaign.EndDate <= DateOnly.FromDateTime(DateTime.UtcNow)) ||
 						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Canceled) ||
-						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Completed))
-					.Build();
+						(x.CampaignParticipation.Campaign.Status == CampaignStatus.Completed));
 
-				var trafficsToClose = await trafficRepo.GetAllAsync(queryOptions);
+				var trafficsToClose = await trafficRepo.GetAllAsync(queryOptions.Build());
 				foreach (var traffic in trafficsToClose)
 				{
 					traffic.IsClosed = true;
