@@ -52,11 +52,13 @@ namespace ClickFlow.API
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
 
+			var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
 			builder.Services.AddCors(opts =>
 			{
-				opts.AddPolicy("corspolicy", build =>
+				opts.AddPolicy("CorsPolicy", build =>
 				{
-					build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+					build.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader();
 				});
 			});
 
@@ -135,9 +137,9 @@ namespace ClickFlow.API
 				app.UseSwaggerUI();
 			}
 
-			app.UseCors("corspolicy");
+			app.UseCors("CorsPolicy");
 
-			app.UseHttpsRedirection();
+			//app.UseHttpsRedirection();
 
 			app.UseAuthentication();
 
