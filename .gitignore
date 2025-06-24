@@ -19,11 +19,6 @@ obj/
 
 # Environment files
 .env*
-appsettings.*.json
-
-# Ignore app settings for different environments
-appsettings.Development.json
-appsettings.Production.json
 
 # Editor directories and files
 .DS_Store
