@@ -2,6 +2,7 @@
 using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
+using ClickFlow.BLL.DTOs.CommentDTOs;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Paging;
 using System.Globalization;
@@ -60,6 +61,8 @@ namespace ClickFlow.BLL.Helpers.Mapper
 				.ForMember(dest => dest.TotalCampaigns, opt => opt.Ignore())
 				.ForMember(dest => dest.DailyTraffic, opt => opt.Ignore());
 
+			CreateMap<Comment, CommentResponseDTO>()
+				.ForMember(dest => dest.AuthorInfo, opt => opt.MapFrom(src => src.Author));
 		}
 	}
 }

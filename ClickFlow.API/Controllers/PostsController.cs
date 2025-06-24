@@ -81,5 +81,15 @@ namespace ClickFlow.API.Controllers
 			if (!response.IsSuccess) return SaveError(response);
 			return SaveSuccess(response);
 		}
+
+
+		[Authorize]
+		[HttpPost]
+		[Route("search")]
+		public async Task<IActionResult> SearchPosts([FromBody] PostSearchDTO searchDto, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+		{
+			var response = await _postService.SearchPosts(searchDto, pageIndex, pageSize);
+			return GetSuccess(response);
+		}
 	}
 }

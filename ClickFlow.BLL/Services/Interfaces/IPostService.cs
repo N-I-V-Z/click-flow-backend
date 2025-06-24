@@ -12,5 +12,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize);
 		Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize);
 		Task<PostResponseDTO> GetPostById(int id);
+		Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize);
 	}
 }
