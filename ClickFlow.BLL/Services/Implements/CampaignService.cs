@@ -2,6 +2,7 @@
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.Response;
+using ClickFlow.BLL.DTOs.TransactionDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -41,6 +42,9 @@ namespace ClickFlow.BLL.Services.Implements
 
 
 				var advertiserRepo = _unitOfWork.GetRepo<Advertiser>();
+				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
 
 
 				var advertiser = await _advertiserService.GetAdvertiserByUserIdAsync(userId);
@@ -49,6 +53,36 @@ namespace ClickFlow.BLL.Services.Implements
 				{
 					return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy Advertiser." };
 				}
+
+				var advertiserWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(w => w.UserId == userId).Build());
+				if (advertiserWallet == null)
+				{
+					return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy ví của advertiser." };
+				}
+				var budget = (int)dto.Budget;
+				if (advertiserWallet.Balance < budget)
+				{
+					return new BaseResponse { IsSuccess = false, Message = "Số dư không đủ để tạo chiến dịch." };
+				}
+
+				// Trừ tiền advertiser và cộng tiền cho admin
+				var adminUser = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>().WithPredicate(u => u.Role == Role.Admin).Build());
+				if (adminUser == null)
+				{
+					await _unitOfWork.RollBackAsync();
+					return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy tài khoản admin." };
+				}
+				var adminWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(w => w.UserId == adminUser.Id).Build());
+				if (adminWallet == null)
+				{
+					await _unitOfWork.RollBackAsync();
+					return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy ví của admin." };
+				}
+
+				var commission = (int)(budget * 0.05);
+
+				await ProcessCampaignPaymentAsync(advertiserWallet, adminWallet, budget, commission);
+
 
 				DateTime startDate = DateTime.ParseExact(dto.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 				DateTime endDate = DateTime.ParseExact(dto.EndDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
@@ -85,6 +119,84 @@ namespace ClickFlow.BLL.Services.Implements
 				await _unitOfWork.RollBackAsync();
 				throw new Exception("Đã xảy ra lỗi khi tạo chiến dịch.", ex);
 			}
+		}
+
+		private async Task ProcessCampaignPaymentAsync(
+			Wallet advertiserWallet,
+			Wallet adminWallet,
+			int budget,
+			int commission)
+		{
+			var walletRepo = _unitOfWork.GetRepo<Wallet>();
+			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+
+			advertiserWallet.Balance -= budget;
+			adminWallet.Balance += commission;
+
+			await walletRepo.UpdateAsync(advertiserWallet);
+			await walletRepo.UpdateAsync(adminWallet);
+
+			// Create advertiser transaction
+			await transactionRepo.CreateAsync(new Transaction
+			{
+				WalletId = advertiserWallet.Id,
+				Amount = budget,
+				Balance = advertiserWallet.Balance,
+				PaymentDate = DateTime.UtcNow,
+				TransactionType = TransactionType.Pay,
+				Status = true
+			});
+
+			// Create admin transaction
+			await transactionRepo.CreateAsync(new Transaction
+			{
+				WalletId = adminWallet.Id,
+				Amount = commission,
+				Balance = adminWallet.Balance,
+				PaymentDate = DateTime.UtcNow,
+				TransactionType = TransactionType.Received,
+				Status = true
+			});
+		}
+
+		private async Task ProcessCampaignRefundAsync(
+		Wallet advertiserWallet,
+		Wallet adminWallet,
+		int budget,
+		int commission)
+		{
+			var walletRepo = _unitOfWork.GetRepo<Wallet>();
+			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+
+			advertiserWallet.Balance += budget;
+			adminWallet.Balance -= commission;
+
+			await walletRepo.UpdateAsync(advertiserWallet);
+			await walletRepo.UpdateAsync(adminWallet);
+
+			// Tạo transaction hoàn tiền cho advertiser
+			var advertiserTransaction = new Transaction
+			{
+				WalletId = advertiserWallet.Id,
+				Amount = budget,
+				Balance = advertiserWallet.Balance,
+				PaymentDate = DateTime.UtcNow,
+				TransactionType = TransactionType.Deposit,
+				Status = true
+			};
+			await transactionRepo.CreateAsync(advertiserTransaction);
+
+			// Tạo transaction trừ tiền cho admin
+			var adminTransaction = new Transaction
+			{
+				WalletId = adminWallet.Id,
+				Amount = commission,
+				Balance = adminWallet.Balance,
+				PaymentDate = DateTime.UtcNow,
+				TransactionType = TransactionType.Withdraw,
+				Status = true
+			};
+			await transactionRepo.CreateAsync(adminTransaction);
 		}
 
 		public async Task<BaseResponse> UpdateCampaign(CampaignUpdateDTO dto)
@@ -127,7 +239,8 @@ namespace ClickFlow.BLL.Services.Implements
 
 				var campaign = await repo.GetSingleAsync(new QueryBuilder<Campaign>()
 					.WithPredicate(x => x.Id == dto.Id)
-					.WithTracking(false)
+					.WithInclude(x => x.Advertiser)
+					.WithTracking(true)
 					.Build());
 
 				if (campaign == null)
@@ -138,6 +251,38 @@ namespace ClickFlow.BLL.Services.Implements
 				if (!dto.IsStatusValid())
 				{
 					return new BaseResponse { IsSuccess = false, Message = "Trạng thái không hợp lệ." };
+				}
+
+				if (dto.Status.Value == CampaignStatus.Canceled && campaign.Status == CampaignStatus.Pending)
+				{
+					var walletRepo = _unitOfWork.GetRepo<Wallet>();
+					var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+					var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+
+					var advertiserWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(w => w.UserId == campaign.Advertiser.UserId).Build());
+					if (advertiserWallet == null)
+					{
+						await _unitOfWork.RollBackAsync();
+						return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy ví của advertiser." };
+					}
+
+					var adminUser = await userRepo.GetSingleAsync(new QueryBuilder<ApplicationUser>().WithPredicate(u => u.Role == Role.Admin).Build());
+					if (adminUser == null)
+					{
+						await _unitOfWork.RollBackAsync();
+						return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy tài khoản admin." };
+					}
+					var adminWallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>().WithPredicate(w => w.UserId == adminUser.Id).Build());
+					if (adminWallet == null)
+					{
+						await _unitOfWork.RollBackAsync();
+						return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy ví của admin." };
+					}
+					
+					var budget = (int)campaign.Budget;
+					var commission = (int)(budget * 0.05);
+
+					await ProcessCampaignRefundAsync(advertiserWallet, adminWallet, budget, commission);
 				}
 
 				campaign.Status = dto.Status.Value;
