@@ -108,6 +108,7 @@ namespace ClickFlow.BLL.Services.Implements
 			var comment = await repo.GetSingleAsync(new QueryBuilder<Comment>()
 				.WithPredicate(x => x.Id == id && !x.IsDeleted)
 				.WithInclude(c => c.Author)
+				.WithInclude(c => c.Author.UserDetail)
 				.Build());
 
 			return comment == null ? null : _mapper.Map<CommentResponseDTO>(comment);
@@ -119,6 +120,7 @@ namespace ClickFlow.BLL.Services.Implements
 			var query = repo.Get(new QueryBuilder<Comment>()
 				.WithPredicate(c => c.PostId == postId && !c.IsDeleted)
 				.WithInclude(c => c.Author)
+				.WithInclude(c => c.Author.UserDetail)
 				.Build());
 
 			var paged = await PaginatedList<Comment>.CreateAsync(query, pageIndex, pageSize);

@@ -141,5 +141,31 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 
 		}
+
+		public async Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize)
+		{
+			var repo = _unitOfWork.GetRepo<Post>();
+			var queryBuilder = new QueryBuilder<Post>()
+				.WithPredicate(p => !p.IsDeleted);
+
+			if (!string.IsNullOrWhiteSpace(searchDto.Keyword))
+			{
+				queryBuilder = queryBuilder.WithPredicate(p => !p.IsDeleted && (p.Title.Contains(searchDto.Keyword) || p.Content.Contains(searchDto.Keyword)));
+			}
+			if (searchDto.Topic.HasValue)
+			{
+				queryBuilder = queryBuilder.WithPredicate(p => !p.IsDeleted && p.Topic == searchDto.Topic);
+			}
+			if (searchDto.AuthorId.HasValue)
+			{
+				queryBuilder = queryBuilder.WithPredicate(p => !p.IsDeleted && p.AuthorId == searchDto.AuthorId);
+			}
+			queryBuilder = queryBuilder.WithInclude(p => p.Author.UserDetail);
+
+			var posts = repo.Get(queryBuilder.Build());
+			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
+			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
+			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalItems, pageIndex, pageSize);
+		}
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace ClickFlow.BLL.DTOs.CommentDTOs
+﻿using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
+
+namespace ClickFlow.BLL.DTOs.CommentDTOs
 {
 	public class CommentResponseDTO
 	{
@@ -10,5 +12,6 @@
 		public int PostId { get; set; }
 		public int? ParentCommentId { get; set; }
 		public List<CommentResponseDTO> Replies { get; set; }
+		public ApplicationUserResponseDTO AuthorInfo { get; set; }
 	}
 }
