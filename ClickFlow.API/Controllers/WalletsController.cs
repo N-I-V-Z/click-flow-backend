@@ -16,7 +16,7 @@ namespace ClickFlow.API.Controllers
 			_walletService = walletService;
 		}
 
-		[Authorize(Roles = "Publisher, Advertiser")]
+		[Authorize(Roles = "Admin, Publisher, Advertiser")]
 		[HttpGet("own")]
 		public async Task<IActionResult> GetOwnWallet()
 		{
@@ -35,7 +35,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher, Advertiser")]
+		[Authorize(Roles = "Admin, Publisher, Advertiser")]
 		[HttpPut("{walletId}")]
 		public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] WalletUpdateDTO dto)
 		{
