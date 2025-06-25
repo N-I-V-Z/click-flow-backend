@@ -25,7 +25,7 @@ namespace ClickFlow.DAL.Configurations
 			builder.Property(p => p.Topic)
 				.HasMaxLength(100);
 
-			builder.Property(p => p.View)
+			builder.Property(p => p.LikeCount)
 				.HasDefaultValue(0);
 
 			builder.Property(p => p.FeedbackNumber)

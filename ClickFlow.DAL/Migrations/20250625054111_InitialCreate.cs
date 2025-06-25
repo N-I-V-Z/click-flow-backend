@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ClickFlow.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -224,7 +224,7 @@ namespace ClickFlow.DAL.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AuthorId = table.Column<int>(type: "int", nullable: false),
                     Topic = table.Column<int>(type: "int", maxLength: 100, nullable: false),
-                    View = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    LikeCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     FeedbackNumber = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
@@ -555,6 +555,37 @@ namespace ClickFlow.DAL.Migrations
                         principalTable: "Posts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Likes",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Likes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Likes_ApplicationUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "dbo",
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Likes_Posts_PostId",
+                        column: x => x.PostId,
+                        principalSchema: "dbo",
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -925,6 +956,19 @@ namespace ClickFlow.DAL.Migrations
                 column: "FeedbackerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Likes_PostId_UserId",
+                schema: "dbo",
+                table: "Likes",
+                columns: new[] { "PostId", "UserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Likes_UserId",
+                schema: "dbo",
+                table: "Likes",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
                 schema: "dbo",
                 table: "Messages",
@@ -1073,6 +1117,10 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "Likes",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "Messages",
                 schema: "dbo");
 
@@ -1117,11 +1165,11 @@ namespace ClickFlow.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Posts",
+                name: "Traffics",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Traffics",
+                name: "Posts",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

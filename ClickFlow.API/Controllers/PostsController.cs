@@ -20,9 +20,13 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet]
 		[Route("get-all-posts/{pageIndex}/{pageSize}")]
-		public async Task<IActionResult> GetAllPosts(int pageIndex, int pageSize)
+		public async Task<IActionResult> GetAllPosts(
+			int pageIndex, 
+			int pageSize, 
+			[FromQuery] string sortBy = "CreatedAt", 
+			[FromQuery] bool isDescending = true)
 		{
-			var response = await _postService.GetAllPosts(pageIndex, pageSize);
+			var response = await _postService.GetAllPosts(pageIndex, pageSize, UserId, sortBy, isDescending);
 			return GetSuccess(response);
 		}
 
@@ -30,9 +34,14 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet]
 		[Route("get-posts-by-author/{authorId}/{pageIndex}/{pageSize}")]
-		public async Task<IActionResult> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize)
+		public async Task<IActionResult> GetPostsByAuthorId(
+			int authorId, 
+			int pageIndex, 
+			int pageSize, 
+			[FromQuery] string sortBy = "CreatedAt", 
+			[FromQuery] bool isDescending = true)
 		{
-			var response = await _postService.GetPostsByAuthorId(authorId, pageIndex, pageSize);
+			var response = await _postService.GetPostsByAuthorId(authorId, pageIndex, pageSize, UserId, sortBy, isDescending);
 			return GetSuccess(response);
 		}
 
@@ -42,7 +51,7 @@ namespace ClickFlow.API.Controllers
 		[Route("get-post-by-id/{id}")]
 		public async Task<IActionResult> GetPostById(int id)
 		{
-			var response = await _postService.GetPostById(id);
+			var response = await _postService.GetPostById(id, UserId);
 			if (response == null) return GetError("Bài viết không tồn tại.");
 			return GetSuccess(response);
 		}
@@ -86,9 +95,14 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpPost]
 		[Route("search")]
-		public async Task<IActionResult> SearchPosts([FromBody] PostSearchDTO searchDto, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+		public async Task<IActionResult> SearchPosts(
+			[FromBody] PostSearchDTO searchDto, 
+			[FromQuery] int pageIndex = 1, 
+			[FromQuery] int pageSize = 10,
+			[FromQuery] string sortBy = "CreatedAt", 
+			[FromQuery] bool isDescending = true)
 		{
-			var response = await _postService.SearchPosts(searchDto, pageIndex, pageSize);
+			var response = await _postService.SearchPosts(searchDto, pageIndex, pageSize, UserId, sortBy, isDescending);
 			return GetSuccess(response);
 		}
 	}

@@ -3,6 +3,7 @@ using ClickFlow.BLL.DTOs.ApplicationUserDTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.CommentDTOs;
+using ClickFlow.BLL.DTOs.LikeDTOs;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Paging;
 using System.Globalization;
@@ -63,6 +64,10 @@ namespace ClickFlow.BLL.Helpers.Mapper
 
 			CreateMap<Comment, CommentResponseDTO>()
 				.ForMember(dest => dest.AuthorInfo, opt => opt.MapFrom(src => src.Author));
+
+			// Thêm mapping cho Like
+			CreateMap<Like, LikeResponseDTO>()
+				.ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User));
 		}
 	}
 }
