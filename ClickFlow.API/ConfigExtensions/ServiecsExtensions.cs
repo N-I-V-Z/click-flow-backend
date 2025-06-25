@@ -1255,7 +1255,7 @@ namespace ClickFlow.API.ConfigExtensions
 								CreatedAt = DateTime.UtcNow.AddDays(-10),
 								AuthorId = admin.Id,
 								Topic = Topic.Other,
-								View = 325,
+								LikeCount = 325,
 								FeedbackNumber = 24,
 								IsDeleted = false
 							},
@@ -1266,7 +1266,7 @@ namespace ClickFlow.API.ConfigExtensions
 								CreatedAt = DateTime.UtcNow.AddDays(-8),
 								AuthorId = admin.Id,
 								Topic = Topic.Other,
-								View = 187,
+								LikeCount = 187,
 								FeedbackNumber = 15,
 								IsDeleted = false
 							},
@@ -1277,7 +1277,7 @@ namespace ClickFlow.API.ConfigExtensions
 								CreatedAt = DateTime.UtcNow.AddDays(-5),
 								AuthorId = publisher1.Id,
 								Topic = Topic.Tips,
-								View = 243,
+								LikeCount = 243,
 								FeedbackNumber = 32,
 								IsDeleted = false
 							},
@@ -1288,7 +1288,7 @@ namespace ClickFlow.API.ConfigExtensions
 								CreatedAt = DateTime.UtcNow.AddDays(-3),
 								AuthorId = admin.Id,
 								Topic = Topic.Tips,
-								View = 156,
+								LikeCount = 156,
 								FeedbackNumber = 18,
 								IsDeleted = false
 							},
@@ -1299,7 +1299,7 @@ namespace ClickFlow.API.ConfigExtensions
 								CreatedAt = DateTime.UtcNow.AddDays(-2),
 								AuthorId = advertiser1.Id,
 								Topic = Topic.Tips,
-								View = 98,
+								LikeCount = 98,
 								FeedbackNumber = 7,
 								IsDeleted = false
 							},
@@ -1310,7 +1310,7 @@ namespace ClickFlow.API.ConfigExtensions
 								CreatedAt = DateTime.UtcNow.AddDays(-1),
 								AuthorId = admin.Id,
 								Topic = Topic.QA,
-								View = 76,
+								LikeCount = 76,
 								FeedbackNumber = 5,
 								IsDeleted = false
 							}

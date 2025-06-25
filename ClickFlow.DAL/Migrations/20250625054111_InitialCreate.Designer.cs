@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClickFlow.DAL.Migrations
 {
     [DbContext(typeof(ClickFlowContext))]
-    [Migration("20250622035803_Init")]
-    partial class Init
+    [Migration("20250625054111_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -449,6 +449,38 @@ namespace ClickFlow.DAL.Migrations
                     b.ToTable("Feedbacks", "dbo");
                 });
 
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Like", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("PostId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("Likes", "dbo");
+                });
+
             modelBuilder.Entity("ClickFlow.DAL.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -589,6 +621,11 @@ namespace ClickFlow.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<int>("LikeCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -597,11 +634,6 @@ namespace ClickFlow.DAL.Migrations
                     b.Property<int>("Topic")
                         .HasMaxLength(100)
                         .HasColumnType("int");
-
-                    b.Property<int>("View")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
 
                     b.HasKey("Id");
 
@@ -1198,6 +1230,25 @@ namespace ClickFlow.DAL.Migrations
                     b.Navigation("Feedbacker");
                 });
 
+            modelBuilder.Entity("ClickFlow.DAL.Entities.Like", b =>
+                {
+                    b.HasOne("ClickFlow.DAL.Entities.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ClickFlow.DAL.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ClickFlow.DAL.Entities.Message", b =>
                 {
                     b.HasOne("ClickFlow.DAL.Entities.Conversation", "Conversation")
@@ -1471,6 +1522,8 @@ namespace ClickFlow.DAL.Migrations
             modelBuilder.Entity("ClickFlow.DAL.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("ClickFlow.DAL.Entities.Publisher", b =>

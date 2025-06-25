@@ -10,9 +10,9 @@ namespace ClickFlow.BLL.DTOs.PostDTOs
 		public string Content { get; set; }
 		public Topic Topic { get; set; }
 		public DateTime CreatedAt { get; set; }
-		public int View { get; set; }
+		public int LikeCount { get; set; }
 		public int FeedbackNumber { get; set; }
 		public ApplicationUserResponseDTO Author { get; set; }
-
+		public bool IsLikedByCurrentUser { get; set; }
 	}
 }

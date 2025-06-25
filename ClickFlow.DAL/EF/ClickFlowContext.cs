@@ -32,6 +32,7 @@ namespace ClickFlow.DAL.EF
 		public DbSet<Video> Videos { get; set; }
 		public DbSet<Post> Posts { get; set; }
 		public DbSet<Comment> Comments { get; set; }
+		public DbSet<Like> Likes { get; set; }
 		public DbSet<Conversation> Conversations { get; set; }
 		public DbSet<Message> Messages { get; set; }
 		public DbSet<Conversion> Conversions { get; set; }
@@ -61,6 +62,7 @@ namespace ClickFlow.DAL.EF
 			modelBuilder.ApplyConfiguration(new VideoConfiguration());
 			modelBuilder.ApplyConfiguration(new PostConfiguration());
 			modelBuilder.ApplyConfiguration(new CommentConfiguration());
+			modelBuilder.ApplyConfiguration(new LikeConfiguration());
 			modelBuilder.ApplyConfiguration(new ConversationConfiguration());
 			modelBuilder.ApplyConfiguration(new MessageConfiguration());
 			modelBuilder.ApplyConfiguration(new ConversionConfiguration());

@@ -6,6 +6,7 @@ using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
+using System.Linq;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -13,11 +14,13 @@ namespace ClickFlow.BLL.Services.Implements
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IMapper _mapper;
+		private readonly ILikeService _likeService;
 
-		public PostService(IUnitOfWork unitOfWork, IMapper mapper)
+		public PostService(IUnitOfWork unitOfWork, IMapper mapper, ILikeService likeService)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
+			_likeService = likeService;
 		}
 		public async Task<BaseResponse> CreatePost(PostCreateDTO dto, int authorId)
 		{
@@ -30,14 +33,14 @@ namespace ClickFlow.BLL.Services.Implements
 				post.AuthorId = authorId;
 				post.CreatedAt = DateTime.Now;
 				post.IsDeleted = false;
-				post.View = 0;
+				post.LikeCount = 0;
 				post.FeedbackNumber = 0;
 
 				await repo.CreateAsync(post);
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
-				return new BaseResponse { IsSuccess = true, Message = "Bài viết đã đuocự tạo thành công" };
+				return new BaseResponse { IsSuccess = true, Message = "Bài viết đã được tạo thành công" };
 
 
 			}
@@ -74,7 +77,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize)
+		public async Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var posts = repo.Get(new QueryBuilder<Post>()
@@ -82,22 +85,46 @@ namespace ClickFlow.BLL.Services.Implements
 				.WithInclude(p => p.Author.UserDetail)
 				.Build());
 
+			// Sort posts
+			posts = SortPosts(posts, sortBy, isDescending);
+
 			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
 			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
+			
+			// Kiểm tra trạng thái like cho từng post nếu có currentUserId
+			if (currentUserId.HasValue)
+			{
+				foreach (var post in result)
+				{
+					post.IsLikedByCurrentUser = await _likeService.IsPostLikedByUser(post.Id, currentUserId.Value);
+				}
+			}
+			
 			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalPages, pageSize, pageIndex);
 		}
 
-		public async Task<PostResponseDTO> GetPostById(int id)
+		public async Task<PostResponseDTO> GetPostById(int id, int? currentUserId = null)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var post = await repo.GetSingleAsync(new QueryBuilder<Post>()
 				.WithPredicate(p => p.Id == id && !p.IsDeleted)
 				.WithInclude(p => p.Author.UserDetail)
 				.Build());
-			return post == null ? null : _mapper.Map<PostResponseDTO>(post);
+			
+			if (post == null) return null;
+			
+			var result = _mapper.Map<PostResponseDTO>(post);
+			
+			// Kiểm tra trạng thái like nếu có currentUserId
+			if (currentUserId.HasValue)
+			{
+				result.IsLikedByCurrentUser = await _likeService.IsPostLikedByUser(id, currentUserId.Value);
+			}
+			
+			return result;
 		}
 
-		public async Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize)
+		public async Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var posts = repo.Get(new QueryBuilder<Post>()
@@ -105,8 +132,21 @@ namespace ClickFlow.BLL.Services.Implements
 				.WithInclude(p => p.Author.UserDetail)
 				.Build());
 
+			// Sort posts
+			posts = SortPosts(posts, sortBy, isDescending);
+
 			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
 			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
+			
+			// Kiểm tra trạng thái like cho từng post nếu có currentUserId
+			if (currentUserId.HasValue)
+			{
+				foreach (var post in result)
+				{
+					post.IsLikedByCurrentUser = await _likeService.IsPostLikedByUser(post.Id, currentUserId.Value);
+				}
+			}
+			
 			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalItems, pageIndex, pageSize);
 		}
 
@@ -142,7 +182,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 		}
 
-		public async Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize)
+		public async Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var queryBuilder = new QueryBuilder<Post>()
@@ -163,9 +203,35 @@ namespace ClickFlow.BLL.Services.Implements
 			queryBuilder = queryBuilder.WithInclude(p => p.Author.UserDetail);
 
 			var posts = repo.Get(queryBuilder.Build());
+			
+			// Sort posts
+			posts = SortPosts(posts, sortBy, isDescending);
+
 			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
 			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
+			
+			// Kiểm tra trạng thái like cho từng post nếu có currentUserId
+			if (currentUserId.HasValue)
+			{
+				foreach (var post in result)
+				{
+					post.IsLikedByCurrentUser = await _likeService.IsPostLikedByUser(post.Id, currentUserId.Value);
+				}
+			}
+			
 			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalItems, pageIndex, pageSize);
+		}
+
+		private IQueryable<Post> SortPosts(IQueryable<Post> posts, string sortBy, bool isDescending)
+		{
+			return sortBy.ToLower() switch
+			{
+				"createdat" => isDescending ? posts.OrderByDescending(p => p.CreatedAt) : posts.OrderBy(p => p.CreatedAt),
+				"likecount" => isDescending ? posts.OrderByDescending(p => p.LikeCount) : posts.OrderBy(p => p.LikeCount),
+				"feedbacknumber" => isDescending ? posts.OrderByDescending(p => p.FeedbackNumber) : posts.OrderBy(p => p.FeedbackNumber),
+				"title" => isDescending ? posts.OrderByDescending(p => p.Title) : posts.OrderBy(p => p.Title),
+				_ => isDescending ? posts.OrderByDescending(p => p.CreatedAt) : posts.OrderBy(p => p.CreatedAt) // Default sort by CreatedAt
+			};
 		}
 	}
 }
