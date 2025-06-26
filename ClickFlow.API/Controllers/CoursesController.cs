@@ -4,6 +4,7 @@ using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -63,7 +64,8 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var response = await _courseService.GetJoinedCourses(UserId, dto);
+				var data = await _courseService.GetJoinedCourses(UserId, dto);
+				var response = new PagingDTO<CourseResponseDTO>(data);
 
 				return GetSuccess(response);
 			}
