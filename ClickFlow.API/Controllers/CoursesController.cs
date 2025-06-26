@@ -58,6 +58,25 @@ namespace ClickFlow.API.Controllers
 		}
 
 		[Authorize(Roles = "Publisher")]
+		[HttpGet("joined")]
+		public async Task<IActionResult> GetJoinedCourses([FromQuery] PagingRequestDTO dto)
+		{
+			try
+			{
+				var response = await _courseService.GetJoinedCourses(UserId, dto);
+
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
 		[HttpGet("publisher")]
 		public async Task<IActionResult> GetAllCoursesForPublisher([FromQuery] PagingRequestDTO dto)
 		{

@@ -119,6 +119,19 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
+		public async Task<PaginatedList<CourseResponseDTO>> GetJoinedCourses(int userId, PagingRequestDTO dto)
+		{
+			var courseRepo = _unitOfWork.GetRepo<Course>();
+
+			var queryBuilder = CreateQueryBuilder(dto.Keyword)
+				.WithInclude(x => x.CoursePublishers)
+				.WithPredicate(x => x.CoursePublishers.FirstOrDefault(x => x.PublisherId == userId) != null);
+
+			var loadedRecords = courseRepo.Get(queryBuilder.Build());
+
+			return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
+		}
+
 		public async Task<BaseResponse> JoinTheCourseAsync(int courseId, int publisherId)
 		{
 			try
