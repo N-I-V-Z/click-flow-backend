@@ -1,5 +1,6 @@
 ﻿
 using ClickFlow.API.ConfigExtensions;
+using ClickFlow.API.Middlewares;
 using ClickFlow.BLL.Helpers.Config;
 using ClickFlow.BLL.Services.BackgroundServices;
 using ClickFlow.BLL.Services.Implements;
@@ -136,6 +137,10 @@ namespace ClickFlow.API
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+			// Chặn call api từ Postman
+			if (app.Environment.IsProduction())
+				app.UseMiddleware<BlockPostmanMiddleware>();
 
 			app.UseCors("CorsPolicy");
 
