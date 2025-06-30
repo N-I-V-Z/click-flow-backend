@@ -4,6 +4,7 @@ using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClickFlow.API.Controllers
 {
@@ -45,6 +46,26 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _courseService.CheckPublisherInCourseAsync(UserId, courseId);
+
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("joined")]
+		public async Task<IActionResult> GetJoinedCourses([FromQuery] PagingRequestDTO dto)
+		{
+			try
+			{
+				var data = await _courseService.GetJoinedCourses(UserId, dto);
+				var response = new PagingDTO<CourseResponseDTO>(data);
 
 				return GetSuccess(response);
 			}
