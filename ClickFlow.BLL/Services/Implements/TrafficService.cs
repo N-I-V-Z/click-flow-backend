@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper;
 using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
@@ -419,11 +418,19 @@ namespace ClickFlow.BLL.Services.Implements
 			return traffics.Count();
 		}
 
-		public async Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsAsync()
+		public async Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsAsync(int publisherId)
 		{
 			var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-			var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.IsValid);
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(t =>
+					t.IsValid &&
+					t.CampaignParticipation != null &&
+					t.CampaignParticipation.PublisherId == publisherId &&
+					t.CampaignParticipation.Campaign != null &&
+					t.CampaignParticipation.Campaign.Status == CampaignStatus.Activing &&
+					!t.CampaignParticipation.Campaign.IsDeleted
+				);
 
 			var query = trafficRepo.Get(queryBuilder.Build());
 
@@ -453,11 +460,19 @@ namespace ClickFlow.BLL.Services.Implements
 			return result;
 		}
 
-		public async Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsAsync()
+		public async Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsAsync(int publisherId)
 		{
 			var trafficRepo = _unitOfWork.GetRepo<Traffic>();
 
-			var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.IsValid);
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(t =>
+					t.IsValid &&
+					t.CampaignParticipation != null &&
+					t.CampaignParticipation.PublisherId == publisherId &&
+					t.CampaignParticipation.Campaign != null &&
+					t.CampaignParticipation.Campaign.Status == CampaignStatus.Activing &&
+					!t.CampaignParticipation.Campaign.IsDeleted
+				);
 
 			var query = trafficRepo.Get(queryBuilder.Build());
 
@@ -473,5 +488,70 @@ namespace ClickFlow.BLL.Services.Implements
 
 			return deviceStats;
 		}
+
+		public async Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsByCampaignAsync(int campaignId)
+		{
+			var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(t =>
+					t.IsValid &&
+					t.CampaignParticipation != null &&
+					t.CampaignParticipation.CampaignId == campaignId
+				);
+
+			var query = trafficRepo.Get(queryBuilder.Build());
+
+			var browserGroups = await query
+				.GroupBy(t => t.Browser)
+				.Select(g => new TrafficBrowserStatisticsDTO
+				{
+					Browser = g.Key,
+					ClickCount = g.Count()
+				})
+				.ToListAsync();
+
+			var totalClicks = browserGroups.Sum(x => x.ClickCount);
+
+			var result = browserGroups
+				.Select(x => new TrafficBrowserStatisticsDTO
+				{
+					Browser = x.Browser,
+					ClickCount = x.ClickCount,
+					ClickRate = totalClicks > 0
+						? (int)Math.Round(100.0 * x.ClickCount / totalClicks)
+						: 0
+				})
+				.OrderByDescending(x => x.ClickCount)
+				.ToList();
+
+			return result;
+		}
+		public async Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsByCampaignAsync(int campaignId)
+		{
+			var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(t =>
+					t.IsValid &&
+					t.CampaignParticipation != null &&
+					t.CampaignParticipation.CampaignId == campaignId
+				);
+
+			var query = trafficRepo.Get(queryBuilder.Build());
+
+			var deviceStats = await query
+				.GroupBy(t => t.DeviceType)
+				.Select(g => new TrafficDeviceStatisticsDTO
+				{
+					DeviceType = g.Key,
+					Count = g.Count()
+				})
+				.OrderByDescending(x => x.Count)
+				.ToListAsync();
+
+			return deviceStats;
+		}
+
 	}
 }

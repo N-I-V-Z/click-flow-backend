@@ -20,7 +20,9 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<bool> IsValidTrafficAsync(TrafficCreateDTO dto, string IpAddress);
 		Task<int> CountTrafficForPublisherAsync(int campaignId, int publisherId);
 		Task<int> CountTrafficOfAllActiveCampaignForPublisherAsync(int publisherId);
-		Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsAsync();
-		Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsAsync();
+		Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsAsync(int publisherId);
+		Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsByCampaignAsync(int campaignId);
+		Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsAsync(int publisherId);
+		Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsByCampaignAsync(int campaignId);
 	}
 }
