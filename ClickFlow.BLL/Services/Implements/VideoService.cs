@@ -35,62 +35,38 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<VideoResponseDTO> CreateVideoAsync(VideoCreateDTO dto)
 		{
-			try
+			var videoRepo = _unitOfWork.GetRepo<Video>();
+			var newVideo = _mapper.Map<Video>(dto);
+
+			await videoRepo.CreateAsync(newVideo);
+
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				var videoRepo = _unitOfWork.GetRepo<Video>();
-				var newVideo = _mapper.Map<Video>(dto);
-
-				await videoRepo.CreateAsync(newVideo);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<VideoResponseDTO>(newVideo);
+				return null;
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+
+			return _mapper.Map<VideoResponseDTO>(newVideo);
 		}
 
 		public async Task<List<VideoResponseDTO>> GetAllVideosByCourseIdAsync(int courseId)
 		{
-			try
-			{
-				var videoRepo = _unitOfWork.GetRepo<Video>();
-				var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.CourseId == courseId);
+			var videoRepo = _unitOfWork.GetRepo<Video>();
+			var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.CourseId == courseId);
 
-				var loadedRecords = await videoRepo.GetAllAsync(queryBuilder.Build());
+			var loadedRecords = await videoRepo.GetAllAsync(queryBuilder.Build());
 
-				return _mapper.Map<List<VideoResponseDTO>>(loadedRecords);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return _mapper.Map<List<VideoResponseDTO>>(loadedRecords);
 		}
 
 		public async Task<VideoResponseDTO> GetVideoByIdAsync(int id)
 		{
-			try
-			{
-				var videoRepo = _unitOfWork.GetRepo<Video>();
-				var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.Id == id);
+			var videoRepo = _unitOfWork.GetRepo<Video>();
+			var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.Id == id);
 
-				var loadedRecords = await videoRepo.GetSingleAsync(queryBuilder.Build());
+			var loadedRecords = await videoRepo.GetSingleAsync(queryBuilder.Build());
 
-				return _mapper.Map<VideoResponseDTO>(loadedRecords);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return _mapper.Map<VideoResponseDTO>(loadedRecords);
 		}
 
 		public async Task<VideoResponseDTO> UpdateVideoAsync(int id, VideoUpdateDTO dto)

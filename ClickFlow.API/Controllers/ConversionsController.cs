@@ -29,7 +29,7 @@ namespace ClickFlow.API.Controllers
 			{
 				// 1) Kiểm tra quota conversion trước
 				//    Cần biết PublisherId từ dto.ClickId → extension: conversionService trả publisherId
-				var publisher = await _conversionService.GetPublisherIdByClickId(dto.ClickId);
+				var publisher = await _conversionService.GetPublisherIdByClickIdAsync(dto.ClickId);
 				if (publisher == null)
 					return SaveError("Không tìm thấy Publisher tương ứng với ClickId.");
 

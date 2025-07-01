@@ -103,70 +103,46 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<PaginatedList<ConversionResponseDTO>> GetAllAsync(ConversionGetAllDTO dto)
 		{
-			try
+			var repo = _unitOfWork.GetRepo<Conversion>();
+			var queryBuilder = CreateQueryBuilder(dto.Keyword);
+
+			if (dto.EventType != null)
 			{
-				var repo = _unitOfWork.GetRepo<Conversion>();
-				var queryBuilder = CreateQueryBuilder(dto.Keyword);
-
-				if (dto.EventType != null)
-				{
-					queryBuilder.WithPredicate(x => x.EventType == dto.EventType);
-				}
-
-				if (!string.IsNullOrEmpty(dto.ClickId))
-				{
-					queryBuilder.WithPredicate(x => x.ClickId.Equals(dto.ClickId));
-				}
-
-				var conversions = repo.Get(queryBuilder.Build());
-
-				return await GetPagedData(conversions, dto.PageIndex, dto.PageSize);
+				queryBuilder.WithPredicate(x => x.EventType == dto.EventType);
 			}
-			catch (Exception ex)
+
+			if (!string.IsNullOrEmpty(dto.ClickId))
 			{
-				Console.WriteLine(ex.ToString());
-				throw;
+				queryBuilder.WithPredicate(x => x.ClickId.Equals(dto.ClickId));
 			}
+
+			var conversions = repo.Get(queryBuilder.Build());
+
+			return await GetPagedData(conversions, dto.PageIndex, dto.PageSize);
 
 		}
 
 		public async Task<ConversionResponseDTO> GetByIdAsync(int id)
 		{
-			try
-			{
-				var repo = _unitOfWork.GetRepo<Conversion>();
-				var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.Id == id);
+			var repo = _unitOfWork.GetRepo<Conversion>();
+			var queryBuilder = CreateQueryBuilder().WithPredicate(x => x.Id == id);
 
-				var result = await repo.GetSingleAsync(queryBuilder.Build());
-				return _mapper.Map<ConversionResponseDTO>(result);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			var result = await repo.GetSingleAsync(queryBuilder.Build());
+			return _mapper.Map<ConversionResponseDTO>(result);
 
 		}
 
-		public async Task<PublisherResponseDTO> GetPublisherIdByClickId(string clickId)
+		public async Task<PublisherResponseDTO> GetPublisherIdByClickIdAsync(string clickId)
 		{
-			try
-			{
-				var conversionRepo = _unitOfWork.GetRepo<Conversion>();
+			var conversionRepo = _unitOfWork.GetRepo<Conversion>();
 
-				var queryBuilder = CreateQueryBuilder()
-					.WithPredicate(x => x.ClickId.Equals(clickId))
-					.WithInclude(x => x.Click.CampaignParticipation.Publisher);
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(x => x.ClickId.Equals(clickId))
+				.WithInclude(x => x.Click.CampaignParticipation.Publisher);
 
-				var conversion = await conversionRepo.GetSingleAsync(queryBuilder.Build());
+			var conversion = await conversionRepo.GetSingleAsync(queryBuilder.Build());
 
-				return _mapper.Map<PublisherResponseDTO>(conversion?.Click?.CampaignParticipation?.Publisher);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return _mapper.Map<PublisherResponseDTO>(conversion?.Click?.CampaignParticipation?.Publisher);
 		}
 	}
 }

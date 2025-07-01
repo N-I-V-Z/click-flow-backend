@@ -5,7 +5,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 {
 	public interface IVnPayService
 	{
-		Task<string> CreatePaymentUrl(int userId, HttpContext context, VnPayRequestDTO vnPayRequest);
+		Task<string> CreatePaymentUrlAsync(int userId, HttpContext context, VnPayRequestDTO vnPayRequest);
 		VnPayResponseDTO PaymentExcute(IQueryCollection collection);
 	}
 }

@@ -36,7 +36,7 @@ namespace ClickFlow.API.Controllers
 			_configuration = configuration;
 		}
 
-		[Authorize(Roles = "Publisher, Advertiser")]
+		[Authorize(Roles = "Admin, Publisher, Advertiser")]
 		[HttpGet("own")]
 		public async Task<IActionResult> GetOwnTransactions([FromQuery] PagingRequestDTO dto)
 		{

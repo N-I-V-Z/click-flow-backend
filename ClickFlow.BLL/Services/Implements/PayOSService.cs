@@ -14,98 +14,49 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<PaymentLinkInformation> CancelPaymentLinkAsync(long orderId)
 		{
-			try
-			{
-				PaymentLinkInformation response = await _payOS.cancelPaymentLink(orderId);
-				return response;
-			}
-			catch (Exception ex)
-			{
-
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			PaymentLinkInformation response = await _payOS.cancelPaymentLink(orderId);
+			return response;
 		}
 
 		public async Task ConfirmWebhookAsync(string webhookUrl)
 		{
-			try
-			{
-				await _payOS.confirmWebhook(webhookUrl);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			await _payOS.confirmWebhook(webhookUrl);
 		}
 
 		public async Task<CreatePaymentResult> CreatePaymentLinkAsync(PaymentData data)
 		{
-			try
-			{
-				CreatePaymentResult response = await _payOS.createPaymentLink(data);
-				if (response == null) throw new Exception("Lỗi khi tạo link thanh toán.");
+			CreatePaymentResult response = await _payOS.createPaymentLink(data);
+			if (response == null) throw new Exception("Lỗi khi tạo link thanh toán.");
 
-				return response;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return response;
 		}
 
 		public async Task<PaymentLinkInformation> GetPaymentLinkInformation(long orderId)
 		{
-			try
-			{
-				PaymentLinkInformation response = await _payOS.getPaymentLinkInformation(orderId);
-				if (response == null) throw new Exception($"Lỗi khi lấy thông tin link thanh toán Order: #{orderId}.");
+			PaymentLinkInformation response = await _payOS.getPaymentLinkInformation(orderId);
+			if (response == null) throw new Exception($"Lỗi khi lấy thông tin link thanh toán Order: #{orderId}.");
 
-				return response;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return response;
 		}
 
 		public async Task<PaymentLinkInformation> GetPaymentLinkInformationAsync(long orderId)
 		{
-			try
-			{
-				PaymentLinkInformation response = await _payOS.cancelPaymentLink(orderId);
-				if (response == null) throw new Exception($"Lỗi khi hủy thông tin link thanh toán Order: #{orderId}.");
+			PaymentLinkInformation response = await _payOS.cancelPaymentLink(orderId);
+			if (response == null) throw new Exception($"Lỗi khi hủy thông tin link thanh toán Order: #{orderId}.");
 
-				return response;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return response;
 		}
 
 		public WebhookData VerifyPaymentWebhookData(WebhookType data)
 		{
-			try
+			WebhookData response = _payOS.verifyPaymentWebhookData(data);
+
+			if (data.desc == "Ma giao dich thu nghiem" || data.desc == "VQRIO123")
 			{
-				WebhookData response = _payOS.verifyPaymentWebhookData(data);
-
-				if (data.desc == "Ma giao dich thu nghiem" || data.desc == "VQRIO123")
-				{
-					return response;
-				}
-
 				return response;
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+
+			return response;
 		}
 	}
 }
