@@ -21,29 +21,21 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<UserPlanResponseDTO> GetCurrentPlanAsync(int publisherId)
 		{
-			try
-			{
-				var upRepo = _unitOfWork.GetRepo<UserPlan>();
-				var userPlan = await upRepo.GetSingleAsync(
-					new QueryBuilder<UserPlan>()
-						.WithPredicate(up => up.UserId == publisherId)
-						.WithInclude(up => up.Plan)
-						.Build());
+			var upRepo = _unitOfWork.GetRepo<UserPlan>();
+			var userPlan = await upRepo.GetSingleAsync(
+				new QueryBuilder<UserPlan>()
+					.WithPredicate(up => up.UserId == publisherId)
+					.WithInclude(up => up.Plan)
+					.Build());
 
-				if (userPlan == null)
-					throw new KeyNotFoundException($"Publisher (ID={publisherId}) chưa có gói.");
+			if (userPlan == null)
+				throw new KeyNotFoundException($"Publisher (ID={publisherId}) chưa có gói.");
 
-				// Nếu ExpirationDate != null và đã qua ngày → hết hạn
-				if (userPlan.ExpirationDate != null && DateTime.UtcNow > userPlan.ExpirationDate.Value)
-					throw new Exception("Gói của bạn đã hết hạn, vui lòng gia hạn.");
+			// Nếu ExpirationDate != null và đã qua ngày → hết hạn
+			if (userPlan.ExpirationDate != null && DateTime.UtcNow > userPlan.ExpirationDate.Value)
+				throw new Exception("Gói của bạn đã hết hạn, vui lòng gia hạn.");
 
-				return _mapper.Map<UserPlanResponseDTO>(userPlan);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return _mapper.Map<UserPlanResponseDTO>(userPlan);
 		}
 
 		public async Task<UserPlanResponseDTO> AssignPlanToPublisherAsync(int userId, int planId)
@@ -150,82 +142,58 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<bool> CanAddCampaignAsync(int publisherId)
 		{
-			try
-			{
-				var userPlan = await GetCurrentPlanAsync(publisherId);
-				return userPlan.CurrentCampaigns < userPlan.Plan.MaxCampaigns;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			var userPlan = await GetCurrentPlanAsync(publisherId);
+			return userPlan.CurrentCampaigns < userPlan.Plan.MaxCampaigns;
 		}
 
 		public async Task<bool> IncreaseClickCountAsync(int publisherId)
 		{
-			try
-			{
-				var upRepo = _unitOfWork.GetRepo<UserPlan>();
-				var userPlanEntity = await upRepo.GetSingleAsync(
-					new QueryBuilder<UserPlan>()
-						.WithPredicate(up => up.UserId == publisherId)
-						.WithInclude(up => up.Plan)
-						.Build());
+			var upRepo = _unitOfWork.GetRepo<UserPlan>();
+			var userPlanEntity = await upRepo.GetSingleAsync(
+				new QueryBuilder<UserPlan>()
+					.WithPredicate(up => up.UserId == publisherId)
+					.WithInclude(up => up.Plan)
+					.Build());
 
-				if (userPlanEntity == null)
-					throw new KeyNotFoundException($"Publisher (ID={publisherId}) chưa được gán gói nào.");
+			if (userPlanEntity == null)
+				throw new KeyNotFoundException($"Publisher (ID={publisherId}) chưa được gán gói nào.");
 
-				// Kiểm tra hết hạn và hạn mức
-				if (userPlanEntity.ExpirationDate != null && DateTime.UtcNow > userPlanEntity.ExpirationDate.Value)
-					return false;
+			// Kiểm tra hết hạn và hạn mức
+			if (userPlanEntity.ExpirationDate != null && DateTime.UtcNow > userPlanEntity.ExpirationDate.Value)
+				return false;
 
-				if (userPlanEntity.CurrentClicks >= userPlanEntity.Plan.MaxClicksPerMonth)
-					return false;
+			if (userPlanEntity.CurrentClicks >= userPlanEntity.Plan.MaxClicksPerMonth)
+				return false;
 
-				userPlanEntity.CurrentClicks++;
-				await upRepo.UpdateAsync(userPlanEntity);
-				await _unitOfWork.SaveAsync();
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			userPlanEntity.CurrentClicks++;
+			await upRepo.UpdateAsync(userPlanEntity);
+			await _unitOfWork.SaveAsync();
+			return true;
 		}
 
 		public async Task<bool> IncreaseConversionCountAsync(int publisherId)
 		{
-			try
-			{
-				var upRepo = _unitOfWork.GetRepo<UserPlan>();
-				var userPlanEntity = await upRepo.GetSingleAsync(
-					new QueryBuilder<UserPlan>()
-						.WithPredicate(up => up.UserId == publisherId)
-						.WithInclude(up => up.Plan)
-						.Build());
+			var upRepo = _unitOfWork.GetRepo<UserPlan>();
+			var userPlanEntity = await upRepo.GetSingleAsync(
+				new QueryBuilder<UserPlan>()
+					.WithPredicate(up => up.UserId == publisherId)
+					.WithInclude(up => up.Plan)
+					.Build());
 
-				if (userPlanEntity == null)
-					throw new KeyNotFoundException($"Publisher (ID={publisherId}) chưa được gán gói nào.");
+			if (userPlanEntity == null)
+				throw new KeyNotFoundException($"Publisher (ID={publisherId}) chưa được gán gói nào.");
 
-				// Kiểm tra hết hạn và hạn mức
-				if (userPlanEntity.ExpirationDate != null && DateTime.UtcNow > userPlanEntity.ExpirationDate.Value)
-					return false;
+			// Kiểm tra hết hạn và hạn mức
+			if (userPlanEntity.ExpirationDate != null && DateTime.UtcNow > userPlanEntity.ExpirationDate.Value)
+				return false;
 
-				if (userPlanEntity.CurrentConversions >= userPlanEntity.Plan.MaxConversionsPerMonth)
-					return false;
+			if (userPlanEntity.CurrentConversions >= userPlanEntity.Plan.MaxConversionsPerMonth)
+				return false;
 
-				userPlanEntity.CurrentConversions++;
-				await upRepo.UpdateAsync(userPlanEntity);
-				await _unitOfWork.SaveAsync();
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			userPlanEntity.CurrentConversions++;
+			await upRepo.UpdateAsync(userPlanEntity);
+			await _unitOfWork.SaveAsync();
+			return true;
 		}
 	}
 }

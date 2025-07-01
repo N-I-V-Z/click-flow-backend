@@ -19,78 +19,54 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<WalletResponseDTO> CreateWalletAsync(int userId, WalletCreateDTO dto)
 		{
-			try
+			var repo = _unitOfWork.GetRepo<Wallet>();
+
+			var createdWallet = _mapper.Map<Wallet>(dto);
+			createdWallet.UserId = userId;
+
+			await repo.CreateAsync(createdWallet);
+
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				var repo = _unitOfWork.GetRepo<Wallet>();
-
-				var createdWallet = _mapper.Map<Wallet>(dto);
-				createdWallet.UserId = userId;
-
-				await repo.CreateAsync(createdWallet);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<WalletResponseDTO>(createdWallet);
+				return null;
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+
+			return _mapper.Map<WalletResponseDTO>(createdWallet);
 		}
 
 		public async Task<WalletResponseDTO> GetWalletByUserIdAsync(int id)
 		{
-			try
-			{
-				var walletRepo = _unitOfWork.GetRepo<Wallet>();
+			var walletRepo = _unitOfWork.GetRepo<Wallet>();
 
-				var walletQueryBuilder = CreateQueryBuilder();
-				var walletQueryOptions = walletQueryBuilder
-					.WithPredicate(x => x.UserId == id)
-					.Build();
-				var wallet = await walletRepo.GetSingleAsync(walletQueryOptions);
+			var walletQueryBuilder = CreateQueryBuilder();
+			var walletQueryOptions = walletQueryBuilder
+				.WithPredicate(x => x.UserId == id)
+				.Build();
+			var wallet = await walletRepo.GetSingleAsync(walletQueryOptions);
 
-				return _mapper.Map<WalletResponseDTO>(wallet);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return _mapper.Map<WalletResponseDTO>(wallet);
 		}
 
 		public async Task<WalletResponseDTO> UpdateWalletAsync(int id, WalletUpdateDTO dto)
 		{
-			try
+			var repo = _unitOfWork.GetRepo<Wallet>();
+
+			var updatedWallet = new Wallet
 			{
-				var repo = _unitOfWork.GetRepo<Wallet>();
+				Id = id,
+				Balance = dto.Balance
+			};
 
-				var updatedWallet = new Wallet
-				{
-					Id = id,
-					Balance = dto.Balance
-				};
+			await repo.UpdateAsync(updatedWallet);
 
-				await repo.UpdateAsync(updatedWallet);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<WalletResponseDTO>(updatedWallet);
-			}
-			catch (Exception ex)
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				Console.WriteLine(ex.ToString());
-				throw;
+				return null;
 			}
+
+			return _mapper.Map<WalletResponseDTO>(updatedWallet);
 		}
 	}
 }

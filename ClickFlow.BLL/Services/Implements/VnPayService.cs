@@ -14,7 +14,7 @@ namespace ClickFlow.BLL.Services.Implements
 		private readonly VnPayConfiguration _vnPayConfig = vnPayConfig;
 		private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-		public async Task<string> CreatePaymentUrl(int userId, HttpContext context, VnPayRequestDTO vnPayRequest)
+		public async Task<string> CreatePaymentUrlAsync(int userId, HttpContext context, VnPayRequestDTO vnPayRequest)
 		{
 			try
 			{

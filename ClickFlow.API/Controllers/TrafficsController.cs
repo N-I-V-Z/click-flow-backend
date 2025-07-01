@@ -227,7 +227,8 @@ namespace ClickFlow.API.Controllers
 			{
 				var response = await _trafficService.GetBrowserStatisticsAsync();
 				return GetSuccess(response);
-			}catch(Exception ex)
+			}
+			catch (Exception ex)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.WriteLine(ex.Message);

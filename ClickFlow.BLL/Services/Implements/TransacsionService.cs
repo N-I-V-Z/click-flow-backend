@@ -86,35 +86,27 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
 		{
-			try
+			var walletRepo = _unitOfWork.GetRepo<Wallet>();
+			var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
+				.WithPredicate(x => x.UserId == userId)
+				.WithTracking(false)
+				.Build());
+
+			if (wallet == null)
 			{
-				var walletRepo = _unitOfWork.GetRepo<Wallet>();
-				var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
-					.WithPredicate(x => x.UserId == userId)
-					.WithTracking(false)
-					.Build());
-
-				if (wallet == null)
-				{
-					// Nếu không có ví, trả danh sách rỗng
-					return new PaginatedList<TransactionResponseDTO>(
-						Enumerable.Empty<TransactionResponseDTO>().ToList(),
-						0, dto.PageIndex, dto.PageSize);
-				}
-
-				var queryBuilder = CreateQueryBuilder(dto.Keyword);
-				var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == wallet.Id).WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
-
-				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
-				var transactions = transactionRepo.Get(queryOptions.Build());
-
-				return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
+				// Nếu không có ví, trả danh sách rỗng
+				return new PaginatedList<TransactionResponseDTO>(
+					Enumerable.Empty<TransactionResponseDTO>().ToList(),
+					0, dto.PageIndex, dto.PageSize);
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+
+			var queryBuilder = CreateQueryBuilder(dto.Keyword);
+			var queryOptions = queryBuilder.WithPredicate(x => x.WalletId == wallet.Id).WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
+
+			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+			var transactions = transactionRepo.Get(queryOptions.Build());
+
+			return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 		}
 
 		public async Task<TransactionResponseDTO> UpdateStatusTransactionAsync(long id, TransactionUpdateStatusDTO dto)
@@ -182,20 +174,12 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsAsync(PagingRequestDTO dto)
 		{
-			try
-			{
-				var queryBuilder = CreateQueryBuilder(dto.Keyword).WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
+			var queryBuilder = CreateQueryBuilder(dto.Keyword).WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
 
-				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
-				var transactions = transactionRepo.Get(queryBuilder.Build());
+			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
+			var transactions = transactionRepo.Get(queryBuilder.Build());
 
-				return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return await GetPagedData(transactions, dto.PageIndex, dto.PageSize);
 		}
 	}
 }
