@@ -24,5 +24,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsByCampaignAsync(int campaignId);
 		Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsAsync(int publisherId);
 		Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsByCampaignAsync(int campaignId);
+		Task<List<TrafficRevenueDTO>> GetRevenuesForPublisherAsync(int publisherId);
 	}
 }

@@ -3,6 +3,7 @@ using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Helpers.Config;
 using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -280,6 +281,24 @@ namespace ClickFlow.API.Controllers
 			try
 			{
 				var response = await _trafficService.GetDeviceStatisticsByCampaignAsync(campaignId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publisher/revenue")]
+		public async Task<IActionResult> GetRevenueEachCampaignForPublisher()
+		{
+			try
+			{
+				var response = await _trafficService.GetRevenuesForPublisherAsync(UserId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
