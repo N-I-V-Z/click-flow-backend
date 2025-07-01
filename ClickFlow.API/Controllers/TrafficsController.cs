@@ -219,13 +219,13 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Admin")]
-		[HttpGet("browser-statistics")]
-		public async Task<IActionResult> GetBrowserStatistics()
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publishers/statistics/browsers")]
+		public async Task<IActionResult> GetBrowserStatisticsForPublisher()
 		{
 			try
 			{
-				var response = await _trafficService.GetBrowserStatisticsAsync();
+				var response = await _trafficService.GetBrowserStatisticsAsync(UserId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -237,13 +237,49 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Admin")]
-		[HttpGet("device-statistics")]
-		public async Task<IActionResult> GetDeviceStatistics()
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publishers/statistics/devices")]
+		public async Task<IActionResult> GetDeviceStatisticsForPublisher()
 		{
 			try
 			{
-				var response = await _trafficService.GetDeviceStatisticsAsync();
+				var response = await _trafficService.GetDeviceStatisticsAsync(UserId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Advertiser")]
+		[HttpGet("campaigns/{campaignId}/statistics/browsers")]
+		public async Task<IActionResult> GetBrowserStatisticsByCampaign(int campaignId)
+		{
+			try
+			{
+				var response = await _trafficService.GetBrowserStatisticsByCampaignAsync(campaignId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Advertiser")]
+		[HttpGet("campaigns/{campaignId}/statistics/devices")]
+		public async Task<IActionResult> GetDeviceStatisticsByCampaign(int campaignId)
+		{
+			try
+			{
+				var response = await _trafficService.GetDeviceStatisticsByCampaignAsync(campaignId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
