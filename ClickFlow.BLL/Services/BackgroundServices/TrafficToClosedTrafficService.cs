@@ -39,7 +39,7 @@ namespace ClickFlow.BLL.Services.BackgroundServices
 				using (var scope = _scopeFactory.CreateScope())
 				{
 					var trafficService = scope.ServiceProvider.GetRequiredService<ITrafficService>();
-					await trafficService.TransferTrafficToClosedTraffic();
+					await trafficService.TransferTrafficToClosedTrafficAsync();
 					_logger.LogInformation("Traffic processing completed.");
 				}
 			}

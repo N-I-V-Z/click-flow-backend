@@ -12,13 +12,15 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<PaginatedList<TrafficResponseDTO>> GetAllByAdvertiserIdAsync(int id, PagingRequestDTO dto);
 		Task<PaginatedList<TrafficResponseDTO>> GetAllByCampaignIdAsync(int id, PagingRequestDTO dto);
 		Task<TrafficResponseDTO> GetByIdAsync(int id);
-		Task<BaseResponse> ValidateTraffic(TrafficCreateDTO dto);
+		Task<BaseResponse> ValidateTrafficAsync(TrafficCreateDTO dto);
 		Task<TrafficClickResponseDTO> CreateAsync(TrafficCreateDTO dto, string remoteIp);
-		Task TransferTrafficToClosedTraffic();
-		Task<int> AverageTrafficInCampaign(int publisherId);
-		Task<int> CountAllTrafficByCampaign(int campaignId);
-		Task<bool> IsValidTraffic(TrafficCreateDTO dto, string IpAddress);
-		Task<int> CountTrafficForPublisher(int campaignId, int publisherId);
-		Task<int> CountTrafficOfAllActiveCampaignForPublisher(int publisherId);
+		Task TransferTrafficToClosedTrafficAsync();
+		Task<int> AverageTrafficInCampaignAsync(int publisherId);
+		Task<int> CountAllTrafficByCampaignAsync(int campaignId);
+		Task<bool> IsValidTrafficAsync(TrafficCreateDTO dto, string IpAddress);
+		Task<int> CountTrafficForPublisherAsync(int campaignId, int publisherId);
+		Task<int> CountTrafficOfAllActiveCampaignForPublisherAsync(int publisherId);
+		Task<List<TrafficBrowserStatisticsDTO>> GetBrowserStatisticsAsync();
+		Task<List<TrafficDeviceStatisticsDTO>> GetDeviceStatisticsAsync();
 	}
 }

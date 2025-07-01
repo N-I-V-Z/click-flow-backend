@@ -429,7 +429,7 @@ namespace ClickFlow.BLL.Services.Implements
 			var avgTrafficDict = new Dictionary<int, int>();
 			foreach (var publisherId in publisherIds)
 			{
-				avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaign(publisherId);
+				avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaignAsync(publisherId);
 			}
 
 			// Gán TotalCampaigns và DailyTraffic vào từng CampaignParticipationResponseDTO
@@ -921,7 +921,7 @@ namespace ClickFlow.BLL.Services.Implements
 			var avgTrafficDict = new Dictionary<int, int>();
 			foreach (var publisherId in publisherIds)
 			{
-				avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaign(publisherId);
+				avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaignAsync(publisherId);
 			}
 			
 			// Assign TotalCampaigns and DailyTraffic to each DTO
