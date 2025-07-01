@@ -553,5 +553,42 @@ namespace ClickFlow.BLL.Services.Implements
 			return deviceStats;
 		}
 
+		public async Task<List<TrafficRevenueDTO>> GetRevenuesForPublisherAsync(int publisherId)
+		{
+			var trafficRepo = _unitOfWork.GetRepo<Traffic>();
+
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(t =>
+					t.IsValid &&
+					t.CampaignParticipation != null &&
+					t.CampaignParticipation.PublisherId == publisherId &&
+					t.CampaignParticipation.Campaign != null &&
+					t.CampaignParticipation.Campaign.Status == CampaignStatus.Activing &&
+					!t.CampaignParticipation.Campaign.IsDeleted &&
+					t.Conversions != null && t.Conversions.Any(c => c.Revenue != null)
+				);
+
+			var query = trafficRepo.Get(queryBuilder.Build());
+
+			var revenueGroups = await query
+				.SelectMany(t => t.Conversions
+					.Where(c => c.Revenue != null)
+					.Select(c => new
+					{
+						CampaignName = t.CampaignParticipation.Campaign.Name,
+						Revenue = c.Revenue ?? 0
+					})
+				)
+				.GroupBy(x => x.CampaignName)
+				.Select(g => new TrafficRevenueDTO
+				{
+					CampaignName = g.Key,
+					Revenue = g.Sum(x => x.Revenue)
+				})
+				.OrderByDescending(x => x.Revenue)
+				.ToListAsync();
+
+			return revenueGroups;
+		}
 	}
 }
