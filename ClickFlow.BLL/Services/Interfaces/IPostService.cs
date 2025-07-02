@@ -9,9 +9,9 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<BaseResponse> CreatePost(PostCreateDTO dto, int authorId);
 		Task<BaseResponse> UpdatePost(PostUpdateDTO dto, int authorId);
 		Task<BaseResponse> DeletePost(int id);
-		Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true);
-		Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true);
+		Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize, int? currentUserId = null, bool isAscending = false);
+		Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize, int? currentUserId = null, bool isAscending = false);
 		Task<PostResponseDTO> GetPostById(int id, int? currentUserId = null);
-		Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true);
+		Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize, int? currentUserId = null);
 	}
 }

@@ -7,6 +7,7 @@ using ClickFlow.DAL.Paging;
 using ClickFlow.DAL.Queries;
 using ClickFlow.DAL.UnitOfWork;
 using System.Linq;
+using System;
 
 namespace ClickFlow.BLL.Services.Implements
 {
@@ -77,7 +78,7 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true)
+		public async Task<PaginatedList<PostResponseDTO>> GetAllPosts(int pageIndex, int pageSize, int? currentUserId = null, bool isAscending = false)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var posts = repo.Get(new QueryBuilder<Post>()
@@ -85,8 +86,8 @@ namespace ClickFlow.BLL.Services.Implements
 				.WithInclude(p => p.Author.UserDetail)
 				.Build());
 
-			// Sort posts
-			posts = SortPosts(posts, sortBy, isDescending);
+			// Sort by CreatedAt according to isAscending flag
+			posts = isAscending ? posts.OrderBy(p => p.CreatedAt) : posts.OrderByDescending(p => p.CreatedAt);
 
 			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
 			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
@@ -100,7 +101,7 @@ namespace ClickFlow.BLL.Services.Implements
 				}
 			}
 			
-			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalPages, pageSize, pageIndex);
+			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalItems, pageIndex, pageSize);
 		}
 
 		public async Task<PostResponseDTO> GetPostById(int id, int? currentUserId = null)
@@ -124,7 +125,7 @@ namespace ClickFlow.BLL.Services.Implements
 			return result;
 		}
 
-		public async Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true)
+		public async Task<PaginatedList<PostResponseDTO>> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize, int? currentUserId = null, bool isAscending = false)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var posts = repo.Get(new QueryBuilder<Post>()
@@ -132,8 +133,8 @@ namespace ClickFlow.BLL.Services.Implements
 				.WithInclude(p => p.Author.UserDetail)
 				.Build());
 
-			// Sort posts
-			posts = SortPosts(posts, sortBy, isDescending);
+			// Sort by CreatedAt according to isAscending flag
+			posts = isAscending ? posts.OrderBy(p => p.CreatedAt) : posts.OrderByDescending(p => p.CreatedAt);
 
 			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
 			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
@@ -182,7 +183,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 		}
 
-		public async Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize, int? currentUserId = null, string sortBy = "CreatedAt", bool isDescending = true)
+		public async Task<PaginatedList<PostResponseDTO>> SearchPosts(PostSearchDTO searchDto, int pageIndex, int pageSize, int? currentUserId = null)
 		{
 			var repo = _unitOfWork.GetRepo<Post>();
 			var queryBuilder = new QueryBuilder<Post>()
@@ -204,8 +205,8 @@ namespace ClickFlow.BLL.Services.Implements
 
 			var posts = repo.Get(queryBuilder.Build());
 			
-			// Sort posts
-			posts = SortPosts(posts, sortBy, isDescending);
+			// Default sort by CreatedAt descending
+			posts = posts.OrderByDescending(p => p.CreatedAt);
 
 			var pagedPosts = await PaginatedList<Post>.CreateAsync(posts, pageIndex, pageSize);
 			var result = _mapper.Map<List<PostResponseDTO>>(pagedPosts);
@@ -220,18 +221,6 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 			
 			return new PaginatedList<PostResponseDTO>(result, pagedPosts.TotalItems, pageIndex, pageSize);
-		}
-
-		private IQueryable<Post> SortPosts(IQueryable<Post> posts, string sortBy, bool isDescending)
-		{
-			return sortBy.ToLower() switch
-			{
-				"createdat" => isDescending ? posts.OrderByDescending(p => p.CreatedAt) : posts.OrderBy(p => p.CreatedAt),
-				"likecount" => isDescending ? posts.OrderByDescending(p => p.LikeCount) : posts.OrderBy(p => p.LikeCount),
-				"feedbacknumber" => isDescending ? posts.OrderByDescending(p => p.FeedbackNumber) : posts.OrderBy(p => p.FeedbackNumber),
-				"title" => isDescending ? posts.OrderByDescending(p => p.Title) : posts.OrderBy(p => p.Title),
-				_ => isDescending ? posts.OrderByDescending(p => p.CreatedAt) : posts.OrderBy(p => p.CreatedAt) // Default sort by CreatedAt
-			};
 		}
 	}
 }
