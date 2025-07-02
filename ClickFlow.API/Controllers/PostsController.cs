@@ -1,4 +1,5 @@
-﻿using ClickFlow.BLL.DTOs.PostDTOs;
+﻿using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.PostDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +21,10 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet]
 		[Route("get-all-posts/{pageIndex}/{pageSize}")]
-		public async Task<IActionResult> GetAllPosts(
-			int pageIndex, 
-			int pageSize, 
-			[FromQuery] string sortBy = "CreatedAt", 
-			[FromQuery] bool isDescending = true)
+		public async Task<IActionResult> GetAllPosts(int pageIndex, int pageSize, [FromQuery] bool isAscending = false)
 		{
-			var response = await _postService.GetAllPosts(pageIndex, pageSize, UserId, sortBy, isDescending);
+			var data = await _postService.GetAllPosts(pageIndex, pageSize, UserId, isAscending);
+			var response = new PagingDTO<PostResponseDTO>(data);
 			return GetSuccess(response);
 		}
 
@@ -34,14 +32,10 @@ namespace ClickFlow.API.Controllers
 		[Authorize]
 		[HttpGet]
 		[Route("get-posts-by-author/{authorId}/{pageIndex}/{pageSize}")]
-		public async Task<IActionResult> GetPostsByAuthorId(
-			int authorId, 
-			int pageIndex, 
-			int pageSize, 
-			[FromQuery] string sortBy = "CreatedAt", 
-			[FromQuery] bool isDescending = true)
+		public async Task<IActionResult> GetPostsByAuthorId(int authorId, int pageIndex, int pageSize, [FromQuery] bool isAscending = false)
 		{
-			var response = await _postService.GetPostsByAuthorId(authorId, pageIndex, pageSize, UserId, sortBy, isDescending);
+			var data = await _postService.GetPostsByAuthorId(authorId, pageIndex, pageSize, UserId, isAscending);
+			var response = new PagingDTO<PostResponseDTO>(data);
 			return GetSuccess(response);
 		}
 
@@ -98,11 +92,10 @@ namespace ClickFlow.API.Controllers
 		public async Task<IActionResult> SearchPosts(
 			[FromBody] PostSearchDTO searchDto, 
 			[FromQuery] int pageIndex = 1, 
-			[FromQuery] int pageSize = 10,
-			[FromQuery] string sortBy = "CreatedAt", 
-			[FromQuery] bool isDescending = true)
+			[FromQuery] int pageSize = 10)
 		{
-			var response = await _postService.SearchPosts(searchDto, pageIndex, pageSize, UserId, sortBy, isDescending);
+			var data = await _postService.SearchPosts(searchDto, pageIndex, pageSize, UserId);
+			var response = new PagingDTO<PostResponseDTO>(data);
 			return GetSuccess(response);
 		}
 	}
