@@ -31,95 +31,63 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<CourseResponseDTO> CreateCourseAsync(int userId, CourseCreateDTO dto)
 		{
-			try
+			var courseRepo = _unitOfWork.GetRepo<Course>();
+			var newCourse = _mapper.Map<Course>(dto);
+
+			newCourse.CreateAt = DateTime.UtcNow;
+			newCourse.CreateById = userId;
+
+			await courseRepo.CreateAsync(newCourse);
+
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				var courseRepo = _unitOfWork.GetRepo<Course>();
-				var newCourse = _mapper.Map<Course>(dto);
-
-				newCourse.CreateAt = DateTime.UtcNow;
-				newCourse.CreateById = userId;
-
-				await courseRepo.CreateAsync(newCourse);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<CourseResponseDTO>(newCourse);
+				return null;
 			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+
+			return _mapper.Map<CourseResponseDTO>(newCourse);
 		}
 
 		public async Task<PaginatedList<CourseResponseDTO>> GetAllCourseForPublisherAsync(int publisherId, PagingRequestDTO dto)
 		{
-			try
-			{
-				var repo = _unitOfWork.GetRepo<Course>();
+			var repo = _unitOfWork.GetRepo<Course>();
 
-				var queryBuilder = CreateQueryBuilder(dto.Keyword)
-					.WithInclude(x => x.CoursePublishers)
-					.WithPredicate(x =>
-						x.CoursePublishers.FirstOrDefault(c => c.PublisherId == publisherId) == null
-					);
+			var queryBuilder = CreateQueryBuilder(dto.Keyword)
+				.WithInclude(x => x.CoursePublishers)
+				.WithPredicate(x =>
+					x.CoursePublishers.FirstOrDefault(c => c.PublisherId == publisherId) == null
+				);
 
-				var loadedRecords = repo.Get(queryBuilder.Build());
+			var loadedRecords = repo.Get(queryBuilder.Build());
 
-				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 		}
 
 		public async Task<PaginatedList<CourseResponseDTO>> GetAllCoursesAsync(PagingRequestDTO dto)
 		{
-			try
-			{
-				var courseRepo = _unitOfWork.GetRepo<Course>();
+			var courseRepo = _unitOfWork.GetRepo<Course>();
 
-				var queryBuilder = CreateQueryBuilder(dto.Keyword);
+			var queryBuilder = CreateQueryBuilder(dto.Keyword);
 
-				var loadedRecords = courseRepo.Get(queryBuilder.Build());
+			var loadedRecords = courseRepo.Get(queryBuilder.Build());
 
-				return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			return await GetPagedData(loadedRecords, dto.PageIndex, dto.PageSize);
 		}
 
 		public async Task<CourseResponseDTO> GetCourseByIdAsync(int id)
 		{
-			try
-			{
-				var courseRepo = _unitOfWork.GetRepo<Course>();
-				var queryBuilder = CreateQueryBuilder()
-					.WithPredicate(x => x.Id == id);
+			var courseRepo = _unitOfWork.GetRepo<Course>();
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(x => x.Id == id);
 
-				var queryOptions = queryBuilder.Build();
+			var queryOptions = queryBuilder.Build();
 
-				var response = await courseRepo.GetSingleAsync(queryOptions);
-				if (response == null) return null;
-				return _mapper.Map<CourseResponseDTO>(response);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			var response = await courseRepo.GetSingleAsync(queryOptions);
+			if (response == null) return null;
+			return _mapper.Map<CourseResponseDTO>(response);
 		}
 
-		public async Task<PaginatedList<CourseResponseDTO>> GetJoinedCourses(int userId, PagingRequestDTO dto)
+		public async Task<PaginatedList<CourseResponseDTO>> GetJoinedCoursesAsync(int userId, PagingRequestDTO dto)
 		{
 			var courseRepo = _unitOfWork.GetRepo<Course>();
 
@@ -313,8 +281,9 @@ namespace ClickFlow.BLL.Services.Implements
 
 				return _mapper.Map<CourseResponseDTO>(course);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				Console.WriteLine(ex.ToString());
 				await _unitOfWork.RollBackAsync();
 				throw;
 			}

@@ -64,7 +64,7 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var data = await _courseService.GetJoinedCourses(UserId, dto);
+				var data = await _courseService.GetJoinedCoursesAsync(UserId, dto);
 				var response = new PagingDTO<CourseResponseDTO>(data);
 
 				return GetSuccess(response);

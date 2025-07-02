@@ -3,6 +3,7 @@ using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Helpers.Config;
 using ClickFlow.BLL.Services.Interfaces;
+using ClickFlow.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -136,7 +137,7 @@ namespace ClickFlow.API.Controllers
 					return SaveError(checkCampaign.Message);
 
 				// 2) Kiểm tra traffic hợp lệ (ví dụ publisher đã tham gia)
-				var checkTraffic = await _trafficService.ValidateTraffic(dto);
+				var checkTraffic = await _trafficService.ValidateTrafficAsync(dto);
 				if (!checkTraffic.IsSuccess)
 					return SaveError(checkTraffic.Message);
 
@@ -171,7 +172,7 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var response = await _trafficService.CountAllTrafficByCampaign(campaignId);
+				var response = await _trafficService.CountAllTrafficByCampaignAsync(campaignId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -189,7 +190,7 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var response = await _trafficService.CountTrafficForPublisher(campaignId, UserId);
+				var response = await _trafficService.CountTrafficForPublisherAsync(campaignId, UserId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -207,7 +208,7 @@ namespace ClickFlow.API.Controllers
 		{
 			try
 			{
-				var response = await _trafficService.CountTrafficOfAllActiveCampaignForPublisher(UserId);
+				var response = await _trafficService.CountTrafficOfAllActiveCampaignForPublisherAsync(UserId);
 				return GetSuccess(response);
 			}
 			catch (Exception ex)
@@ -219,5 +220,94 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publishers/statistics/browsers")]
+		public async Task<IActionResult> GetBrowserStatisticsForPublisher()
+		{
+			try
+			{
+				var response = await _trafficService.GetBrowserStatisticsAsync(UserId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publishers/statistics/devices")]
+		public async Task<IActionResult> GetDeviceStatisticsForPublisher()
+		{
+			try
+			{
+				var response = await _trafficService.GetDeviceStatisticsAsync(UserId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Advertiser")]
+		[HttpGet("campaigns/{campaignId}/statistics/browsers")]
+		public async Task<IActionResult> GetBrowserStatisticsByCampaign(int campaignId)
+		{
+			try
+			{
+				var response = await _trafficService.GetBrowserStatisticsByCampaignAsync(campaignId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Advertiser")]
+		[HttpGet("campaigns/{campaignId}/statistics/devices")]
+		public async Task<IActionResult> GetDeviceStatisticsByCampaign(int campaignId)
+		{
+			try
+			{
+				var response = await _trafficService.GetDeviceStatisticsByCampaignAsync(campaignId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("publisher/revenue")]
+		public async Task<IActionResult> GetRevenueEachCampaignForPublisher()
+		{
+			try
+			{
+				var response = await _trafficService.GetRevenuesForPublisherAsync(UserId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
 	}
 }

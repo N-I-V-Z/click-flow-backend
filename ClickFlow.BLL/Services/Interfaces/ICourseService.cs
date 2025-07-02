@@ -10,7 +10,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<CourseResponseDTO> CreateCourseAsync(int userId, CourseCreateDTO dto);
 		Task<CourseResponseDTO> UpdateCourseAsync(int id, CourseUpdateDTO dto);
 		Task<PaginatedList<CourseResponseDTO>> GetAllCoursesAsync(PagingRequestDTO dto);
-		Task<PaginatedList<CourseResponseDTO>> GetJoinedCourses(int userId, PagingRequestDTO dto);
+		Task<PaginatedList<CourseResponseDTO>> GetJoinedCoursesAsync(int userId, PagingRequestDTO dto);
 		Task<CourseResponseDTO> GetCourseByIdAsync(int id);
 		Task<PaginatedList<CourseResponseDTO>> GetAllCourseForPublisherAsync(int publisherId, PagingRequestDTO dto);
 		Task<BaseResponse> JoinTheCourseAsync(int courseId, int publisherId);

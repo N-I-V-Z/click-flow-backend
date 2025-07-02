@@ -22,84 +22,59 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<List<MessageResponseDTO>> GetMessagesAsync(int conversationId)
 		{
-			try
-			{
-				var messageRepo = _unitOfWork.GetRepo<Message>();
-				var queryBuilder = CreateQueryBuilder()
-					.WithPredicate(x => x.ConversationId == conversationId).WithOrderBy(x => x.OrderBy(x => x.SentAt))
-					.WithInclude(x => x.Sender, x => x.Conversation);
+			var messageRepo = _unitOfWork.GetRepo<Message>();
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(x => x.ConversationId == conversationId).WithOrderBy(x => x.OrderBy(x => x.SentAt))
+				.WithInclude(x => x.Sender, x => x.Conversation);
 
-				var messageData = await messageRepo.GetAllAsync(queryBuilder.Build());
-				return _mapper.Map<List<MessageResponseDTO>>(messageData);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
-			}
+			var messageData = await messageRepo.GetAllAsync(queryBuilder.Build());
+			return _mapper.Map<List<MessageResponseDTO>>(messageData);
 		}
 
 		public async Task MarkMessagesAsReadAsync(int conversationId, int readerId)
 		{
-			try
+			var messageRepo = _unitOfWork.GetRepo<Message>();
+			var queryBuilder = CreateQueryBuilder()
+				.WithPredicate(x => x.ConversationId == conversationId && x.SenderId != readerId && !x.IsRead);
+
+			var unreadMessages = await messageRepo.GetAllAsync(queryBuilder.Build());
+
+			if (unreadMessages.Any())
 			{
-				var messageRepo = _unitOfWork.GetRepo<Message>();
-				var queryBuilder = CreateQueryBuilder()
-					.WithPredicate(x => x.ConversationId == conversationId && x.SenderId != readerId && !x.IsRead);
-
-				var unreadMessages = await messageRepo.GetAllAsync(queryBuilder.Build());
-
-				if (unreadMessages.Any())
+				foreach (var message in unreadMessages)
 				{
-					foreach (var message in unreadMessages)
-					{
-						message.IsRead = true;
-						await messageRepo.UpdateAsync(message);
-					}
-
-					await _unitOfWork.SaveChangesAsync();
+					message.IsRead = true;
+					await messageRepo.UpdateAsync(message);
 				}
 
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-				throw;
+				await _unitOfWork.SaveChangesAsync();
 			}
 		}
 
 		public async Task<MessageResponseDTO> SendMessageAsync(int senderId, MessageSendDTO dto)
 		{
-			try
+			string fileUrl = null;
+			if (dto.File != null)
 			{
-				string fileUrl = null;
-				if (dto.File != null)
-				{
-					var uploadedFile = await _cloudinaryService.UploadImageAsync(dto.File);
-					fileUrl = uploadedFile.Url.ToString();
+				var uploadedFile = await _cloudinaryService.UploadImageAsync(dto.File);
+				fileUrl = uploadedFile.Url.ToString();
 
-				}
-
-				var newMessage = _mapper.Map<Message>(dto);
-				newMessage.SenderId = senderId;
-				newMessage.FileUrl = fileUrl;
-				newMessage.SentAt = DateTime.Now;
-
-				var messageRepo = _unitOfWork.GetRepo<Message>();
-				await messageRepo.CreateAsync(newMessage);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-				return _mapper.Map<MessageResponseDTO>(newMessage);
 			}
-			catch (Exception ex)
+
+			var newMessage = _mapper.Map<Message>(dto);
+			newMessage.SenderId = senderId;
+			newMessage.FileUrl = fileUrl;
+			newMessage.SentAt = DateTime.Now;
+
+			var messageRepo = _unitOfWork.GetRepo<Message>();
+			await messageRepo.CreateAsync(newMessage);
+
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				Console.WriteLine(ex.ToString());
-				throw;
+				return null;
 			}
+			return _mapper.Map<MessageResponseDTO>(newMessage);
 		}
 	}
 }
