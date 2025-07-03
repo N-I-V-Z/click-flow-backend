@@ -39,7 +39,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet("{courseId}/check")]
 		public async Task<IActionResult> CheckJoinCourse(int courseId)
 		{
@@ -58,7 +58,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet("joined")]
 		public async Task<IActionResult> GetJoinedCourses([FromQuery] PagingRequestDTO dto)
 		{
@@ -78,7 +78,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpGet("publisher")]
 		public async Task<IActionResult> GetAllCoursesForPublisher([FromQuery] PagingRequestDTO dto)
 		{
@@ -98,7 +98,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Admin, Publisher")]
+		[Authorize]
 		[HttpGet("{courseId}")]
 		public async Task<IActionResult> GetById(int courseId)
 		{
@@ -138,7 +138,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost("{courseId}/join")]
 		public async Task<IActionResult> JoinCourse(int courseId)
 		{
@@ -159,7 +159,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Publisher")]
+		[Authorize(Roles = "Publisher, Advertiser")]
 		[HttpPost("{courseId}/rate")]
 		public async Task<IActionResult> RateCourse(int courseId, [FromBody] CourseRateDTO dto)
 		{
