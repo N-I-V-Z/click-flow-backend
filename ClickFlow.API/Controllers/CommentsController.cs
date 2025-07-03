@@ -1,3 +1,4 @@
+using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.CommentDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -61,7 +62,8 @@ namespace ClickFlow.API.Controllers
 		public async Task<IActionResult> GetByPostId(int postId, int pageIndex, int pageSize)
 		{
 			var comments = await _commentService.GetCommentsByPostId(postId, pageIndex, pageSize);
-			return GetSuccess(comments);
+			var response = new PagingDTO<CommentResponseDTO>(comments);
+			return GetSuccess(response);
 		}
 	}
 }
