@@ -1390,7 +1390,8 @@ namespace ClickFlow.DAL.Migrations
                 {
                     b.HasOne("ClickFlow.DAL.Entities.Course", "Course")
                         .WithMany("Videos")
-                        .HasForeignKey("CourseId");
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Course");
                 });

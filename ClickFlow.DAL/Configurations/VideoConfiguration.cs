@@ -18,7 +18,8 @@ namespace ClickFlow.DAL.Configurations
 			builder.HasOne(v => v.Course)
 				   .WithMany(c => c.Videos)
 				   .HasForeignKey(v => v.CourseId)
-				   .IsRequired(false);
+				   .IsRequired(false)
+				   .OnDelete(DeleteBehavior.Cascade);
 		}
 	}
 }
