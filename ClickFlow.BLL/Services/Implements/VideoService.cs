@@ -71,36 +71,45 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<VideoResponseDTO> UpdateVideoAsync(int id, VideoUpdateDTO dto)
 		{
-			try
+			var videoRepo = _unitOfWork.GetRepo<Video>();
+
+			var video = await videoRepo.GetSingleAsync(CreateQueryBuilder()
+				.WithPredicate(x => x.Id == id)
+				.WithTracking(false)
+				.Build());
+
+			if (videoRepo == null)
 			{
-				var videoRepo = _unitOfWork.GetRepo<Video>();
-
-				var video = await videoRepo.GetSingleAsync(CreateQueryBuilder()
-					.WithPredicate(x => x.Id == id)
-					.WithTracking(false)
-					.Build());
-
-				if (videoRepo == null)
-				{
-					return null;
-				}
-
-				_mapper.Map(dto, video);
-				await videoRepo.UpdateAsync(video);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<VideoResponseDTO>(video);
+				return null;
 			}
-			catch (Exception)
+
+			_mapper.Map(dto, video);
+			await videoRepo.UpdateAsync(video);
+
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				await _unitOfWork.RollBackAsync();
-				throw;
+				return null;
 			}
+
+			return _mapper.Map<VideoResponseDTO>(video);
+		}
+
+		public async Task<bool> DeleteVideoAsync(int id)
+		{
+			var videoRepo = _unitOfWork.GetRepo<Video>();
+
+			var query = CreateQueryBuilder().WithPredicate(x => x.Id == id);
+
+			var video = await videoRepo.GetSingleAsync(query.Build());
+
+			if (video == null) throw new KeyNotFoundException("Không tìm thấy video.");
+
+			await videoRepo.DeleteAsync(video);
+
+			var saver = await _unitOfWork.SaveAsync();
+
+			return saver == true ? true : false;
 		}
 	}
 }

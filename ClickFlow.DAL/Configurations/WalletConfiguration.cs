@@ -14,6 +14,10 @@ namespace ClickFlow.DAL.Configurations
 
 			builder.Property(w => w.Balance)
 				   .IsRequired();
+			builder.Property(w => w.BankCode)
+				   .IsRequired(false);
+			builder.Property(w => w.BankName)
+				   .IsRequired(false);
 
 			builder.HasOne(w => w.ApplicationUser)
 				   .WithOne(u => u.Wallet)

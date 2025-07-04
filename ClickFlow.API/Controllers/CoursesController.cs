@@ -98,7 +98,7 @@ namespace ClickFlow.API.Controllers
 			}
 		}
 
-		[Authorize(Roles = "Admin, Publisher")]
+		[Authorize]
 		[HttpGet("{courseId}")]
 		public async Task<IActionResult> GetById(int courseId)
 		{
@@ -191,6 +191,46 @@ namespace ClickFlow.API.Controllers
 				var response = await _courseService.UpdateCourseAsync(courseId, dto);
 				if (response == null) return SaveError();
 				return SaveSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpDelete("{courseId}")]
+		public async Task<IActionResult> DeleteCourse(int courseId)
+		{
+			try
+			{
+				var response = await _courseService.DeleteCourseAsync(courseId);
+				return SaveSuccess(response);
+			}
+			catch(KeyNotFoundException knfEx)
+			{
+				return SaveError(knfEx.Message);
+			}
+			catch(Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
+
+		[Authorize(Roles = "Publisher")]
+		[HttpGet("{courseId}/rate/check")]
+		public async Task<IActionResult> CheckRateCourse(int courseId)
+		{
+			try
+			{
+				var response = await _courseService.CheckRateCourseAsync(courseId, UserId);
+				return GetSuccess(response);
 			}
 			catch (Exception ex)
 			{

@@ -16,5 +16,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<BaseResponse> JoinTheCourseAsync(int courseId, int publisherId);
 		Task<BaseResponse> RateTheCourseAsync(int courseId, int publisherId, CourseRateDTO dto);
 		Task<bool> CheckPublisherInCourseAsync(int publisherId, int courseId);
+		Task<bool> DeleteCourseAsync(int courseId);
+		Task<bool> CheckRateCourseAsync(int courseId, int publisherId);
 	}
 }

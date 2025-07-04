@@ -940,6 +940,12 @@ namespace ClickFlow.DAL.Migrations
                     b.Property<int>("Balance")
                         .HasColumnType("int");
 
+                    b.Property<string>("BankCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -1384,7 +1390,8 @@ namespace ClickFlow.DAL.Migrations
                 {
                     b.HasOne("ClickFlow.DAL.Entities.Course", "Course")
                         .WithMany("Videos")
-                        .HasForeignKey("CourseId");
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Course");
                 });

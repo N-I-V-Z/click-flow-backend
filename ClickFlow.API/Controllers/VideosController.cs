@@ -95,5 +95,27 @@ namespace ClickFlow.API.Controllers
 				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
 			}
 		}
+
+		[Authorize(Roles = "Admin")]
+		[HttpDelete("{videoId}")]
+		public async Task<IActionResult> DeleteVideo(int videoId)
+		{
+			try
+			{
+				var response = await _videoService.DeleteVideoAsync(videoId);
+				return response ? SaveSuccess(response) : SaveError(response);
+			}
+			catch(KeyNotFoundException knfEx)
+			{
+				return SaveError(knfEx.Message);
+			}
+			catch (Exception ex)
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine(ex.Message);
+				Console.ResetColor();
+				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+			}
+		}
 	}
 }

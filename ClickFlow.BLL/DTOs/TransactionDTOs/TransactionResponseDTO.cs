@@ -1,4 +1,5 @@
-﻿using ClickFlow.DAL.Enums;
+﻿using ClickFlow.DAL.Entities;
+using ClickFlow.DAL.Enums;
 
 namespace ClickFlow.BLL.DTOs.TransactionDTOs
 {
@@ -11,5 +12,7 @@ namespace ClickFlow.BLL.DTOs.TransactionDTOs
 		public int? Balance { get; set; }
 		public TransactionType TransactionType { get; set; }
 		public int? WalletId { get; set; }
+		public Wallet? Wallet { get; set; }
+
 	}
 }

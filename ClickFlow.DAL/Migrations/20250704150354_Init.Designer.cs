@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClickFlow.DAL.Migrations
 {
     [DbContext(typeof(ClickFlowContext))]
-    [Migration("20250625054111_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250704150354_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -943,6 +943,12 @@ namespace ClickFlow.DAL.Migrations
                     b.Property<int>("Balance")
                         .HasColumnType("int");
 
+                    b.Property<string>("BankCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -1387,7 +1393,8 @@ namespace ClickFlow.DAL.Migrations
                 {
                     b.HasOne("ClickFlow.DAL.Entities.Course", "Course")
                         .WithMany("Videos")
-                        .HasForeignKey("CourseId");
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Course");
                 });
