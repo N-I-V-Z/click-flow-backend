@@ -52,13 +52,12 @@ namespace ClickFlow.BLL.Services.Implements
 		{
 			var repo = _unitOfWork.GetRepo<Wallet>();
 
-			var updatedWallet = new Wallet
-			{
-				Id = id,
-				Balance = dto.Balance
-			};
+			var wallet = await repo.GetSingleAsync(CreateQueryBuilder().WithPredicate(x => x.Id == id).Build());
 
-			await repo.UpdateAsync(updatedWallet);
+			wallet.BankCode = dto.BankCode;
+			wallet.BankName = dto.BankName;
+
+			await repo.UpdateAsync(wallet);
 
 			var saver = await _unitOfWork.SaveAsync();
 			if (!saver)
@@ -66,7 +65,7 @@ namespace ClickFlow.BLL.Services.Implements
 				return null;
 			}
 
-			return _mapper.Map<WalletResponseDTO>(updatedWallet);
+			return _mapper.Map<WalletResponseDTO>(wallet);
 		}
 	}
 }
