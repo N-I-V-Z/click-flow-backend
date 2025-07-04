@@ -6,5 +6,7 @@ namespace ClickFlow.BLL.DTOs.WalletDTOs
 	{
 		[DefaultValue(0)]
 		public int Balance { get; set; }
+		public string? BankCode { get; set; }
+		public string? BankName { get; set; }
 	}
 }
