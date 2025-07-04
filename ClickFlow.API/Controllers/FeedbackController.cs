@@ -85,6 +85,13 @@ namespace ClickFlow.API.Controllers
 			return SaveSuccess(response);
 		}
 
-
+		[Authorize]
+		[HttpGet]
+		[Route("check-feedback/{campaignId}")]
+		public async Task<IActionResult> CheckFeedback(int campaignId)
+		{
+			var hasFeedback = await _feedbackService.HasFeedback(campaignId, UserId);
+			return GetSuccess(hasFeedback);
+		}
 	}
 }

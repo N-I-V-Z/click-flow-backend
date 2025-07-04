@@ -14,5 +14,7 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<PaginatedList<FeedbackResponseDTO>> GetFeedbacksByCampaignId(int campaignId, int pageIndex, int pageSize);
 		Task<PaginatedList<FeedbackResponseDTO>> GetFeedbacksByFeedbackerId(int feedbackerId, int pageIndex, int pageSize);
 		Task<FeedbackResponseDTO> GetFeedbackById(int id);
+
+		Task<bool> HasFeedback(int campaignId, int feedbackerId);
 	}
 }
