@@ -28,6 +28,15 @@ namespace ClickFlow.BLL.Services.Implements
 
 		}
 
+		public async Task<bool> CheckRateCourseAsync(int courseId, int publisherId)
+		{
+			var cpRepo = _unitOfWork.GetRepo<CoursePublisher>();
+
+			var cp = await cpRepo.GetSingleAsync(new QueryBuilder<CoursePublisher>().WithPredicate(x => x.CourseId == courseId && x.PublisherId == publisherId && x.Rate == null).Build());
+
+			return cp != null;
+		}
+
 		public async Task<CourseResponseDTO> CreateCourseAsync(int userId, CourseCreateDTO dto)
 		{
 			var courseRepo = _unitOfWork.GetRepo<Course>();
