@@ -8,5 +8,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<VideoResponseDTO> UpdateVideoAsync(int id, VideoUpdateDTO dto);
 		Task<List<VideoResponseDTO>> GetAllVideosByCourseIdAsync(int courseId);
 		Task<VideoResponseDTO> GetVideoByIdAsync(int id);
+		Task<bool> DeleteVideoAsync(int id);
 	}
 }
