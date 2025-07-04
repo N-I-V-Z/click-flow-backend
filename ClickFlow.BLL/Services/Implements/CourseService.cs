@@ -48,6 +48,23 @@ namespace ClickFlow.BLL.Services.Implements
 			return _mapper.Map<CourseResponseDTO>(newCourse);
 		}
 
+		public async Task<bool> DeleteCourseAsync(int courseId)
+		{
+			var courseRepo = _unitOfWork.GetRepo<Course>();
+
+			var query = CreateQueryBuilder().WithPredicate(x => x.Id == courseId);
+
+			var course = await courseRepo.GetSingleAsync(query.Build());
+
+			if (course == null) throw new KeyNotFoundException("Không tìm thấy khóa học.");
+
+			await courseRepo.DeleteAsync(course);
+
+			var saver = _unitOfWork.SaveAsync();
+
+			return saver == null ? false : true;
+		}
+
 		public async Task<PaginatedList<CourseResponseDTO>> GetAllCourseForPublisherAsync(int publisherId, PagingRequestDTO dto)
 		{
 			var repo = _unitOfWork.GetRepo<Course>();
