@@ -2,7 +2,6 @@
 using ClickFlow.BLL.DTOs.CourseDTOs;
 using ClickFlow.BLL.DTOs.PagingDTOs;
 using ClickFlow.BLL.DTOs.Response;
-using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -27,6 +26,15 @@ namespace ClickFlow.BLL.Services.Implements
 			var cpRepo = _unitOfWork.GetRepo<CoursePublisher>();
 			return await cpRepo.AnyAsync(new QueryBuilder<CoursePublisher>().WithPredicate(x => x.PublisherId == publisherId && x.CourseId == courseId).Build());
 
+		}
+
+		public async Task<bool> CheckRateCourseAsync(int courseId, int publisherId)
+		{
+			var cpRepo = _unitOfWork.GetRepo<CoursePublisher>();
+
+			var cp = await cpRepo.GetSingleAsync(new QueryBuilder<CoursePublisher>().WithPredicate(x => x.CourseId == courseId && x.PublisherId == publisherId && x.Rate == null).Build());
+
+			return cp != null;
 		}
 
 		public async Task<CourseResponseDTO> CreateCourseAsync(int userId, CourseCreateDTO dto)
@@ -212,8 +220,7 @@ namespace ClickFlow.BLL.Services.Implements
 			catch (Exception ex)
 			{
 				await _unitOfWork.RollBackAsync();
-				Console.WriteLine(ex.ToString());
-				throw;
+				throw new Exception(ex.Message);
 			}
 		}
 
@@ -265,45 +272,35 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
 				await _unitOfWork.RollBackAsync();
-				throw;
+				throw new Exception(ex.Message);
 			}
 		}
 
 		public async Task<CourseResponseDTO> UpdateCourseAsync(int id, CourseUpdateDTO dto)
 		{
-			try
+			var repo = _unitOfWork.GetRepo<Course>();
+
+			var course = await repo.GetSingleAsync(CreateQueryBuilder()
+				.WithPredicate(x => x.Id == id)
+				.WithTracking(false)
+				.Build());
+
+			if (course == null)
 			{
-				var repo = _unitOfWork.GetRepo<Course>();
-
-				var course = await repo.GetSingleAsync(CreateQueryBuilder()
-					.WithPredicate(x => x.Id == id)
-					.WithTracking(false)
-					.Build());
-
-				if (course == null)
-				{
-					return null;
-				}
-
-				_mapper.Map(dto, course);
-				await repo.UpdateAsync(course);
-
-				var saver = await _unitOfWork.SaveAsync();
-				if (!saver)
-				{
-					return null;
-				}
-
-				return _mapper.Map<CourseResponseDTO>(course);
+				return null;
 			}
-			catch (Exception ex)
+
+			_mapper.Map(dto, course);
+			await repo.UpdateAsync(course);
+
+			var saver = await _unitOfWork.SaveAsync();
+			if (!saver)
 			{
-				Console.WriteLine(ex.ToString());
-				await _unitOfWork.RollBackAsync();
-				throw;
+				return null;
 			}
+
+			return _mapper.Map<CourseResponseDTO>(course);
 		}
 	}
 }

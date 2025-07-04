@@ -516,7 +516,8 @@ namespace ClickFlow.DAL.Migrations
                         column: x => x.CourseId,
                         principalSchema: "dbo",
                         principalTable: "Courses",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

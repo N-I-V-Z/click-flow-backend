@@ -77,9 +77,8 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
 				await _unitOfWork.RollBackAsync();
-				throw;
+				throw new Exception(ex.Message);
 			}
 		}
 
@@ -169,9 +168,8 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
 				await _unitOfWork.RollBackAsync();
-				throw;
+				throw new Exception(ex.Message);
 			}
 		}
 
