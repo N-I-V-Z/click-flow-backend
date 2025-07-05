@@ -87,7 +87,7 @@ namespace ClickFlow.BLL.Services.Implements
 				// Xóa course
 				await courseRepo.DeleteAsync(course);
 
-				var saver = _unitOfWork.SaveAsync();
+				var saver = await _unitOfWork.SaveAsync();
 				await _unitOfWork.CommitTransactionAsync();
 				return saver == null ? false : true;
 			}
