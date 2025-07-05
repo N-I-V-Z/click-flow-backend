@@ -618,7 +618,7 @@ namespace ClickFlow.DAL.Migrations
                         principalSchema: "dbo",
                         principalTable: "Courses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CoursePublishers_Publishers_PublisherId",
                         column: x => x.PublisherId,

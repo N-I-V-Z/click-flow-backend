@@ -1206,7 +1206,7 @@ namespace ClickFlow.DAL.Migrations
                     b.HasOne("ClickFlow.DAL.Entities.Course", "Course")
                         .WithMany("CoursePublishers")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ClickFlow.DAL.Entities.Publisher", "Publisher")
