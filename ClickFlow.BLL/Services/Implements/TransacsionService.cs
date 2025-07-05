@@ -83,7 +83,7 @@ namespace ClickFlow.BLL.Services.Implements
 		}
 
 
-		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, TransactionGetByUserIdDTO dto)
 		{
 			var walletRepo = _unitOfWork.GetRepo<Wallet>();
 			var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
@@ -104,6 +104,11 @@ namespace ClickFlow.BLL.Services.Implements
 				.WithPredicate(x => x.WalletId == wallet.Id)
 				.WithInclude(x => x.Wallet)
 				.WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
+
+			if (dto.TransactionType != null)
+			{
+				queryBuilder.WithPredicate(x => x.TransactionType == dto.TransactionType);
+			}
 
 			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 			var transactions = transactionRepo.Get(queryOptions.Build());
