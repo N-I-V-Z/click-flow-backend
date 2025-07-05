@@ -20,6 +20,11 @@ namespace ClickFlow.DAL.Configurations
 				   .WithMany(p => p.CoursePublishers)
 				   .HasForeignKey(c => c.PublisherId)
 				   .IsRequired(false);
+
+			builder.HasOne(cp => cp.Course)
+				   .WithMany(c => c.CoursePublishers)
+				   .HasForeignKey(cp => cp.CourseId)
+				   .OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

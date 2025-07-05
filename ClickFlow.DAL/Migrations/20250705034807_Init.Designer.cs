@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClickFlow.DAL.Migrations
 {
     [DbContext(typeof(ClickFlowContext))]
-    [Migration("20250704150354_Init")]
+    [Migration("20250705034807_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -1209,7 +1209,7 @@ namespace ClickFlow.DAL.Migrations
                     b.HasOne("ClickFlow.DAL.Entities.Course", "Course")
                         .WithMany("CoursePublishers")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ClickFlow.DAL.Entities.Publisher", "Publisher")

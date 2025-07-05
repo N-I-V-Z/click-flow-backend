@@ -214,6 +214,10 @@ namespace ClickFlow.API.Controllers
 			{
 				return SaveError(knfEx.Message);
 			}
+			catch(InvalidOperationException ioEx)
+			{
+				return SaveError(ioEx.Message);
+			}
 			catch(Exception ex)
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
