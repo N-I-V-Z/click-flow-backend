@@ -58,19 +58,53 @@ namespace ClickFlow.BLL.Services.Implements
 
 		public async Task<bool> DeleteCourseAsync(int courseId)
 		{
-			var courseRepo = _unitOfWork.GetRepo<Course>();
+			try
+			{
+				// Check khóa học tồn tại
+				var courseRepo = _unitOfWork.GetRepo<Course>();
+				var query = CreateQueryBuilder().WithPredicate(x => x.Id == courseId);
+				var course = await courseRepo.GetSingleAsync(query.Build());
+				if (course == null) throw new KeyNotFoundException("Không tìm thấy khóa học.");
 
-			var query = CreateQueryBuilder().WithPredicate(x => x.Id == courseId);
+				// Check đã có người dùng tham gia khóa học chưa
+				var cpRepo = _unitOfWork.GetRepo<CoursePublisher>();
+				var cpQuery = new QueryBuilder<CoursePublisher>()
+					.WithTracking(false)
+					.WithPredicate(x => x.CourseId == courseId);
+				if (await cpRepo.AnyAsync(cpQuery.Build()) == true) throw new InvalidOperationException("Đã có Publisher tham gia khóa học này.");
 
-			var course = await courseRepo.GetSingleAsync(query.Build());
+				await _unitOfWork.BeginTransactionAsync();
 
-			if (course == null) throw new KeyNotFoundException("Không tìm thấy khóa học.");
+				// Xóa video
+				var videoRepo = _unitOfWork.GetRepo<Video>();
+				var videoQuery = new QueryBuilder<Video>()
+					.WithTracking(false)
+					.WithPredicate(x => x.CourseId == courseId);
+				var videos = await videoRepo.GetAllAsync(videoQuery.Build());
+				await videoRepo.DeleteAllAsync(videos.ToList());
+				await _unitOfWork.SaveChangesAsync();
 
-			await courseRepo.DeleteAsync(course);
+				// Xóa course
+				await courseRepo.DeleteAsync(course);
 
-			var saver = _unitOfWork.SaveAsync();
+				var saver = _unitOfWork.SaveAsync();
+				await _unitOfWork.CommitTransactionAsync();
+				return saver == null ? false : true;
+			}
+			catch (KeyNotFoundException knfEx)
+			{
+				throw new Exception(knfEx.Message);
 
-			return saver == null ? false : true;
+			}
+			catch(InvalidOperationException ioEx)
+			{
+				throw new Exception(ioEx.Message);
+			}
+			catch (Exception ex)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new Exception(ex.Message);
+			}
 		}
 
 		public async Task<PaginatedList<CourseResponseDTO>> GetAllCourseForPublisherAsync(int publisherId, PagingRequestDTO dto)
