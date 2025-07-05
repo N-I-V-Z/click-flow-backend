@@ -164,8 +164,11 @@ namespace ClickFlow.BLL.Services.Implements
 					}
 				}
 				await transactionRepo.UpdateAsync(transaction);
+				await _unitOfWork.SaveChangesAsync();
+
 				await walletRepo.UpdateAsync(wallet);
-				await _unitOfWork.SaveAsync();
+				await _unitOfWork.SaveChangesAsync();
+
 				await _unitOfWork.CommitTransactionAsync();
 
 				return _mapper.Map<TransactionResponseDTO>(transaction);
