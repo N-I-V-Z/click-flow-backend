@@ -75,15 +75,6 @@ namespace ClickFlow.BLL.Services.Implements
 
 				await _unitOfWork.BeginTransactionAsync();
 
-				// Xóa video
-				var videoRepo = _unitOfWork.GetRepo<Video>();
-				var videoQuery = new QueryBuilder<Video>()
-					.WithTracking(false)
-					.WithPredicate(x => x.CourseId == courseId);
-				var videos = await videoRepo.GetAllAsync(videoQuery.Build());
-				await videoRepo.DeleteAllAsync(videos.ToList());
-				await _unitOfWork.SaveChangesAsync();
-
 				// Xóa course
 				await courseRepo.DeleteAsync(course);
 
