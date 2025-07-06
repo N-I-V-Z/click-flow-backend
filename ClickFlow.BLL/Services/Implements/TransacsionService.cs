@@ -192,6 +192,11 @@ namespace ClickFlow.BLL.Services.Implements
 				queryBuilder.WithPredicate(x => x.Status == dto.Status);
 			}
 
+			if (dto.TransactionType!= null)
+			{
+				queryBuilder.WithPredicate(x => x.TransactionType == dto.TransactionType);
+			}
+
 			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 			var transactions = transactionRepo.Get(queryBuilder.Build());
 
