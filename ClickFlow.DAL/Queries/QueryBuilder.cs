@@ -8,7 +8,14 @@ namespace ClickFlow.DAL.Queries
 
 		public QueryBuilder<T> WithPredicate(Expression<Func<T, bool>> predicate)
 		{
-			_options.Predicate = predicate;
+			if (_options.Predicate == null)
+			{
+				_options.Predicate = predicate;
+			}
+			else
+			{
+				_options.Predicate = _options.Predicate.AndAlso(predicate);
+			}
 			return this;
 		}
 
