@@ -91,7 +91,7 @@ namespace ClickFlow.API.Controllers
 
 		[Authorize(Roles = "Admin")]
 		[HttpGet]
-		public async Task<IActionResult> GetAllTransactions([FromQuery] PagingRequestDTO dto)
+		public async Task<IActionResult> GetAllTransactions([FromQuery] TransactionGetAllDTO dto)
 		{
 			try
 			{
