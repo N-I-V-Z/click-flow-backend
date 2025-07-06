@@ -70,7 +70,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				// 4) Lưu Transaction pending
 				var created = await transactionRepo.CreateAsync(newTransaction);
-				await _unitOfWork.SaveAsync();
+				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
 				return _mapper.Map<TransactionResponseDTO>(created);

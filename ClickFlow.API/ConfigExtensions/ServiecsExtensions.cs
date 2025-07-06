@@ -276,10 +276,10 @@ namespace ClickFlow.API.ConfigExtensions
 					foreach (var wallet in wallets)
 					{
 						await context.Transactions.AddRangeAsync(
-							new Transaction { Balance = wallet.Balance + 10_000, Amount = 10_000, TransactionType = TransactionType.Deposit, PaymentDate = DateTime.UtcNow, WalletId = wallet.Id },
-							new Transaction { Balance = wallet.Balance, Amount = 10_000, TransactionType = TransactionType.Withdraw, PaymentDate = DateTime.UtcNow.AddMinutes(5), WalletId = wallet.Id },
-							new Transaction { Balance = wallet.Balance - 10_000, Amount = 10_000, TransactionType = TransactionType.Withdraw, PaymentDate = DateTime.UtcNow.AddMinutes(10), WalletId = wallet.Id },
-							new Transaction { Balance = wallet.Balance, Amount = 10_000, TransactionType = TransactionType.Deposit, PaymentDate = DateTime.UtcNow.AddMinutes(10), WalletId = wallet.Id }
+							new Transaction { Balance = wallet.Balance + 10_000, Amount = 10_000, TransactionType = TransactionType.Deposit, PaymentDate = DateTime.UtcNow.AddMinutes(-15), WalletId = wallet.Id, Status = true },
+							new Transaction { Balance = wallet.Balance, Amount = 10_000, TransactionType = TransactionType.Withdraw, PaymentDate = DateTime.UtcNow.AddMinutes(-10), WalletId = wallet.Id, Status = false },
+							new Transaction { Balance = wallet.Balance - 10_000, Amount = 10_000, TransactionType = TransactionType.Withdraw, PaymentDate = DateTime.UtcNow.AddMinutes(-5), WalletId = wallet.Id, Status = false },
+							new Transaction { Balance = wallet.Balance, Amount = 10_000, TransactionType = TransactionType.Deposit, PaymentDate = DateTime.UtcNow, WalletId = wallet.Id, Status = true }
 							);
 					}
 					await context.SaveChangesAsync();
