@@ -92,6 +92,7 @@ namespace ClickFlow.API
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
 					ClockSkew = TimeSpan.Zero,
 					ValidateLifetime = true,
+					RoleClaimType = "Role"
 				};
 			});
 
