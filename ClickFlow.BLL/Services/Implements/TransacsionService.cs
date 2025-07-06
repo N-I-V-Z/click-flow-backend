@@ -181,11 +181,16 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsAsync(PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsAsync(TransactionGetAllDTO dto)
 		{
 			var queryBuilder = CreateQueryBuilder(dto.Keyword)
 				.WithInclude(x => x.Wallet)
 				.WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
+
+			if (dto.Status != null)
+			{
+				queryBuilder.WithPredicate(x => x.Status == dto.Status);
+			}
 
 			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 			var transactions = transactionRepo.Get(queryBuilder.Build());
