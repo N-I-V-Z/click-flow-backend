@@ -28,40 +28,45 @@ namespace ClickFlow.BLL.Services.Implements
 				var likeRepo = _unitOfWork.GetRepo<Like>();
 				var postRepo = _unitOfWork.GetRepo<Post>();
 
-				// Kiểm tra xem user đã like post này chưa
-				var existingLike = await likeRepo.GetSingleAsync(new QueryBuilder<Like>()
-					.WithPredicate(l => l.PostId == postId && l.UserId == userId && !l.IsDeleted)
+			
+				var existingLikeAny = await likeRepo.GetSingleAsync(new QueryBuilder<Like>()
+					.WithPredicate(l => l.PostId == postId && l.UserId == userId)
 					.Build());
 
-				if (existingLike != null)
+				if (existingLikeAny != null && !existingLikeAny.IsDeleted)
 				{
 					return new BaseResponse { IsSuccess = false, Message = "Bạn đã thích bài viết này rồi." };
 				}
 
-				// Kiểm tra post có tồn tại không
+		
+				if (existingLikeAny != null && existingLikeAny.IsDeleted)
+				{
+					existingLikeAny.IsDeleted = false;
+					existingLikeAny.CreatedAt = DateTime.UtcNow;
+					await likeRepo.UpdateAsync(existingLikeAny);
+				}
+				else
+				{
+					// Tạo like mới
+					var like = new Like
+					{
+						PostId = postId,
+						UserId = userId,
+						CreatedAt = DateTime.UtcNow,
+						IsDeleted = false
+					};
+					await likeRepo.CreateAsync(like);
+				}
+
+				// Cập nhật số lượng like của post
 				var post = await postRepo.GetSingleAsync(new QueryBuilder<Post>()
 					.WithPredicate(p => p.Id == postId && !p.IsDeleted)
 					.Build());
-
-				if (post == null)
+				if (post != null)
 				{
-					return new BaseResponse { IsSuccess = false, Message = "Bài viết không tồn tại." };
+					post.LikeCount++;
+					await postRepo.UpdateAsync(post);
 				}
-
-				// Tạo like mới
-				var like = new Like
-				{
-					PostId = postId,
-					UserId = userId,
-					CreatedAt = DateTime.UtcNow,
-					IsDeleted = false
-				};
-
-				await likeRepo.CreateAsync(like);
-
-				// Cập nhật số lượng like của post
-				post.LikeCount++;
-				await postRepo.UpdateAsync(post);
 
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
@@ -83,7 +88,6 @@ namespace ClickFlow.BLL.Services.Implements
 				var likeRepo = _unitOfWork.GetRepo<Like>();
 				var postRepo = _unitOfWork.GetRepo<Post>();
 
-				// Tìm like hiện tại
 				var existingLike = await likeRepo.GetSingleAsync(new QueryBuilder<Like>()
 					.WithPredicate(l => l.PostId == postId && l.UserId == userId && !l.IsDeleted)
 					.Build());
@@ -93,7 +97,6 @@ namespace ClickFlow.BLL.Services.Implements
 					return new BaseResponse { IsSuccess = false, Message = "Bạn chưa thích bài viết này." };
 				}
 
-				// Xóa like (soft delete)
 				existingLike.IsDeleted = true;
 				await likeRepo.UpdateAsync(existingLike);
 

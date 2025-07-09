@@ -22,25 +22,22 @@ namespace ClickFlow.API.Controllers
 
 		[HttpPost("like/{postId}")]
 		public async Task<ActionResult<BaseResponse>> LikePost(int postId)
-		{
-			var userId = GetCurrentUserId();
-			var result = await _likeService.LikePost(postId, userId);
+		{	
+			var result = await _likeService.LikePost(postId, UserId);
 			return Ok(result);
 		}
 
 		[HttpDelete("unlike/{postId}")]
 		public async Task<ActionResult<BaseResponse>> UnlikePost(int postId)
-		{
-			var userId = GetCurrentUserId();
-			var result = await _likeService.UnlikePost(postId, userId);
+		{		
+			var result = await _likeService.UnlikePost(postId, UserId);
 			return Ok(result);
 		}
 
 		[HttpGet("check/{postId}")]
 		public async Task<ActionResult<bool>> IsPostLiked(int postId)
-		{
-			var userId = GetCurrentUserId();
-			var result = await _likeService.IsPostLikedByUser(postId, userId);
+		{			
+			var result = await _likeService.IsPostLikedByUser(postId, UserId);
 			return Ok(result);
 		}
 
@@ -63,14 +60,5 @@ namespace ClickFlow.API.Controllers
 			return Ok(result);
 		}
 
-		private int GetCurrentUserId()
-		{
-			var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-			if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
-			{
-				throw new UnauthorizedAccessException("User ID not found in token");
-			}
-			return userId;
-		}
 	}
 } 

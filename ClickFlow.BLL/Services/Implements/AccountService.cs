@@ -31,9 +31,12 @@ namespace ClickFlow.BLL.Services.Implements
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWalletService _walletService;
+		private readonly IUserPlanService _userPlanService;
+
+		private readonly int PLAN_FREE_ID = 1;
 
         public AccountService(IIdentityService identityService, IUnitOfWork unitOfWork,
-                               IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IWalletService walletService)
+                               IEmailService emailService, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IWalletService walletService, IUserPlanService userPlanService)
         {
             _unitOfWork = unitOfWork;
             _identityService = identityService;
@@ -41,6 +44,7 @@ namespace ClickFlow.BLL.Services.Implements
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _walletService = walletService;
+			_userPlanService = userPlanService;
         }
         public async Task<AuthenResultDTO> GenerateTokenAsync(ApplicationUser user)
         {
@@ -405,7 +409,14 @@ namespace ClickFlow.BLL.Services.Implements
 						};
 						var publisherRepo = _unitOfWork.GetRepo<Publisher>();
 						await publisherRepo.CreateAsync(publisher);
-						break;
+
+                        var userPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
+
+                        if (userPlan == null)
+                        {
+                            await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
+                        }
+                        break;
 					case Role.Admin:
 						break;
 
@@ -415,7 +426,7 @@ namespace ClickFlow.BLL.Services.Implements
 				}
 
 				// Tạo ví cho user mới
-				await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
+				await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });				
 
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
@@ -670,6 +681,13 @@ namespace ClickFlow.BLL.Services.Implements
                 {
                     await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
                 }
+
+				var userPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
+				
+					if (userPlan == null) 
+					{
+                        await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
+                    }
 
                 await _unitOfWork.SaveChangesAsync();
 

@@ -543,12 +543,15 @@ namespace ClickFlow.BLL.Services.Implements
 			return new PaginatedList<CampaignResponseDTO>(result, pagedCampaigns.TotalItems, pageIndex, pageSize);
 		}
 
-		public async Task<PaginatedList<CampaignResponseForPublisherDTO>> GetAllCampaignForPublisher(int publisherId, int pageIndex, int pageSize)
+		public async Task<PaginatedList<CampaignResponseForPublisherDTO>> GetAllCampaignForPublisher(int publisherId, int pageIndex, int pageSize, Industry? industry = null, TypePay? typePay = null)
 		{
 			var campaignRepo = _unitOfWork.GetRepo<Campaign>();
 
 			var campaignsQuery = campaignRepo.Get(new QueryBuilder<Campaign>()
-				.WithPredicate(x => !x.IsDeleted && x.Status == CampaignStatus.Activing)
+				.WithPredicate(x => !x.IsDeleted &&
+								 x.Status == CampaignStatus.Activing &&
+								 (!industry.HasValue || x.TypeCampaign == industry.Value) &&
+								 (!typePay.HasValue || x.TypePay == typePay.Value))
 				.WithInclude(x => x.Advertiser)
 				.WithInclude(x => x.CampaignParticipations.Where(p => p.PublisherId == publisherId))
 				.Build());

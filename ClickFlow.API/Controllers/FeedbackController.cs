@@ -1,4 +1,5 @@
-﻿using ClickFlow.BLL.DTOs.FeedbackDTOs;
+﻿using ClickFlow.BLL.DTOs;
+using ClickFlow.BLL.DTOs.FeedbackDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,8 @@ namespace ClickFlow.API.Controllers
 		[Route("get-all-feedbacks/{pageIndex}/{pageSize}")]
 		public async Task<IActionResult> GetAllFeedbacks(int pageIndex, int pageSize)
 		{
-			var response = await _feedbackService.GetAllFeedbacks(pageIndex, pageSize);
+			var data = await _feedbackService.GetAllFeedbacks(pageIndex, pageSize);
+			var response = new PagingDTO<FeedbackResponseDTO>(data);
 			return GetSuccess(response);
 		}
 
@@ -30,8 +32,9 @@ namespace ClickFlow.API.Controllers
 		[Route("get-feedbacks-by-campaign/{campaignId}/{pageIndex}/{pageSize}")]
 		public async Task<IActionResult> GetFeedbacksByCampaignId(int campaignId, int pageIndex, int pageSize)
 		{
-			var response = await _feedbackService.GetFeedbacksByCampaignId(campaignId, pageIndex, pageSize);
-			return GetSuccess(response);
+			var data = await _feedbackService.GetFeedbacksByCampaignId(campaignId, pageIndex, pageSize);
+            var response = new PagingDTO<FeedbackResponseDTO>(data);
+            return GetSuccess(response);
 		}
 
 		[Authorize]
@@ -39,8 +42,9 @@ namespace ClickFlow.API.Controllers
 		[Route("get-feedbacks-by-feedbacker/{feedbackerId}/{pageIndex}/{pageSize}")]
 		public async Task<IActionResult> GetFeedbacksByFeedbackerId(int feedbackerId, int pageIndex, int pageSize)
 		{
-			var response = await _feedbackService.GetFeedbacksByFeedbackerId(feedbackerId, pageIndex, pageSize);
-			return GetSuccess(response);
+			var data = await _feedbackService.GetFeedbacksByFeedbackerId(feedbackerId, pageIndex, pageSize);
+            var response = new PagingDTO<FeedbackResponseDTO>(data);
+            return GetSuccess(response);
 		}
 
 		[Authorize]
@@ -85,6 +89,13 @@ namespace ClickFlow.API.Controllers
 			return SaveSuccess(response);
 		}
 
-
+		[Authorize]
+		[HttpGet]
+		[Route("check-feedback/{campaignId}")]
+		public async Task<IActionResult> CheckFeedback(int campaignId)
+		{
+			var hasFeedback = await _feedbackService.HasFeedback(campaignId, UserId);
+			return GetSuccess(hasFeedback);
+		}
 	}
 }

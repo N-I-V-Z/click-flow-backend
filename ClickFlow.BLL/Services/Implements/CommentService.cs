@@ -25,13 +25,30 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				await _unitOfWork.BeginTransactionAsync();
-				var repo = _unitOfWork.GetRepo<Comment>();
+				var commentRepo = _unitOfWork.GetRepo<Comment>();
+				var postRepo = _unitOfWork.GetRepo<Post>();
+
+				
+				var post = await postRepo.GetSingleAsync(new QueryBuilder<Post>()
+					.WithPredicate(p => p.Id == dto.PostId && !p.IsDeleted)
+					.Build());
+
+				if (post == null)
+				{
+					await _unitOfWork.RollBackAsync();
+					return new BaseResponse { IsSuccess = false, Message = "Bài viết không tồn tại." };
+				}
 
 				var comment = _mapper.Map<Comment>(dto);
 				comment.AuthorId = userId;
 				comment.CreatedAt = DateTime.UtcNow;
 
-				await repo.CreateAsync(comment);
+				await commentRepo.CreateAsync(comment);
+
+				
+				post.FeedbackNumber += 1;
+				await postRepo.UpdateAsync(post);
+
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
@@ -78,8 +95,10 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				await _unitOfWork.BeginTransactionAsync();
-				var repo = _unitOfWork.GetRepo<Comment>();
-				var comment = await repo.GetSingleAsync(new QueryBuilder<Comment>()
+				var commentRepo = _unitOfWork.GetRepo<Comment>();
+				var postRepo = _unitOfWork.GetRepo<Post>();
+
+				var comment = await commentRepo.GetSingleAsync(new QueryBuilder<Comment>()
 					.WithPredicate(x => x.Id == id)
 					.Build());
 
@@ -88,8 +107,25 @@ namespace ClickFlow.BLL.Services.Implements
 					return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy bình luận." };
 				}
 
+				if (comment.IsDeleted)
+				{
+					return new BaseResponse { IsSuccess = false, Message = "Bình luận đã được xoá trước đó." };
+				}
+
 				comment.IsDeleted = true;
-				await repo.UpdateAsync(comment);
+				await commentRepo.UpdateAsync(comment);
+
+				
+				var post = await postRepo.GetSingleAsync(new QueryBuilder<Post>()
+					.WithPredicate(p => p.Id == comment.PostId && !p.IsDeleted)
+					.Build());
+
+				if (post != null && post.FeedbackNumber > 0)
+				{
+					post.FeedbackNumber -= 1;
+					await postRepo.UpdateAsync(post);
+				}
+
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 

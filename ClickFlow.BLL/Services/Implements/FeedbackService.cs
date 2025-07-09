@@ -214,6 +214,16 @@ namespace ClickFlow.BLL.Services.Implements
 
 			return _mapper.Map<FeedbackResponseDTO>(feedback);
 		}
+
+		public async Task<bool> HasFeedback(int campaignId, int feedbackerId)
+		{
+			var repo = _unitOfWork.GetRepo<Feedback>();
+			var existingFeedback = await repo.GetSingleAsync(new QueryBuilder<Feedback>()
+				.WithPredicate(x => x.CampaignId == campaignId && x.FeedbackerId == feedbackerId)
+				.Build());
+
+			return existingFeedback != null;
+		}
 	}
 }
 
