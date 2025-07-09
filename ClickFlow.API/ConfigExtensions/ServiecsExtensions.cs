@@ -111,6 +111,15 @@ namespace ClickFlow.API.ConfigExtensions
 			}
 			#endregion
 
+			if (!context.UserRoles.Any(x => x.RoleId == 1))
+			{
+				await context.UserRoles.AddAsync(
+					// Admin
+					new IdentityUserRole<int> { UserId = 1, RoleId = 1 }
+				);
+				await context.SaveChangesAsync();
+			}
+
 			#region Seeding Plan
 			if (!context.Plans.Any())
 			{
@@ -155,12 +164,9 @@ namespace ClickFlow.API.ConfigExtensions
 				#endregion
 
 				#region Seeding UserRoles
-				if (!context.UserRoles.Any())
+				if (!context.UserRoles.Any(x => x.RoleId == 2 || x.RoleId == 3))
 				{
 					await context.UserRoles.AddRangeAsync(
-						// Admin
-						new IdentityUserRole<int> { UserId = 1, RoleId = 1 },
-
 						// Publishers
 						new IdentityUserRole<int> { UserId = 2, RoleId = 3 },
 						new IdentityUserRole<int> { UserId = 3, RoleId = 3 },
