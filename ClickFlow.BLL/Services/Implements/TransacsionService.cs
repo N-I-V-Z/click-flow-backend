@@ -70,7 +70,7 @@ namespace ClickFlow.BLL.Services.Implements
 
 				// 4) Lưu Transaction pending
 				var created = await transactionRepo.CreateAsync(newTransaction);
-				await _unitOfWork.SaveAsync();
+				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
 				return _mapper.Map<TransactionResponseDTO>(created);
@@ -83,7 +83,7 @@ namespace ClickFlow.BLL.Services.Implements
 		}
 
 
-		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsByUserIdAsync(int userId, TransactionGetByUserIdDTO dto)
 		{
 			var walletRepo = _unitOfWork.GetRepo<Wallet>();
 			var wallet = await walletRepo.GetSingleAsync(new QueryBuilder<Wallet>()
@@ -104,6 +104,11 @@ namespace ClickFlow.BLL.Services.Implements
 				.WithPredicate(x => x.WalletId == wallet.Id)
 				.WithInclude(x => x.Wallet)
 				.WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
+
+			if (dto.TransactionType != null)
+			{
+				queryBuilder.WithPredicate(x => x.TransactionType == dto.TransactionType);
+			}
 
 			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 			var transactions = transactionRepo.Get(queryOptions.Build());
@@ -159,8 +164,11 @@ namespace ClickFlow.BLL.Services.Implements
 					}
 				}
 				await transactionRepo.UpdateAsync(transaction);
+				await _unitOfWork.SaveChangesAsync();
+
 				await walletRepo.UpdateAsync(wallet);
-				await _unitOfWork.SaveAsync();
+				await _unitOfWork.SaveChangesAsync();
+
 				await _unitOfWork.CommitTransactionAsync();
 
 				return _mapper.Map<TransactionResponseDTO>(transaction);
@@ -173,11 +181,21 @@ namespace ClickFlow.BLL.Services.Implements
 			}
 		}
 
-		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsAsync(PagingRequestDTO dto)
+		public async Task<PaginatedList<TransactionResponseDTO>> GetAllTransactionsAsync(TransactionGetAllDTO dto)
 		{
 			var queryBuilder = CreateQueryBuilder(dto.Keyword)
 				.WithInclude(x => x.Wallet)
 				.WithOrderBy(x => x.OrderByDescending(x => x.PaymentDate));
+
+			if (dto.Status != null)
+			{
+				queryBuilder.WithPredicate(x => x.Status == dto.Status);
+			}
+
+			if (dto.TransactionType!= null)
+			{
+				queryBuilder.WithPredicate(x => x.TransactionType == dto.TransactionType);
+			}
 
 			var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 			var transactions = transactionRepo.Get(queryBuilder.Build());
