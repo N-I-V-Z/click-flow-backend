@@ -76,6 +76,7 @@ namespace ClickFlow.BLL.Services.Implements
 					Amount = (int)targetPlan.Price,
 					Balance = wallet.Balance,
 					PaymentDate = DateTime.UtcNow,
+					Status = true,
 					TransactionType = TransactionType.Pay,
 				};
 				await transactionRepo.CreateAsync(tx);
