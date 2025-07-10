@@ -663,22 +663,10 @@ namespace ClickFlow.BLL.Services.Implements
 					var publisherRepo = _unitOfWork.GetRepo<Publisher>();
 					var publisher = new Publisher
 					{
-						UserId = user.Id,
-						ApplicationUser = user
+						UserId = user.Id
 					};
 					await publisherRepo.CreateAsync(publisher);
 					isNewUser = true;
-				}
-
-				if (user != null && user.Publisher == null)
-				{
-					var publisherRepo = _unitOfWork.GetRepo<Publisher>();
-					var publisher = new Publisher
-					{
-						UserId = user.Id,
-						ApplicationUser = user
-					};
-					await publisherRepo.CreateAsync(publisher);
 				}
 
 				// Store avatar
