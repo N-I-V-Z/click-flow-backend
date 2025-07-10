@@ -61,7 +61,7 @@ namespace ClickFlow.BLL.Services.Implements
 					throw new KeyNotFoundException($"Ví của Publisher (ID={userId}) không tồn tại.");
 
 				if (wallet.Balance < targetPlan.Price)
-					throw new Exception($"Số dư ví không đủ. Bạn cần {targetPlan.Price} để đăng ký gói này.");
+					throw new InvalidOperationException($"Số dư ví không đủ. Bạn cần {targetPlan.Price} để đăng ký gói này.");
 
 				// 3) Trừ tiền vào Ví
 				// Nếu Price thực tế có thập phân, cân nhắc đổi Wallet.Balance thành decimal
