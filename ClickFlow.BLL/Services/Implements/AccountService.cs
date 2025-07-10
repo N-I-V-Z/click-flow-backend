@@ -715,10 +715,11 @@ namespace ClickFlow.BLL.Services.Implements
                 {
                     currentPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
                 }
-                catch
+                catch(KeyNotFoundException knfEx)
                 {
+					currentPlan = null;
 
-                }
+				}
 
                 if (currentPlan == null)
                 {
