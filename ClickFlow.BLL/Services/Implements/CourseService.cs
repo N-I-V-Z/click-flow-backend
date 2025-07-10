@@ -197,6 +197,7 @@ namespace ClickFlow.BLL.Services.Implements
 				// Trừ tiền
 				wallet.Balance -= course.Price;
 				await walletRepo.UpdateAsync(wallet);
+				await _unitOfWork.SaveChangesAsync();
 
 				var transactionRepo = _unitOfWork.GetRepo<Transaction>();
 				var newTransaction = new Transaction
