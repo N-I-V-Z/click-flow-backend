@@ -127,6 +127,7 @@ namespace ClickFlow.BLL.Services.Implements
 					};
 
 					await conversionRepo.CreateAsync(conversion);
+					await _unitOfWork.SaveChangesAsync();
 
 					// Cộng hoa hồng cho publisher
 					wallet.Balance += (int)commision;
@@ -149,7 +150,6 @@ namespace ClickFlow.BLL.Services.Implements
 						TransactionType = TransactionType.Received,
 						WalletId = adminWallet.Id
 					};
-					await _unitOfWork.SaveChangesAsync();
 				}
 
 				// Nếu là CPS hoặc CPA → chỉ ghi nhận traffic, đợi postback từ advertiser
