@@ -127,7 +127,7 @@ namespace ClickFlow.API.Controllers
 					return SaveError(checkTraffic.Message);
 
 				// 3) Tính IP
-				var ip = Utils.GetIpAddress(HttpContext);
+				var ip = GetClientIpAddress();
 
 				// 4) Tăng click count, nếu hết quota quay về lỗi
 				//    PublisherId lấy từ dto.PublisherId (giả định DTO có trường này)
@@ -267,5 +267,46 @@ namespace ClickFlow.API.Controllers
 				return Error(ex.Message);
 			}
 		}
+
+		private string GetClientIpAddress()
+		{
+			try
+			{
+				// Ưu tiên lấy từ X-Forwarded-For nếu có
+				var forwardedHeader = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+				if (!string.IsNullOrWhiteSpace(forwardedHeader))
+				{
+					// Có thể có nhiều IP, lấy IP đầu tiên (IP thực của client)
+					return forwardedHeader.Split(',')[0].Trim();
+				}
+
+				// Nếu không có header, lấy trực tiếp từ RemoteIpAddress
+				var remoteIp = HttpContext.Connection.RemoteIpAddress;
+
+				if (remoteIp != null)
+				{
+					// Nếu là IPv6, cố gắng lấy IPv4 tương ứng
+					if (remoteIp.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+					{
+						var ip = System.Net.Dns.GetHostEntry(remoteIp)
+							.AddressList.FirstOrDefault(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+						if (ip != null)
+							return ip.ToString();
+					}
+					else
+					{
+						return remoteIp.ToString();
+					}
+				}
+			}
+			catch
+			{
+				// Không log exception vì có thể ảnh hưởng hiệu năng
+			}
+
+			// Trường hợp không xác định được IP
+			return "127.0.0.1";
+		}
+
 	}
 }
