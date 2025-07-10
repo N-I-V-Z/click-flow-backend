@@ -364,7 +364,6 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				await _unitOfWork.BeginTransactionAsync();
-				Console.WriteLine($"Role từ request: {accRequest.Role}");
 				var user = new ApplicationUser
 				{
 					Role = accRequest.Role,
