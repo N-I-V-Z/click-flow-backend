@@ -48,9 +48,13 @@ namespace ClickFlow.API.Controllers
 				if (result == null) return SaveError();
 				return SaveSuccess(result);
 			}
-			catch(KeyNotFoundException knfEx)
+			catch (KeyNotFoundException knfEx)
 			{
-
+				return GetError(knfEx.Message);
+			}
+			catch (InvalidOperationException ioEx)
+			{
+				return GetError(ioEx.Message);
 			}
 			catch (Exception ex)
 			{
@@ -70,14 +74,6 @@ namespace ClickFlow.API.Controllers
 			{
 				bool canAdd = await _userPlanService.CanAddCampaignAsync(UserId);
 				return GetSuccess(canAdd);
-			}
-			catch (KeyNotFoundException knfEx)
-			{
-				return GetError(knfEx.Message);
-			}
-			catch(InvalidOperationException ioEx)
-			{
-				return GetError(ioEx.Message);
 			}
 			catch (Exception ex)
 			{
