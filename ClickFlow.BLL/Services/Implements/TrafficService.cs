@@ -156,7 +156,15 @@ namespace ClickFlow.BLL.Services.Implements
 				// Postback sẽ dựa vào ClickId đã được sinh ở trên để tạo Conversion sau
 
 				var saved = await _unitOfWork.SaveAsync();
-				await _unitOfWork.CommitTransactionAsync();
+
+				if (saved == true)
+				{
+					await _unitOfWork.CommitTransactionAsync();
+				}
+				else
+				{
+					await _unitOfWork.RollBackAsync();
+				}
 
 				return saved ? new TrafficClickResponseDTO
 				{
