@@ -685,11 +685,6 @@ namespace ClickFlow.BLL.Services.Implements
                     };
                     await userDetailRepo.CreateAsync(userDetail);
                 }
-                else
-                {
-                    userDetail.AvatarURL = tokenInfo.Picture;
-                    await userDetailRepo.UpdateAsync(userDetail);
-                }
 
                 // Tạo ví nếu chưa có
                 var wallet = await _walletService.GetWalletByUserIdAsync(user.Id);
