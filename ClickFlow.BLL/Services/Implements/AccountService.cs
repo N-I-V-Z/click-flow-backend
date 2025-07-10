@@ -710,18 +710,7 @@ namespace ClickFlow.BLL.Services.Implements
                     await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
                 }
 
-                UserPlanResponseDTO? currentPlan = null;
-                try
-                {
-                    currentPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
-                }
-                catch(KeyNotFoundException knfEx)
-                {
-					currentPlan = null;
-
-				}
-
-                if (currentPlan == null)
+                if (isNewUser)
                 {
                     await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
                 }
