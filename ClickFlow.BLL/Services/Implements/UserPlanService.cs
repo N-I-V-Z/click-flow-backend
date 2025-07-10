@@ -132,6 +132,16 @@ namespace ClickFlow.BLL.Services.Implements
 				// Trả về gói hiện tại đã gán (gọi lại GetCurrentPlanAsync)
 				return await GetCurrentPlanAsync(userId);
 			}
+			catch (KeyNotFoundException knfEx)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new KeyNotFoundException(knfEx.Message);
+			}
+			catch (InvalidOperationException ioEx)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new InvalidOperationException(ioEx.Message);
+			}
 			catch (Exception ex)
 			{
 				await _unitOfWork.RollBackAsync();
