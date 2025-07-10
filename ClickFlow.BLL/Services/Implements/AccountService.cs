@@ -2,6 +2,7 @@
 using ClickFlow.BLL.DTOs.AccountDTOs;
 using ClickFlow.BLL.DTOs.EmailDTOs;
 using ClickFlow.BLL.DTOs.Response;
+using ClickFlow.BLL.DTOs.UserPlanDTOs;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -404,19 +405,27 @@ namespace ClickFlow.BLL.Services.Implements
 					case Role.Publisher:
 						var publisher = new Publisher
 						{
-							Id = user.Id,
+							UserId = user.Id,
 							ApplicationUser = user
 						};
 						var publisherRepo = _unitOfWork.GetRepo<Publisher>();
 						await publisherRepo.CreateAsync(publisher);
 
-                        var userPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
+						UserPlanResponseDTO? existingPlan = null;
+						try
+						{
+							existingPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
+						}
+						catch
+						{
+							// Chưa có gói hoặc gói đã hết hạn
+						}
 
-                        if (userPlan == null)
-                        {
-                            await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
-                        }
-                        break;
+						if (existingPlan == null)
+						{
+							await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
+						}
+						break;
 					case Role.Admin:
 						break;
 
@@ -650,7 +659,26 @@ namespace ClickFlow.BLL.Services.Implements
 						return null;
 					}
 					await _identityService.AddToRoleAsync(user, user.Role.ToString());
+
+					var publisherRepo = _unitOfWork.GetRepo<Publisher>();
+					var publisher = new Publisher
+					{
+						UserId = user.Id,
+						ApplicationUser = user
+					};
+					await publisherRepo.CreateAsync(publisher);
 					isNewUser = true;
+				}
+
+				if (user != null && user.Publisher == null)
+				{
+					var publisherRepo = _unitOfWork.GetRepo<Publisher>();
+					var publisher = new Publisher
+					{
+						UserId = user.Id,
+						ApplicationUser = user
+					};
+					await publisherRepo.CreateAsync(publisher);
 				}
 
 				// Store avatar
@@ -682,12 +710,20 @@ namespace ClickFlow.BLL.Services.Implements
                     await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
                 }
 
-				var userPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
-				
-					if (userPlan == null) 
-					{
-                        await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
-                    }
+                UserPlanResponseDTO? currentPlan = null;
+                try
+                {
+                    currentPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
+                }
+                catch
+                {
+
+                }
+
+                if (currentPlan == null)
+                {
+                    await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
+                }
 
                 await _unitOfWork.SaveChangesAsync();
 
