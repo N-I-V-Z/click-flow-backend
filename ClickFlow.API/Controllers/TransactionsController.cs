@@ -256,7 +256,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				return Error(ex.Message);
+				return Ok(new PayOSWebhookResponse(-1, "fail", null));
 			}
 		}
 
