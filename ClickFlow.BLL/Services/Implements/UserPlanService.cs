@@ -124,9 +124,29 @@ namespace ClickFlow.BLL.Services.Implements
 						CurrentCampaigns = 0
 					};
 					await upRepo.CreateAsync(newUserPlan);
+					await _unitOfWork.SaveChangesAsync();
 				}
 
-				// 7) Commit transaction sau cùng
+				// 7) Ghi nhận doanh thu cho admin
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+				var admin = await userRepo.GetSingleAsync(
+					new QueryBuilder<ApplicationUser>()
+					.WithTracking(false)
+					.WithPredicate(x => x.Role == Role.Admin)
+					.Build()
+					);
+				if (admin == null) throw new KeyNotFoundException("Không tìm thấy Admin.");
+				var adminWallet = await walletRepo.GetSingleAsync(
+					new QueryBuilder<Wallet>()
+					.WithTracking(false)
+					.WithPredicate(x => x.UserId == admin.Id)
+					.Build()
+					);
+				if (adminWallet == null) throw new KeyNotFoundException("Không tìm thấy ví Admin.");
+				adminWallet.Balance += (int)targetPlan.Price;
+				await walletRepo.UpdateAsync(adminWallet);
+
+				// 8) Commit transaction sau cùng
 				await _unitOfWork.SaveAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
