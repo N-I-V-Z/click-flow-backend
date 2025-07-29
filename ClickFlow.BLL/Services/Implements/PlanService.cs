@@ -95,7 +95,7 @@ namespace ClickFlow.BLL.Services.Implements
 					.Build());
 
 			if (entity == null)
-				return false;
+				throw new KeyNotFoundException("Không tìm thấy Plan.");
 
 			entity.IsActive = false;
 			await planRepo.UpdateAsync(entity);

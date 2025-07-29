@@ -61,7 +61,7 @@ namespace ClickFlow.BLL.Services.Implements
 					throw new KeyNotFoundException($"Ví của Publisher (ID={userId}) không tồn tại.");
 
 				if (wallet.Balance < targetPlan.Price)
-					throw new Exception($"Số dư ví không đủ. Bạn cần {targetPlan.Price} để đăng ký gói này.");
+					throw new InvalidOperationException($"Số dư ví không đủ. Bạn cần {targetPlan.Price} để đăng ký gói này.");
 
 				// 3) Trừ tiền vào Ví
 				// Nếu Price thực tế có thập phân, cân nhắc đổi Wallet.Balance thành decimal
@@ -76,6 +76,7 @@ namespace ClickFlow.BLL.Services.Implements
 					Amount = (int)targetPlan.Price,
 					Balance = wallet.Balance,
 					PaymentDate = DateTime.UtcNow,
+					Status = true,
 					TransactionType = TransactionType.Pay,
 				};
 				await transactionRepo.CreateAsync(tx);
@@ -123,14 +124,44 @@ namespace ClickFlow.BLL.Services.Implements
 						CurrentCampaigns = 0
 					};
 					await upRepo.CreateAsync(newUserPlan);
+					await _unitOfWork.SaveChangesAsync();
 				}
 
-				// 7) Commit transaction sau cùng
+				// 7) Ghi nhận doanh thu cho admin
+				var userRepo = _unitOfWork.GetRepo<ApplicationUser>();
+				var admin = await userRepo.GetSingleAsync(
+					new QueryBuilder<ApplicationUser>()
+					.WithTracking(false)
+					.WithPredicate(x => x.Role == Role.Admin)
+					.Build()
+					);
+				if (admin == null) throw new KeyNotFoundException("Không tìm thấy Admin.");
+				var adminWallet = await walletRepo.GetSingleAsync(
+					new QueryBuilder<Wallet>()
+					.WithTracking(false)
+					.WithPredicate(x => x.UserId == admin.Id)
+					.Build()
+					);
+				if (adminWallet == null) throw new KeyNotFoundException("Không tìm thấy ví Admin.");
+				adminWallet.Balance += (int)targetPlan.Price;
+				await walletRepo.UpdateAsync(adminWallet);
+
+				// 8) Commit transaction sau cùng
 				await _unitOfWork.SaveAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
 				// Trả về gói hiện tại đã gán (gọi lại GetCurrentPlanAsync)
 				return await GetCurrentPlanAsync(userId);
+			}
+			catch (KeyNotFoundException knfEx)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new KeyNotFoundException(knfEx.Message);
+			}
+			catch (InvalidOperationException ioEx)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new InvalidOperationException(ioEx.Message);
 			}
 			catch (Exception ex)
 			{

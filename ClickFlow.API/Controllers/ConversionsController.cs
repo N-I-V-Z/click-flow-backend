@@ -41,10 +41,17 @@ namespace ClickFlow.API.Controllers
 				var result = await _conversionService.CreateAsync(dto);
 				return SaveSuccess(result);
 			}
+			catch(KeyNotFoundException knfEx)
+			{
+				return Error(knfEx.Message);
+			}
+			catch(InvalidOperationException ioEx)
+			{
+				return Error(ioEx.Message);
+			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
-				return SaveError("Đã xảy ra lỗi khi xử lý conversion.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -61,8 +68,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
-				return GetError();
+				return Error(ex.Message);
 			}
 		}
 
@@ -80,8 +86,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
-				return GetError();
+				return Error(ex.Message);
 			}
 		}
 	}

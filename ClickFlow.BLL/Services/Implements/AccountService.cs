@@ -364,7 +364,6 @@ namespace ClickFlow.BLL.Services.Implements
 			try
 			{
 				await _unitOfWork.BeginTransactionAsync();
-				Console.WriteLine($"Role từ request: {accRequest.Role}");
 				var user = new ApplicationUser
 				{
 					Role = accRequest.Role,
@@ -662,21 +661,10 @@ namespace ClickFlow.BLL.Services.Implements
 					var publisher = new Publisher
 					{
 						UserId = user.Id,
-						ApplicationUser = user
+						Id = user.Id
 					};
 					await publisherRepo.CreateAsync(publisher);
 					isNewUser = true;
-				}
-
-				if (user != null && user.Publisher == null)
-				{
-					var publisherRepo = _unitOfWork.GetRepo<Publisher>();
-					var publisher = new Publisher
-					{
-						UserId = user.Id,
-						ApplicationUser = user
-					};
-					await publisherRepo.CreateAsync(publisher);
 				}
 
 				// Store avatar
@@ -695,11 +683,6 @@ namespace ClickFlow.BLL.Services.Implements
                     };
                     await userDetailRepo.CreateAsync(userDetail);
                 }
-                else
-                {
-                    userDetail.AvatarURL = tokenInfo.Picture;
-                    await userDetailRepo.UpdateAsync(userDetail);
-                }
 
                 // Tạo ví nếu chưa có
                 var wallet = await _walletService.GetWalletByUserIdAsync(user.Id);
@@ -708,17 +691,7 @@ namespace ClickFlow.BLL.Services.Implements
                     await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
                 }
 
-                UserPlanResponseDTO? currentPlan = null;
-                try
-                {
-                    currentPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
-                }
-                catch
-                {
-
-                }
-
-                if (currentPlan == null)
+                if (isNewUser)
                 {
                     await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
                 }

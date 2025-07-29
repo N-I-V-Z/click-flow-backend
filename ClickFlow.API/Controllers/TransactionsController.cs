@@ -49,10 +49,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -102,10 +99,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -166,10 +160,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -186,10 +177,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -227,10 +215,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -245,10 +230,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -274,9 +256,6 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine($"[Webhook Error] {ex.Message}");
-				Console.ResetColor();
 				return Ok(new PayOSWebhookResponse(-1, "fail", null));
 			}
 		}
@@ -292,10 +271,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return StatusCode(500, "Lỗi máy chủ, vui lòng thử lại sau.");
+				return Error(ex.Message);
 			}
 		}
 

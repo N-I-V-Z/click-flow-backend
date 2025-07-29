@@ -30,10 +30,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -50,10 +47,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (KeyNotFoundException ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -73,10 +67,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (KeyNotFoundException ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -96,10 +87,7 @@ namespace ClickFlow.API.Controllers
 			}
 			catch (KeyNotFoundException ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+				return Error(ex.Message);
 			}
 		}
 
@@ -111,17 +99,15 @@ namespace ClickFlow.API.Controllers
 			{
 				var success = await _planService.DeleteAsync(id);
 
-				if (!success)
-					return NotFound(new { message = $"Plan with ID {id} not found." });
-
 				return SaveSuccess(success);
+			}
+			catch(KeyNotFoundException knfEx)
+			{
+				return Error(knfEx.Message);
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine(ex.Message);
-				Console.ResetColor();
-				return Error("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau ít phút nữa.");
+				return Error(ex.Message);
 			}
 		}
 	}

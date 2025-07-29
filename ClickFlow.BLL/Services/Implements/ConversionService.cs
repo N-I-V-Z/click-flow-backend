@@ -58,7 +58,7 @@ namespace ClickFlow.BLL.Services.Implements
 					.Build());
 
 				if (traffic == null)
-					throw new Exception($"Không tìm thấy Traffic với ClickId = {dto.ClickId}.");
+					throw new KeyNotFoundException($"Không tìm thấy Traffic với ClickId = {dto.ClickId}.");
 
 				var publisherId = traffic.CampaignParticipation.PublisherId;
 
@@ -70,7 +70,7 @@ namespace ClickFlow.BLL.Services.Implements
 						.Build());
 
 					if (wallet == null)
-						throw new Exception($"Ví của Publisher (ID={publisherId}) không tồn tại.");
+						throw new InvalidOperationException($"Ví của Publisher (ID={publisherId}) không tồn tại.");
 
 					wallet.Balance += conversion.Revenue.Value;
 					await walletRepo.UpdateAsync(wallet);
@@ -92,6 +92,16 @@ namespace ClickFlow.BLL.Services.Implements
 				await _unitOfWork.CommitTransactionAsync();
 
 				return _mapper.Map<ConversionResponseDTO>(conversion);
+			}
+			catch (KeyNotFoundException knfEx)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new KeyNotFoundException(knfEx.Message);
+			}
+			catch (InvalidOperationException ioEx)
+			{
+				await _unitOfWork.RollBackAsync();
+				throw new InvalidOperationException(ioEx.Message);
 			}
 			catch (Exception ex)
 			{

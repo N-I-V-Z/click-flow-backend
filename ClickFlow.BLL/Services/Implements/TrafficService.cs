@@ -127,6 +127,7 @@ namespace ClickFlow.BLL.Services.Implements
 					};
 
 					await conversionRepo.CreateAsync(conversion);
+					await _unitOfWork.SaveChangesAsync();
 
 					// Cộng hoa hồng cho publisher
 					wallet.Balance += (int)commision;
@@ -149,14 +150,21 @@ namespace ClickFlow.BLL.Services.Implements
 						TransactionType = TransactionType.Received,
 						WalletId = adminWallet.Id
 					};
-					await _unitOfWork.SaveChangesAsync();
 				}
 
 				// Nếu là CPS hoặc CPA → chỉ ghi nhận traffic, đợi postback từ advertiser
 				// Postback sẽ dựa vào ClickId đã được sinh ở trên để tạo Conversion sau
 
 				var saved = await _unitOfWork.SaveAsync();
-				await _unitOfWork.CommitTransactionAsync();
+
+				if (saved == true)
+				{
+					await _unitOfWork.CommitTransactionAsync();
+				}
+				else
+				{
+					await _unitOfWork.RollBackAsync();
+				}
 
 				return saved ? new TrafficClickResponseDTO
 				{
