@@ -386,7 +386,10 @@ namespace ClickFlow.BLL.Services.Implements
 					throw new ArgumentException("Role không hợp lệ.");
 				}
 
-				await _identityService.AddToRoleAsync(user, accRequest.Role.ToString());
+				await _identityService.AddToRoleAsync(user, accRequest.Role.ToString());			
+				await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });
+
+				bool assignFreePlan = false; // đánh dấu cần gán gói miễn phí sau khi commit
 				switch (accRequest.Role)
 				{
 					case Role.Advertiser:
@@ -410,21 +413,9 @@ namespace ClickFlow.BLL.Services.Implements
 						};
 						var publisherRepo = _unitOfWork.GetRepo<Publisher>();
 						await publisherRepo.CreateAsync(publisher);
-
-						UserPlanResponseDTO? existingPlan = null;
-						try
-						{
-							existingPlan = await _userPlanService.GetCurrentPlanAsync(user.Id);
-						}
-						catch
-						{
-							// Chưa có gói hoặc gói đã hết hạn
-						}
-
-						if (existingPlan == null)
-						{
-							await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
-						}
+						
+						await _unitOfWork.SaveChangesAsync();
+						assignFreePlan = true; 
 						break;
 					case Role.Admin:
 						break;
@@ -434,13 +425,20 @@ namespace ClickFlow.BLL.Services.Implements
 
 				}
 
-				// Tạo ví cho user mới
-				await _walletService.CreateWalletAsync(user.Id, new ClickFlow.BLL.DTOs.WalletDTOs.WalletCreateDTO { Balance = 0 });				
+			
 
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
-				//var sendEmail = await SendEmailConfirmation(user);
+				
+				if (assignFreePlan)
+				{
+					try {
+						await _userPlanService.AssignPlanToPublisherAsync(user.Id, PLAN_FREE_ID);
+					}
+					catch { }
+				}
+			
 				return new AccountViewDTO
 				{
 					Id = user.Id.ToString(),
