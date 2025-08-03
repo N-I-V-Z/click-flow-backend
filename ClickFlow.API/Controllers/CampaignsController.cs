@@ -1,7 +1,6 @@
 ﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
-using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -507,6 +506,25 @@ namespace ClickFlow.API.Controllers
 				Console.ResetColor();
                 return SaveError("Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.");
             }
+		}
+
+		/// <summary>
+		/// [Advertiser] Returns the number of campaigns grouped by status.
+		/// </summary>
+		/// <returns>A dictionary of status names and their corresponding campaign counts.</returns>
+		[Authorize(Roles = "Advertiser")]
+		[HttpGet("status-count")]
+		public async Task<IActionResult> GetCountCampaignForAllStatus()
+		{
+			try
+			{
+				var response = await _campaignService.CountCampaignGroupByStatusAsync(UserId);
+				return GetSuccess(response);
+			}
+			catch (Exception ex)
+			{
+				return Error(ex.Message);
+			}
 		}
 	}
 }

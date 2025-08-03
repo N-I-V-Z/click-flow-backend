@@ -38,5 +38,6 @@ namespace ClickFlow.BLL.Services.Interfaces
 		Task<int> GetCampaignCountByAdvertiserId(int advertiserId, CampaignStatus? status);
 		Task<BaseResponse> UpdateCampaignParticipationStatus(int publisherId, int advertiserId, int campaignParticipationId, CampaignParticipationStatus newStatus);
 		Task UpdateCampaignActiveStatus();
+		Task<CampaignCountGroupByStatusDTO> CountCampaignGroupByStatusAsync(int userId);
 	}
 }

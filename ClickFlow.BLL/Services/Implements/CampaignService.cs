@@ -3,6 +3,7 @@ using ClickFlow.BLL.DTOs.CampaignDTOs;
 using ClickFlow.BLL.DTOs.CampaignParticipationDTOs;
 using ClickFlow.BLL.DTOs.Response;
 using ClickFlow.BLL.DTOs.TransactionDTOs;
+using ClickFlow.BLL.Helpers.Fillters;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Entities;
 using ClickFlow.DAL.Enums;
@@ -23,14 +24,26 @@ namespace ClickFlow.BLL.Services.Implements
 
 		private readonly double COMMISION = 0.9;
 
-
-
 		public CampaignService(IUnitOfWork unitOfWork, IMapper mapper, IAdvertiserService advertiserService, ITrafficService trafficService)
 		{
 			_unitOfWork = unitOfWork;
 			_mapper = mapper;
 			_advertiserService = advertiserService;
 			_trafficService = trafficService;
+		}
+
+		protected virtual QueryBuilder<Campaign> CreateQueryBuilder(string? search = null)
+		{
+			var queryBuilder = new QueryBuilder<Campaign>()
+								.WithTracking(false);
+
+			if (!string.IsNullOrEmpty(search))
+			{
+				var predicate = FilterHelper.BuildSearchExpression<Campaign>(search);
+				queryBuilder.WithPredicate(predicate);
+			}
+
+			return queryBuilder;
 		}
 
 		public async Task<BaseResponse> CreateCampaign(CampaignCreateDTO dto, int userId)
@@ -278,7 +291,7 @@ namespace ClickFlow.BLL.Services.Implements
 						await _unitOfWork.RollBackAsync();
 						return new BaseResponse { IsSuccess = false, Message = "Không tìm thấy ví của admin." };
 					}
-					
+
 					var budget = (int)campaign.Budget;
 					var commission = (int)(budget * 0.05);
 
@@ -578,9 +591,9 @@ namespace ClickFlow.BLL.Services.Implements
 
 
 			return new PaginatedList<CampaignResponseForPublisherDTO>(mappedCampaigns, pagedCampaigns.TotalItems, pageIndex, pageSize);
-		}    
+		}
 
-        public async Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize)
+		public async Task<PaginatedList<CampaignResponseDTO>> GetSimilarCampaignsByTypeCampaign(int campaignId, int pageIndex, int pageSize)
 		{
 			var repo = _unitOfWork.GetRepo<Campaign>();
 
@@ -723,7 +736,7 @@ namespace ClickFlow.BLL.Services.Implements
 			var totalRevenue = await GetTotalRevenueOfValidConversions(campaignId);
 
 			// Lấy giá trị hoa hồng cho 1 lượt click
-			var nextClickRevenue = campaign.Commission ?? (campaign.Percents/100*campaign.Budget) ?? 0;
+			var nextClickRevenue = campaign.Commission ?? (campaign.Percents / 100 * campaign.Budget) ?? 0;
 
 			if (totalRevenue + nextClickRevenue >= availableBudget)
 			{
@@ -887,15 +900,15 @@ namespace ClickFlow.BLL.Services.Implements
 		public async Task<PaginatedList<CampaignParticipationResponseDTO>> GetPublishersInCampaign(int campaignId, int pageIndex, int pageSize)
 		{
 			var repo = _unitOfWork.GetRepo<CampaignParticipation>();
-			
+
 			var participations = repo.Get(new QueryBuilder<CampaignParticipation>()
 				.WithPredicate(x => x.CampaignId == campaignId)
 				.WithInclude(x => x.Publisher)
-				.WithInclude(x => x.Publisher.ApplicationUser)				
+				.WithInclude(x => x.Publisher.ApplicationUser)
 				.Build());
-				
+
 			var pagedParticipations = await PaginatedList<CampaignParticipation>.CreateAsync(participations, pageIndex, pageSize);
-			
+
 			// Map từng item thay vì cả collection
 			var result = new List<CampaignParticipationResponseDTO>();
 			foreach (var item in pagedParticipations)
@@ -903,41 +916,82 @@ namespace ClickFlow.BLL.Services.Implements
 				var dto = _mapper.Map<CampaignParticipationResponseDTO>(item);
 				result.Add(dto);
 			}
-			
+
 			// Get all campaign participations for calculating TotalCampaigns
 			var queryOptions = new QueryBuilder<CampaignParticipation>()
 				.WithInclude(x => x.Publisher)
 				.Build();
-				
+
 			var allCampaignParticipations = repo.Get(queryOptions).ToList();
-			
+
 			// Calculate TotalCampaigns for each publisher
 			var publisherCampaignCount = allCampaignParticipations
 				.GroupBy(x => x.PublisherId)
 				.Select(g => new { PublisherId = g.Key, TotalCampaigns = g.Count() })
 				.ToDictionary(x => x.PublisherId, x => x.TotalCampaigns);
-				
+
 			// Get unique publisher IDs
 			var publisherIds = result.Select(x => x.PublisherId).Distinct().ToList();
-			
+
 			// Calculate DailyTraffic for all publishers
 			var avgTrafficDict = new Dictionary<int, int>();
 			foreach (var publisherId in publisherIds)
 			{
 				avgTrafficDict[publisherId] = await _trafficService.AverageTrafficInCampaignAsync(publisherId);
 			}
-			
+
 			// Assign TotalCampaigns and DailyTraffic to each DTO
 			foreach (var item in result)
 			{
 				item.TotalCampaigns = publisherCampaignCount.ContainsKey(item.PublisherId)
 					? publisherCampaignCount[item.PublisherId]
 					: 0;
-					
+
 				item.DailyTraffic = avgTrafficDict.GetValueOrDefault(item.PublisherId, 0);
 			}
-			
+
 			return new PaginatedList<CampaignParticipationResponseDTO>(result, pagedParticipations.TotalItems, pageIndex, pageSize);
+		}
+
+		public async Task<CampaignCountGroupByStatusDTO> CountCampaignGroupByStatusAsync(int userId)
+		{
+			var repo = _unitOfWork.GetRepo<Campaign>();
+
+			var statusCounts = await repo.Get(CreateQueryBuilder()
+				.WithPredicate(c => !c.IsDeleted && c.AdvertiserId == userId)
+				.Build())
+				.GroupBy(c => c.Status)
+				.Select(g => new { Status = g.Key, Count = g.Count() })
+				.ToListAsync();
+
+			var result = new CampaignCountGroupByStatusDTO();
+
+			foreach (var item in statusCounts)
+			{
+				switch (item.Status)
+				{
+					case CampaignStatus.Pending:
+						result.PendingCount = item.Count;
+						break;
+					case CampaignStatus.Approved:
+						result.ApprovedCount = item.Count;
+						break;
+					case CampaignStatus.Activing:
+						result.ActivingCount = item.Count;
+						break;
+					case CampaignStatus.Paused:
+						result.PausedCount = item.Count;
+						break;
+					case CampaignStatus.Canceled:
+						result.CanceledCount = item.Count;
+						break;
+					case CampaignStatus.Completed:
+						result.CompletedCount = item.Count;
+						break;
+				}
+			}
+
+			return result;
 		}
 	}
 }
