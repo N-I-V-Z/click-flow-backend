@@ -26,6 +26,8 @@ namespace ClickFlow.API
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Add services to the container.
+			builder.Services.AddHttpClient();
+
 			builder.Services.AddControllers()
 				.AddJsonOptions(options =>
 			{
@@ -38,6 +40,7 @@ namespace ClickFlow.API
 			{
 				option.UseSqlServer(builder.Configuration.GetConnectionString("ClickFlowDB"));
 			});
+
 			var emailConfig = builder.Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
 			builder.Services.AddSingleton(emailConfig);
 
@@ -47,8 +50,10 @@ namespace ClickFlow.API
 			builder.Services.Configure<PusherConfiguration>(builder.Configuration.GetSection("PusherConfiguration"));
 			builder.Services.AddScoped<IPusherService, PusherService>();
 
-			builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
+			builder.Services.Configure<AIWebsiteConfiguration>(builder.Configuration.GetSection("AIWebsiteConfiguration"));
+			builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<AIWebsiteConfiguration>>().Value);
 
+			builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>().AddEntityFrameworkStores<ClickFlowContext>().AddDefaultTokenProviders();
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwagger();
