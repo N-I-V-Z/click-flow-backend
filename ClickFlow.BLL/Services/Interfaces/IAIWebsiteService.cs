@@ -2,6 +2,6 @@
 {
 	public interface IAIWebsiteService
 	{
-		Task<string> GetWebsiteAIResponseAsync(string question);
+		Task<string> GetWebsiteAIResponseAsync(int userId, string question);
 	}
 }
