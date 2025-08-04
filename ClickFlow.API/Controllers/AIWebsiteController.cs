@@ -1,4 +1,5 @@
 ﻿using ClickFlow.BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -13,12 +14,14 @@ namespace ClickFlow.API.Controllers
 		{
 			_aiWebsiteService = aiWebsiteService;
 		}
+
+		[Authorize]
 		[HttpGet("response")]
 		public async Task<IActionResult> GetAIWebsiteResponse(string question)
 		{
 			try
 			{
-				var result = await _aiWebsiteService.GetWebsiteAIResponseAsync(question);
+				var result = await _aiWebsiteService.GetWebsiteAIResponseAsync(UserId, question);
 				return GetSuccess(result);
 			}
 			catch (Exception ex)
