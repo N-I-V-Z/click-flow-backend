@@ -1,6 +1,5 @@
 ﻿using ClickFlow.BLL.DTOs;
 using ClickFlow.BLL.DTOs.CampaignDTOs;
-using ClickFlow.BLL.DTOs.TrafficDTOs;
 using ClickFlow.BLL.Helpers.Config;
 using ClickFlow.BLL.Services.Interfaces;
 using ClickFlow.DAL.Enums;
@@ -118,7 +117,7 @@ Là mô hình tiếp thị hiệu quả, nơi affiliates quảng bá sản phẩ
 ";
 
 			var prompt = $@"
-Bạn là AI Assistant chuyên nghiệp của ClickFlow - nền tảng affiliate network hàng đầu Việt Nam.
+Bạn là AI Assistant chuyên nghiệp của ClickFlow - nền tảng affiliate network hàng đầu Việt Nam. Hãy trả lời ngắn gọn trong 2-3 câu nếu được, đừng cho ví dụ quá nhiều, xem kĩ các gợi ý trả lời mà tôi cho bạn
 
 === THÔNG TIN NGƯỜI DÙNG ===
 {userInfo}
@@ -136,6 +135,9 @@ Bạn là AI Assistant chuyên nghiệp của ClickFlow - nền tảng affiliate
 4. 🔄 Nếu có thể, đề xuất next steps phù hợp với user
 5. ❌ Nếu câu hỏi không liên quan ClickFlow/affiliate: 'Xin lỗi, tôi chỉ hỗ trợ các vấn đề liên quan đến ClickFlow và Affiliate Marketing.'
 6. ⚠️ Với thông tin ngoài kiến thức cơ bản về affiliate, thêm disclaimer: '(Thông tin từ AI ClickFlow - vui lòng kiểm tra lại các chi tiết quan trọng)'
+7. Chỉ SHOW THÔNG TIN USER KHI USER HỎI VỀ NÓ CHỨ KHÔNG TỰ Ý TRẢ LỜI, ưu tiên trả lời ngắn gọn đủ ý, lịch sự
+8. Mặc định xưng bạn - tôi, lịch sự.
+
 
 === CÁC ĐỐI TÁC CHÍNH ===
 1. CarePaws
@@ -203,7 +205,7 @@ Hãy trả lời theo góc độ consultant chuyên nghiệp, tập trung vào g
 					var campaigns = await _campaignService.GetCampaignsByAdvertiserId(userId, CampaignStatus.Activing, 1, 10);
 					var campaignDatas = new PagingDTO<CampaignResponseDTO>(campaigns);
 					var campaignInfo = string.Join(", ", campaignDatas.Datas.Select(x =>
-						$"Campaign Name: {x.Name}, Loại: {x.TypePay}, Hoa hồng: {x.Commission?.ToString() ?? x.Percents + "%"}")); 
+						$"Campaign Name: {x.Name}, Loại: {x.TypePay}, Hoa hồng: {x.Commission?.ToString() ?? x.Percents + "%"}"));
 					context.AppendLine($"- Một số chiến dịch đang được chạy: {campaignInfo}");
 				}
 
